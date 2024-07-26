@@ -3,6 +3,7 @@ import BookForm from './BookForm';
 import BookModal from '../../../Model/BookModal';
 
 
+
 const BookManager: React.FC = () => {
   const [books, setBooks] = useState<BookModal[]>([]);
   const [editingBook, setEditingBook] = useState<BookModal | null>(null);
@@ -30,7 +31,7 @@ const BookManager: React.FC = () => {
   const handleCreateOrUpdateBook = (bookData: FormData) => {
     const url = editingBook ? `/api/books/${editingBook.id}` : '/api/books';
     const method = editingBook ? 'PUT' : 'POST';
-    
+
     fetch(url, {
       method,
       body: bookData,

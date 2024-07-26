@@ -3,7 +3,7 @@ import BookModal from '../../../Model/BookModal';
 
 interface BookFormProps {
   onSubmit: (book: FormData) => void;
-  initialData?: BookModal;
+  initialData?: BookModal | null;
 }
 
 
@@ -11,21 +11,22 @@ interface BookFormProps {
 const BookForm: React.FC<BookFormProps> = ({ onSubmit, initialData }) => {
   const [book, setBook] = useState<BookModal>(
     initialData || {
-        id:0,
+        id : 0,
       title: '',
       author: '',
       coverImage: '',
       description: '',
       publisher: '',
       publicationDate: '',
-
       genre: '',
       pages: 0,
-      readOnlineLink: ''
+      readOnlineLink: '',
+
     }
   );
 
   const [file, setFile] = useState<File | null>(null);
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -35,6 +36,19 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, initialData }) => {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setFile(e.target.files[0]);
+    }
+  };
+
+  const handleCoverImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const file = e.target.files[0];
+      setCoverImageFile(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBook({ ...book, coverImage: reader.result as string });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -60,7 +74,8 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, initialData }) => {
       </div>
       <div>
         <label>Cover Image</label>
-        <input type="text" name="coverImage" value={book.coverImage} onChange={handleChange} required />
+        <input type="file" accept="image/*" onChange={handleCoverImageChange} required />
+        {book.coverImage && <img src={book.coverImage} alt="Cover" style={{ width: '100px', height: 'auto' }} />}
       </div>
       <div>
         <label>Description</label>
@@ -74,6 +89,7 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, initialData }) => {
         <label>Publication Date</label>
         <input type="date" name="publicationDate" value={book.publicationDate} onChange={handleChange} required />
       </div>
+    
       <div>
         <label>Genre</label>
         <input type="text" name="genre" value={book.genre} onChange={handleChange} required />
