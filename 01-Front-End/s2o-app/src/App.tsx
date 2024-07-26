@@ -44,7 +44,7 @@ function App() {
       <div >
         <Switch>
           <Route path="/" exact>
-            <Redirect to="/" />
+            <Redirect to="/home" />
           </Route>
           <Route path="/home">
             <HomePage />
