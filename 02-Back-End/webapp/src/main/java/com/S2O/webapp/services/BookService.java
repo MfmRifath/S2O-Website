@@ -23,6 +23,8 @@ public class BookService {
     public Book saveBook(Book book, MultipartFile file) throws IOException {
         if (file != null && !file.isEmpty()) {
             book.setPdfFile(file.getBytes());
+        } else {
+            throw new IllegalArgumentException("PDF file is required");
         }
         return bookRepository.save(book);
     }

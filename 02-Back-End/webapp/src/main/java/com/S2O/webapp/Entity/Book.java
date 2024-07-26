@@ -31,7 +31,7 @@ public class Book {
     private String readOnlineLink;
 
     @Lob
-    @Column(columnDefinition = "MEDIUMBLOB",name = "book_pd")
+    @Column(columnDefinition = "MEDIUMBLOB",name = "book_pdf")
     private byte[] pdfFile;
 
     // Getters and setters

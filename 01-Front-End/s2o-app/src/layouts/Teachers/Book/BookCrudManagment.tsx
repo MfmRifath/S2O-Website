@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import BookForm from './BookForm';
 import BookModal from '../../../Model/BookModal';
 
-
-
 const BookManager: React.FC = () => {
   const [books, setBooks] = useState<BookModal[]>([]);
   const [editingBook, setEditingBook] = useState<BookModal | null>(null);
@@ -11,10 +9,12 @@ const BookManager: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/books')
-      .then(response => {
+    fetch('http://localhost:8080/api/books/all')
+      .then(async response => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          const text = await response.text();
+          console.error('Error response:', text);
+          throw new Error(`Error ${response.status}: ${text}`);
         }
         return response.json();
       })
@@ -23,22 +23,25 @@ const BookManager: React.FC = () => {
         setLoading(false);
       })
       .catch(error => {
+        console.error('Fetch error:', error);
         setError(error.message);
         setLoading(false);
       });
   }, []);
 
   const handleCreateOrUpdateBook = (bookData: FormData) => {
-    const url = editingBook ? `/api/books/${editingBook.id}` : '/api/books';
+    const url = editingBook ? `http://localhost:8080/api/books/edit/book/${editingBook.id}` : 'http://localhost:8080/api/books/add/book';
     const method = editingBook ? 'PUT' : 'POST';
 
     fetch(url, {
       method,
       body: bookData,
     })
-      .then(response => {
+      .then(async response => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          const text = await response.text();
+          console.error('Error response:', text);
+          throw new Error(`Error ${response.status}: ${text}`);
         }
         return response.json();
       })
@@ -53,6 +56,7 @@ const BookManager: React.FC = () => {
         setEditingBook(null);
       })
       .catch(error => {
+        console.error('Fetch error:', error);
         setError(error.message);
       });
   };
@@ -62,16 +66,20 @@ const BookManager: React.FC = () => {
   };
 
   const handleDeleteBook = (id: number) => {
-    fetch(`/api/books/${id}`, {
+    fetch(`http://localhost:8080/api/books/delete/book/${id}`, {
       method: 'DELETE',
     })
       .then(response => {
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          return response.text().then(text => {
+            console.error('Error response:', text);
+            throw new Error(`Error ${response.status}: ${text}`);
+          });
         }
         setBooks(prevBooks => prevBooks.filter(book => book.id !== id));
       })
       .catch(error => {
+        console.error('Fetch error:', error);
         setError(error.message);
       });
   };

@@ -7,21 +7,20 @@ interface BookFormProps {
 }
 
 
-
 const BookForm: React.FC<BookFormProps> = ({ onSubmit, initialData }) => {
   const [book, setBook] = useState<BookModal>(
     initialData || {
-        id : 0,
+        id:0,
       title: '',
       author: '',
       coverImage: '',
       description: '',
       publisher: '',
       publicationDate: '',
+      
       genre: '',
       pages: 0,
-      readOnlineLink: '',
-
+      readOnlineLink: ''
     }
   );
 
@@ -89,7 +88,7 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, initialData }) => {
         <label>Publication Date</label>
         <input type="date" name="publicationDate" value={book.publicationDate} onChange={handleChange} required />
       </div>
-    
+      
       <div>
         <label>Genre</label>
         <input type="text" name="genre" value={book.genre} onChange={handleChange} required />

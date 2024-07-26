@@ -123,10 +123,10 @@ function App() {
           <Route path='/S2OLibrary'>
             <S2OLibrary/>
           </Route>
-          <Route path='/bookManger'>
+          <Route path='/bookManager'>
             <BookManager/>
           </Route>
-          <Route path="bookShelf">
+          <Route path="/bookShelf">
             <Bookshelf/>
           </Route>
           </Switch>

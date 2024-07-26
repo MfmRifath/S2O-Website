@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import BookModal from '../../../../Model/BookModal';
+import PdfReader from '../../../../utils/PdfReader';
 
 
 const Bookshelf: React.FC = () => {
   const [books, setBooks] = useState<BookModal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedBookUrl, setSelectedBookUrl] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('http://localhost:8080/api/books/all')
@@ -33,6 +35,15 @@ const Bookshelf: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
+  if (selectedBookUrl) {
+    return (
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+        <button onClick={() => setSelectedBookUrl(null)}>Back to Bookshelf</button>
+        <PdfReader fileUrl={selectedBookUrl} />
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
       <h1>Bookshelf</h1>
@@ -44,8 +55,10 @@ const Bookshelf: React.FC = () => {
             <p style={{ fontStyle: 'italic' }}>by {book.author}</p>
             <p>{book.description}</p>
             <div style={{ marginTop: '10px' }}>
-              <a href={book.readOnlineLink} target="_blank" rel="noopener noreferrer">Read Online</a> | 
-              <a href={`/api/books/${book.id}/pdf`} target="_blank" rel="noopener noreferrer">Download PDF</a> | 
+              <button onClick={() => setSelectedBookUrl(`http://localhost:8080/api/books/download/book/${book.id}/pdf`)}>Read Online</button>
+              <a href={`http://localhost:8080/api/books/download/book/${book.id}/pdf`} download="book.pdf" target="_blank" rel="noopener noreferrer" style={{ marginLeft: '10px' }}>
+                Download PDF
+              </a>
             </div>
           </div>
         ))}
