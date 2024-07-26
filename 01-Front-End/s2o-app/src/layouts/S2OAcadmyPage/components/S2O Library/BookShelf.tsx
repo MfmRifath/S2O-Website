@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import BookModal from '../../../../Model/BookModal';
-import PdfReader from '../../../../utils/PdfReader';
 
 
 const Bookshelf: React.FC = () => {
@@ -35,14 +34,6 @@ const Bookshelf: React.FC = () => {
     return <div>Error: {error}</div>;
   }
 
-  if (selectedBookUrl) {
-    return (
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
-        <button onClick={() => setSelectedBookUrl(null)}>Back to Bookshelf</button>
-        <PdfReader fileUrl={selectedBookUrl} />
-      </div>
-    );
-  }
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
@@ -55,7 +46,6 @@ const Bookshelf: React.FC = () => {
             <p style={{ fontStyle: 'italic' }}>by {book.author}</p>
             <p>{book.description}</p>
             <div style={{ marginTop: '10px' }}>
-              <button onClick={() => setSelectedBookUrl(`http://localhost:8080/api/books/download/book/${book.id}/pdf`)}>Read Online</button>
               <a href={`http://localhost:8080/api/books/download/book/${book.id}/pdf`} download="book.pdf" target="_blank" rel="noopener noreferrer" style={{ marginLeft: '10px' }}>
                 Download PDF
               </a>

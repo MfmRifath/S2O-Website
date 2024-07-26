@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 
 @Configuration
 public class DataRestConfig implements RepositoryRestConfigurer {
@@ -22,7 +21,4 @@ public class DataRestConfig implements RepositoryRestConfigurer {
                 .allowCredentials(true);
     }
 
-    public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
-    }
 }
