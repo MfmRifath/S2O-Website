@@ -16,7 +16,7 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
-    public List<Book> getAllBooks(){
+    public List<Book> getAllBooks() {
         return bookRepository.findAll();
     }
 
@@ -29,5 +29,9 @@ public class BookService {
 
     public Optional<Book> getBookById(Long id) {
         return bookRepository.findById(id);
+    }
+
+    public void deleteBookById(Long id) {
+        bookRepository.deleteById(id);
     }
 }

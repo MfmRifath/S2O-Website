@@ -22,16 +22,15 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    @PostMapping("/add")
-    public ResponseEntity<Book> createBook(@RequestParam("book") String bookJson, @RequestParam("file") MultipartFile file) throws IOException {
-        // Deserialize the book JSON
-        Book book = new ObjectMapper().readValue(bookJson, Book.class);
-        return ResponseEntity.ok(bookService.saveBook(book, file));
-    }
-
     @GetMapping("/all")
     public ResponseEntity<List<Book>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
+    }
+
+    @PostMapping
+    public ResponseEntity<Book> createBook(@RequestParam("book") String bookJson, @RequestParam("file") MultipartFile file) throws IOException {
+        Book book = new ObjectMapper().readValue(bookJson, Book.class);
+        return ResponseEntity.ok(bookService.saveBook(book, file));
     }
 
     @GetMapping("/{id}")
@@ -51,5 +50,18 @@ public class BookController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestParam("book") String bookJson, @RequestParam("file") MultipartFile file) throws IOException {
+        Book book = new ObjectMapper().readValue(bookJson, Book.class);
+        book.setId(id);
+        return ResponseEntity.ok(bookService.saveBook(book, file));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        bookService.deleteBookById(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,4 +1,4 @@
-class Book {
+class BookModal {
     id: number;
     title: string;
     author: string;
@@ -33,3 +33,4 @@ class Book {
     }
     
   }
+  export default BookModal;
