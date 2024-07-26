@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import BookForm from './BookForm';
 import BookModal from '../../../Model/BookModal';
+import './BookManager.css';
 
 const BookManager: React.FC = () => {
   const [books, setBooks] = useState<BookModal[]>([]);
@@ -53,7 +54,7 @@ const BookManager: React.FC = () => {
             return [...prevBooks, data];
           }
         });
-        setEditingBook(null);
+        setEditingBook(null); // Clear editing state after submission
       })
       .catch(error => {
         console.error('Fetch error:', error);
@@ -93,19 +94,21 @@ const BookManager: React.FC = () => {
   }
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div className="book-manager fade-in">
       <h1>Manage Books</h1>
       <BookForm onSubmit={handleCreateOrUpdateBook} initialData={editingBook ?? undefined} />
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px', marginTop: '20px' }}>
+      <div className="row mt-4">
         {books.map(book => (
-          <div key={book.id} style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
-            <img src={book.coverImage} alt={`${book.title} cover`} style={{ width: '100%', height: 'auto', borderRadius: '10px' }} />
-            <h2 style={{ fontSize: '1.2em', margin: '10px 0' }}>{book.title}</h2>
-            <p style={{ fontStyle: 'italic' }}>by {book.author}</p>
-            <p>{book.description}</p>
-            <div style={{ marginTop: '10px' }}>
-              <button onClick={() => handleEditBook(book)}>Edit</button>
-              <button onClick={() => handleDeleteBook(book.id)}>Delete</button>
+          <div key={book.id} className="col-md-4 col-sm-6 mb-4">
+            <div className="book-item fade-in">
+              <img src={book.coverImage} alt={`${book.title} cover`} className="book-image" />
+              <h2 className="book-title">{book.title}</h2>
+              <p className="book-description">by {book.author}</p>
+              <p>{book.description}</p>
+              <div className="book-actions">
+                <button className="btn btn-primary" onClick={() => handleEditBook(book)}>Edit</button>
+                <button className="btn btn-danger" onClick={() => handleDeleteBook(book.id)}>Delete</button>
+              </div>
             </div>
           </div>
         ))}

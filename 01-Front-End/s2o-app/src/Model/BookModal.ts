@@ -8,7 +8,7 @@ class BookModal {
     publicationDate: string;
     genre: string;
     pages: number;
-    readOnlineLink: string;
+   
 
     constructor(id: number,
         title: string,
@@ -29,7 +29,7 @@ class BookModal {
             this.publicationDate=publicationDate;
             this.genre=genre;
             this.pages=pages;
-            this.readOnlineLink=readOnlineLink;
+            
     }
     
   }

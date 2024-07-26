@@ -1,31 +1,35 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import BookModal from '../../../Model/BookModal';
+import './BookForm.css';
 
 interface BookFormProps {
   onSubmit: (book: FormData) => void;
   initialData?: BookModal | null;
 }
 
-
 const BookForm: React.FC<BookFormProps> = ({ onSubmit, initialData }) => {
   const [book, setBook] = useState<BookModal>(
     initialData || {
-        id:0,
+      id: 0,
       title: '',
       author: '',
       coverImage: '',
       description: '',
       publisher: '',
       publicationDate: '',
-      
       genre: '',
-      pages: 0,
-      readOnlineLink: ''
+      pages: 0
     }
   );
 
   const [file, setFile] = useState<File | null>(null);
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setBook(initialData);
+    }
+  }, [initialData]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -62,50 +66,45 @@ const BookForm: React.FC<BookFormProps> = ({ onSubmit, initialData }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Title</label>
-        <input type="text" name="title" value={book.title} onChange={handleChange} required />
+    <form onSubmit={handleSubmit} className="book-form">
+      <div className="form-group">
+        <label htmlFor="title">Title</label>
+        <input type="text" className="form-control" id="title" name="title" value={book.title} onChange={handleChange} required />
       </div>
-      <div>
-        <label>Author</label>
-        <input type="text" name="author" value={book.author} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="author">Author</label>
+        <input type="text" className="form-control" id="author" name="author" value={book.author} onChange={handleChange} required />
       </div>
-      <div>
-        <label>Cover Image</label>
-        <input type="file" accept="image/*" onChange={handleCoverImageChange} required />
-        {book.coverImage && <img src={book.coverImage} alt="Cover" style={{ width: '100px', height: 'auto' }} />}
+      <div className="form-group">
+        <label htmlFor="coverImage">Cover Image</label>
+        <input type="file" className="form-control-file" id="coverImage" accept="image/*" onChange={handleCoverImageChange} required />
+        {book.coverImage && <img src={book.coverImage} alt="Cover" className="img-thumbnail mt-2" style={{ width: '100px', height: 'auto' }} />}
       </div>
-      <div>
-        <label>Description</label>
-        <textarea name="description" value={book.description} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="description">Description</label>
+        <textarea className="form-control" id="description" name="description" value={book.description} onChange={handleChange} required />
       </div>
-      <div>
-        <label>Publisher</label>
-        <input type="text" name="publisher" value={book.publisher} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="publisher">Publisher</label>
+        <input type="text" className="form-control" id="publisher" name="publisher" value={book.publisher} onChange={handleChange} required />
       </div>
-      <div>
-        <label>Publication Date</label>
-        <input type="date" name="publicationDate" value={book.publicationDate} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="publicationDate">Publication Date</label>
+        <input type="date" className="form-control" id="publicationDate" name="publicationDate" value={book.publicationDate} onChange={handleChange} required />
       </div>
-      
-      <div>
-        <label>Genre</label>
-        <input type="text" name="genre" value={book.genre} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="genre">Genre</label>
+        <input type="text" className="form-control" id="genre" name="genre" value={book.genre} onChange={handleChange} required />
       </div>
-      <div>
-        <label>Pages</label>
-        <input type="number" name="pages" value={book.pages} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="pages">Pages</label>
+        <input type="number" className="form-control" id="pages" name="pages" value={book.pages} onChange={handleChange} required />
       </div>
-      <div>
-        <label>Read Online Link</label>
-        <input type="url" name="readOnlineLink" value={book.readOnlineLink} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="pdfFile">PDF File</label>
+        <input type="file" className="form-control-file" id="pdfFile" accept="application/pdf" onChange={handleFileChange} />
       </div>
-      <div>
-        <label>PDF File</label>
-        <input type="file" accept="application/pdf" onChange={handleFileChange} />
-      </div>
-      <button type="submit">Save</button>
+      <button type="submit" className="btn btn-primary">Save</button>
     </form>
   );
 };

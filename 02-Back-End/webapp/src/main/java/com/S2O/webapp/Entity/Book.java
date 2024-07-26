@@ -27,8 +27,6 @@ public class Book {
     private String genre;
     @Column(name = "pages")
     private int pages;
-    @Column(name = "read_online_link")
-    private String readOnlineLink;
 
     @Lob
     @Column(columnDefinition = "MEDIUMBLOB",name = "book_pdf")

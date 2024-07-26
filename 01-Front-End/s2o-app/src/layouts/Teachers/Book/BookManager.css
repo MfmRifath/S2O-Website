@@ -1,0 +1,56 @@
+.book-manager {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .book-item {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  
+  .book-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .book-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  
+  .book-title {
+    font-size: 1.2em;
+    margin: 10px 0;
+  }
+  
+  .book-description {
+    font-style: italic;
+  }
+  
+  .book-actions {
+    margin-top: 10px;
+  }
+  
+  .book-actions .btn {
+    margin-right: 10px;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
