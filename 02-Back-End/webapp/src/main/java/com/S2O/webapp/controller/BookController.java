@@ -22,14 +22,14 @@ public class BookController {
     @Autowired
     private BookService bookService;
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Book> createBook(@RequestParam("book") String bookJson, @RequestParam("file") MultipartFile file) throws IOException {
         // Deserialize the book JSON
         Book book = new ObjectMapper().readValue(bookJson, Book.class);
         return ResponseEntity.ok(bookService.saveBook(book, file));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<Book>> getAllBooks() {
         return ResponseEntity.ok(bookService.getAllBooks());
     }
