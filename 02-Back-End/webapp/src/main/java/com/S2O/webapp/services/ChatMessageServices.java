@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public class ChatMessageServices {
-    private ChatRepository chatRepository;
+    private ChatRepository chatReposit;
 
     public ChatMessageServices(ChatRepository chatRepository){
         this.chatRepository=chatRepository;
