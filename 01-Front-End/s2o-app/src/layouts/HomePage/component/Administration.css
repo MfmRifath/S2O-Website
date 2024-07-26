@@ -1,0 +1,109 @@
+/* Administration.css */
+.team-item {
+     transform: translateY(30px); /* Initially off-screen */
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out; /* Smooth transition */
+    position: relative; /* For positioning overlay elements */
+    overflow: hidden; /* Hide overflow for animation effect */
+}
+
+/* Keyframes for slide-in animation */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slideInUp {
+    animation: slideInUp 1s ease-in-out forwards;
+}
+
+/* Hover effect */
+.team-item:hover {
+    transform: scale(1.05); /* Slightly enlarge */
+    transition: transform 0.3s ease-in-out; /* Smooth scaling */
+}
+
+.team-item:hover img {
+    transform: scale(1.1); /* Slightly enlarge the image */
+    transition: transform 0.3s ease-in-out; /* Smooth scaling */
+}
+
+.team-item:hover .team-item-overlay {
+    opacity: 1; /* Show overlay on hover */
+    transition: opacity 0.3s ease-in-out; /* Smooth fade-in */
+}
+
+/* Overlay styles for hover effect */
+.team-item-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Dark overlay */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+
+@keyframes moveInBottom {
+    0%{
+        opacity: 0;
+        transform: translateY(100px);
+    }
+  
+    100%{
+  
+        opacity: 1;
+        transform: translateX(0);
+    }
+  }
+  
+  .btn1:link,
+  .btn1:visited {
+    width: 50%;
+    height: 50%;
+    border-radius: 100%;
+    padding: 1rem;
+    background-image: linear-gradient(
+    to right bottom,
+    rgba(75, 112, 245, 0.8),
+    rgba(61, 195, 236, 0.8));
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-block;
+    transition: all .2s;
+    
+  
+  }
+  
+  .btn1:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgb(0, 0, 0.2);
+  }
+  
+  .btn1:active{
+    transform: translateY(-1px);
+    box-shadow: 0 5px 10px rgb(0, 0, 0.2);
+  }
+  
+  
+  .btn1-animated {
+    animation: moveInBottom .5 ease-in-out .75s;
+    animation-fill-mode: backwards;
+  }
+  .align{
+
+    padding-left: 200px;
+    padding-right: 200px;
+  }
+

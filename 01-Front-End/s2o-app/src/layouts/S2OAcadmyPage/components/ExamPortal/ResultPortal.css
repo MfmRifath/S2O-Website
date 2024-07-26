@@ -1,0 +1,74 @@
+.img-container{
+display: flex;
+width:250px;
+height: 250px;
+  margin: auto;
+  padding: 10px;
+
+}
+
+.img1{
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    margin: auto;;
+    border: 3px solid rgb(40, 115, 169);
+    padding: 10px; 
+}
+.dropbtn{
+    display: inline-flexbox;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-left: 0;
+  }
+  
+  /* Dropdown Content (Hidden by Default) */
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    padding: 5px;
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  /* Change color of dropdown links on hover */
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  /* Show the dropdown menu on hover */
+  .dropdown:hover .dropdown-content {display: block;}
+  
+  /* Change the background color of the dropdown button when the dropdown content is shown */
+  .dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+  .container-light{
+    background-image: linear-gradient(rgba(255, 255, 255, 0.8),rgba(108, 95, 95, 0.8));
+    margin-left:50px;
+    margin-right: 50px;
+    border-radius: 100px;
+  }
+  
+.head{
+  width: 100%;
+}
+.sub{
+  width: fit-content;
+  margin: auto;
+}
+.set{
+  
+  width: fit-content;
+  margin: auto;
+
+}

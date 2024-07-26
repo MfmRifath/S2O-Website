@@ -1,0 +1,84 @@
+:root{
+  --mainOpacity: rgba(0, 0, 0, 0.55);
+}
+
+.header {
+  background-image: linear-gradient( #01204E,  #028391), url("./Images/bg.jpg");
+  opacity: var(--mainOpacity);
+  height: 25em !important;
+}
+
+.dark-overlay {
+  background-color: rgba(0, 0, 0, 0.35);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.main-color {
+background-color: #2e2e2e ;
+}
+
+.col-image-left {
+  background-image: url("./Images/logo.jpg");
+  height: 25em !important;
+}
+
+.col-image-right {
+  background-image: url("./Images/logo.jpg");
+  height: 25em !important;
+}
+
+.lost-image {
+  background-image: url("./Images/logo.jpg");
+  height: 25em !important;
+  width: "720"
+}
+
+.homepage-carousel-title {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.book-div {
+  width: 480px;
+  height: 384px;
+}
+
+.inactiveLink {
+  pointer-events: none;
+  cursor: default;
+}
+.round{
+  border-radius: 50%;
+}
+.footer{
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+
+
+body {
+  background-color: linear-gradient(#96C9F4,#3FA2F6);
+  background-image: url('./Images/bg.jpg');
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  font-family: 'Noto Sans Tamil', Arial, sans-serif;
+}
+.container{
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5),rgba(0, 3, 5, 0.2)),
+  url(./Images/bg-container.jpg) !important;
+   border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(14.9px);
+
+  -webkit-backdrop-filter: blur(14.9px);
+  width: 75%;
+  }

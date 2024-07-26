@@ -1,0 +1,142 @@
+/* src/Article.css */
+
+@font-face {
+  font-family: Bamini;
+  src: url(./../../Font/Baamini.ttf);
+}
+/* src/components/Content.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+.container-article {
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Roboto', sans-serif;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.title {
+  font-size: 2.5em;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
+  animation: slideInFromLeft 1s ease-in-out;
+}
+
+.author {
+  font-size: 1.2em;
+  color: #555;
+  text-align: center;
+  margin-bottom: 5px;
+  animation: slideInFromRight 1s ease-in-out;
+}
+
+.author-qualification {
+  font-size: 1em;
+  color: #777;
+  text-align: center;
+  margin-bottom: 15px;
+  animation: slideInFromRight 1s ease-in-out;
+}
+
+.publishedDate {
+  font-size: 0.9em;
+  color: #999;
+  text-align: center;
+  margin-bottom: 20px;
+  animation: fadeIn 1.5s ease-in-out;
+}
+
+.paragraph {
+  line-height: 1.6;
+ 
+
+  margin-bottom: 20px;
+}
+
+.cont {
+  margin-bottom: 15px;
+  font-size: medium;
+  font-family: Bamini;
+  animation: fadeIn 2s ease-in-out;
+}
+
+.image {
+  display: block;
+  max-width: 30%;
+  height: auto;
+  margin: 20px auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  animation: zoomIn 1.5s ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container-article {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 2em;
+  }
+
+  .author {
+    font-size: 1em;
+  }
+
+  .author-qualification {
+    font-size: 0.9em;
+  }
+
+  .publishedDate {
+    font-size: 0.8em;
+  }
+}

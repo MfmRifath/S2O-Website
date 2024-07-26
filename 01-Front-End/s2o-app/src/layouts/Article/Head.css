@@ -1,0 +1,10 @@
+
+.header1{
+    height: 100vh !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.529),rgba(0, 0, 0, 0.375)),
+    url(./../../Images/article-bg.jpg);
+    background-size: contain;
+    background-position: top;
+    position: relative;
+  }
+  

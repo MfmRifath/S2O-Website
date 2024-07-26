@@ -1,0 +1,139 @@
+.founder-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border: 5px solid #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.founder-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+.founder-description {
+    font-size: 1rem;
+    color: #120202;
+    max-width: 600px;
+    margin: 0 auto;
+}
+/* Founder.css */
+.founder-image, .founder-name, .founder-description {
+    transform: translateY(30px); /* Initially off-screen */
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out; /* Smooth transition */
+}
+
+/* Founder.css */
+@keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideInUp {
+    0% {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes scaleIn {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .founder-image {
+    animation: fadeIn 1.5s ease-in-out, scaleIn 1.5s ease-in-out;
+    transition: transform 0.3s;
+  }
+  
+  .founder-image:hover {
+    transform: scale(1.1);
+  }
+  
+  .founder-name {
+    animation: fadeIn 2s ease-in-out, slideInUp 2s ease-in-out;
+  }
+  
+  .founder-description {
+    animation: fadeIn 2.5s ease-in-out, slideInUp 2.5s ease-in-out;
+  }
+  
+.animate-fadeIn {
+    animation: fadeIn 1s ease-in-out forwards;
+}
+
+.animate-slideInUp {
+    animation: slideInUp 1s ease-in-out forwards;
+}
+
+.animate-scaleIn {
+    animation: scaleIn 1s ease-in-out forwards;
+}
+/* Founder.css */
+@keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideInUp {
+    0% {
+      transform: translateY(50px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes scaleIn {
+    0% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  
+  .founder-image {
+    animation: fadeIn 1.5s ease-in-out, scaleIn 1.5s ease-in-out;
+    transition: transform 0.3s;
+  }
+  
+  .founder-image:hover {
+    transform: scale(1.1);
+  }
+  
+  .founder-name {
+    animation: fadeIn 2s ease-in-out, slideInUp 2s ease-in-out;
+  }
+  
+  .founder-description {
+    animation: fadeIn 2.5s ease-in-out, slideInUp 2.5s ease-in-out;
+  }
+ 
+  
+.pcolor{
+  color: black;
+}

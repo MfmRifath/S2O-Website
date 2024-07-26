@@ -1,0 +1,61 @@
+
+
+/* Content Section */
+.content-section {
+  font-family: "EB Garamond", serif;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+  animation: fadeInUp 0.5s ease-in-out;
+}
+.content{
+
+
+  margin: 50px;
+  background-image: linear-gradient(#ffffff9a,#728ab7b5);
+  border-radius: 100px;
+}
+
+.cards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1;
+  min-width: 100%;
+  margin: 1rem 0;
+  margin-left: 10px;
+  transition: transform 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+eacher-details, .best-results, .contact-info {
+  margin-top: 50px;
+}
+
+.teacher-details h2, .best-results h2, .contact-info h2 {
+  margin-bottom: 30px;
+}
+
+.teacher-details .card, .best-results .card {
+  margin-bottom: 20px;
+}
+.academy-home{
+  margin-left: 200px;
+}

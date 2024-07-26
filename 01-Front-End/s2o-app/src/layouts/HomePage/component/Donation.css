@@ -1,0 +1,92 @@
+.donation-description {
+    font-size: 1.25rem;
+    color: #000000;
+    max-width: 700px;
+    margin: 0 auto 20px;
+}
+
+.donation-input {
+    max-width: 300px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.donate-btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+}
+/* Donation.css */
+
+/* Keyframes for animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Class applied when element is in view */
+.animate-fadeInUp {
+    animation: fadeInUp 1s forwards;
+}
+
+/* Button hover effect */
+.donate-btn {
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.donate-btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+    color: #fff;
+}
+
+.donate-btn:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+  
+  .btn:hover {
+    background: #fff;
+    background-image: -webkit-linear-gradient(top, #F8EDED, #FCF8F3);
+    background-image: -moz-linear-gradient(top, #F8EDED #FCF8F3);
+    background-image: -ms-linear-gradient(top, #F8EDED, #FCF8F3);
+    background-image: -o-linear-gradient(top, #F8EDED, #FCF8F3);
+    background-image: linear-gradient(to bottom, #F8EDED, #FCF8F3);
+    backdrop-filter: blur(100px);
+    text-decoration: none;
+  }
+  
+  .btn {
+    /* From https://css.glass */
+    background: #405D72;
+    background-image: -webkit-linear-gradient(top, #405D72, #758694);
+    background-image: -moz-linear-gradient(top, #405D72, #758694);
+    background-image: -ms-linear-gradient(top, #405D72, #758694);
+    background-image: -o-linear-gradient(top, #405D72, #758694);
+    background-image: linear-gradient(to bottom, #405D72, #758694);
+    border-radius: 32px;
+    text-shadow: 7px 3px 7px #240324;
+    font-family: Georgia;
+    font-size: 20px;
+    padding: 10px 20px 10px 20px;
+    text-decoration: none;
+  }
+  

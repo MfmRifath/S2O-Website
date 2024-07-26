@@ -1,0 +1,85 @@
+/* General Styles */
+.library-page {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  
+  /* Flexbox Layout */
+  .library-sections {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between items */
+    padding: 0 20px;
+  }
+  
+  .library-item {
+    background: #fff; /* White background for items */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animation for hover effects */
+    flex: 1 1 calc(25% - 20px);
+    margin: 10px;
+    box-sizing: border-box;
+    max-width: 300px; /* Limit the max width */
+  }
+  
+  /* Hover Effects */
+  .library-item:hover {
+    transform: scale(1.05); /* Slightly zoom in */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increase shadow on hover */
+  }
+  
+  /* Animation Effects */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .exam{
+    background-image: linear-gradient(#ffffffcd,#ffffff93),
+    url(./../../../../Images/Exam.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: top;
+  }
+  .book{
+    background-image: linear-gradient(#ffffffc2,#ffffff93),
+    url(./../../../../Images/Book.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: top;
+  }
+  .resource{
+    background-image: linear-gradient(#ffffffc7,#ffffff93),
+    url(./../../../../Images/Resourse.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: top;
+  }
+  
+  .library-item {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .library-item {
+      flex: 1 1 calc(50% - 20px); /* Two items per row on medium screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .library-item {
+      flex: 1 1 100%; /* Full width on small screens */
+    }
+  }
+  

@@ -1,0 +1,10 @@
+.container-white{
+ background-color: rgba(240, 248, 255, 0.8);
+ border-radius: 100px;
+}
+.head-primary{
+    display: block;
+}
+.res{
+    margin-left: 50px;
+}

@@ -1,0 +1,103 @@
+/* Vision.css */
+
+/* Animation for icons */
+@keyframes fadeInIcon {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-30px);
+    }
+    60% {
+        transform: translateY(-15px);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Initial animation for card icons */
+.card-icon {
+    transform: translateY(-20px); /* Start from above */
+    transition: transform 0.6s ease, opacity 0.3s ease; /* Smooth transition */
+}
+
+/* Apply animations to icons */
+.card.animate .card-icon {
+    animation: fadeInIcon 0.8s forwards; /* Fade in animation */
+}
+
+.card.animate .card-icon.bounce {
+    animation: bounce 1s infinite; /* Bounce animation */
+}
+
+.card.animate .card-icon.rotate {
+    animation: rotate 2s linear infinite; /* Rotate animation */
+}
+
+.card.animate .card-icon.pulse {
+    animation: pulse 1.5s infinite; /* Pulse animation */
+}
+
+/* Hover effect for icons */
+.card-icon:hover {
+    color: #74b369; /* Change to your desired hover color */
+    transform: scale(1.2); /* Slightly enlarge the icon */
+}
+@keyframes slideInFromBottom {
+    from {
+        opacity: 1;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 5;
+        transform: translateY(0);
+    }
+}
+
+.card-body {
+    background: rgba( 255, 25r5, 255, 0.3 );
+    box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+    backdrop-filter: blur( 20px );
+    -webkit-backdrop-filter: blur( 20px );
+    border-radius: 10px;
+    background-color:#D3D3D3;
+    border: 1px solid rgba( 255, 255, 255, 0.18 );
+    transform: translateY(20px); /* Start from below */
+    transition: transform 2s ease, opacity 1s ease; /* Smooth transition */
+}
+.card.animate .card-body {
+    animation: slideInFromBottom 2s forwards; /* Slide in animation */
+}

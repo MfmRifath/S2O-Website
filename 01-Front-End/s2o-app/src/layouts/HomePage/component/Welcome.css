@@ -1,0 +1,151 @@
+/*
+COLORS:
+
+Light green: #7ed56f
+Medium green: #55c57a
+Dark green: #28b485
+
+*/
+
+*{
+  margin: 0;
+
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.header{
+  height: 100vh !important;
+  
+  background-image:linear-gradient(#00000046,#0000007f),url(./../../../Images/bg-welcome.jpg);
+  background-size: cover;
+  background-position: top;
+  position: relative;
+}
+
+.logo-box{
+  position:absolute;
+  top: 40px;
+  left: 40px;
+}
+
+.logo {
+  height: 35px;
+}
+.heading-primary {
+      color: #ffff;
+      text-transform: uppercase;
+
+      backface-visibility: hidden;
+      margin-bottom: 60px;
+}
+
+.heading-primary-main {
+  display: inline;
+  font-size: 60px;
+  font-weight: 400;
+  letter-spacing: 10px;
+
+  animation-name: moveInLeft;
+  animation-duration: 2s;
+  
+  animation-timing-function: ease-out;
+  
+  /*
+  animation-iteration-count: 3;
+  
+  */
+
+}
+
+.heading-primary-sub {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 17.4px;
+
+  animation: moveInRight 1s ease-out;
+}
+
+.text-box{
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+  
+}
+@keyframes moveInLeft {
+  0%{
+      opacity: 0;
+      transform: translateX(-100px);
+  }
+
+
+  80%{
+      transform: translateX(10px);
+  }
+
+  100%{
+
+      opacity: 1;
+      transform: translateX(0);
+  }
+}
+@keyframes moveInRight {
+  0%{
+      opacity: 0;
+      transform: translateX(100px);
+  }
+
+
+  80%{ 
+      transform: translateX(-10px);
+  }
+
+  100%{
+
+      opacity: 1;
+      transform: translateX(0);
+  }
+}
+@keyframes moveInBottom {
+  0%{
+      opacity: 0;
+      transform: translateY(100px);
+  }
+
+  100%{
+
+      opacity: 1;
+      transform: translateX(0);
+  }
+}
+
+.btn:link,
+.btn:visited {
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 15px 40px;
+  display: inline-block;
+  border-radius: 100px;
+  transition: all .2s;
+  position: relative;
+
+}
+
+.btn:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgb(0, 0, 0.2);
+}
+
+.btn:active{
+  transform: translateY(-1px);
+  box-shadow: 0 5px 10px rgb(0, 0, 0);
+}
+
+
+.btn-animated {
+  animation: moveInBottom .5 ease-in-out .75s;
+  animation-fill-mode: backwards;
+}
