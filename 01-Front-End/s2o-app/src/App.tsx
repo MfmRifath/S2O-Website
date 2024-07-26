@@ -29,6 +29,8 @@ import { EditAdministration } from "./layouts/Admin/components/EditAdministratio
 import { Article } from "./layouts/Article/Article";
 import ChatWithAdmin from "./layouts/ChatWithAdmin/ChatWithAdmin";
 import { S2OLibrary } from "./layouts/S2OAcadmyPage/components/S2OLibrary";
+import BookManager from "./layouts/Teachers/Book/BookCrudManagment";
+import Bookshelf from "./layouts/S2OAcadmyPage/components/S2O Library/BookShelf";
 
 
 
@@ -120,6 +122,12 @@ function App() {
           </Route>
           <Route path='/S2OLibrary'>
             <S2OLibrary/>
+          </Route>
+          <Route path='/bookManger'>
+            <BookManager/>
+          </Route>
+          <Route path="bookShelf">
+            <Bookshelf/>
           </Route>
           </Switch>
       </div>

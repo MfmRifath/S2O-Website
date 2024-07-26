@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBook, faFileAlt, faStickyNote, faVideo } from '@fortawesome/free-solid-svg-icons';
 import './LibraryContent.css';
+import { Link } from 'react-router-dom';
 
 const LibraryContent: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ const LibraryContent: React.FC = () => {
       <div className="library-sections">
         <div className="library-item book">
           <h2><FontAwesomeIcon icon={faBook} /> Books</h2>
-          <p><a href="#">Browse our collection</a>: Discover a wide range of books across various subjects and genres.</p>
+          <p><Link to='/bookShelf'>Browse our collection</Link>: Discover a wide range of books across various subjects and genres.</p>
         </div>
         
         <div className="library-item exam">
