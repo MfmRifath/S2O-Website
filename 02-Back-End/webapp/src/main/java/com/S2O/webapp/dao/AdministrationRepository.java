@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AdministrationRepository extends JpaRepository<Administration,Long> {
 
+    boolean existsById(Long id);
 
 }

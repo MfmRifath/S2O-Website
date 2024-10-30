@@ -1,23 +1,45 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./Administration.css"; // Import the CSS file
-import AdminitrationModal from "../../../Model/AdminitrationModal";
+import axios from "axios";
+import "./Administration.css";
 import { SpinnerLoading } from "../../Utils/SpinnerLoading";
-import YearModal from "../../../Model/YearModal";
+
+interface Image {
+  url: string;
+  keyName: string;
+}
+
+interface AdminitrationModal {
+  id: number;
+  designation: string;
+  adminName: string;
+  adminQualification: string;
+  insta: string;
+  LinkedIn: string;
+  email: string;
+  year: number;
+  adminImages: Image;
+}
 
 export const Administration = () => {
   const teamRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [selectedYear, setSelectedYear] = useState<any | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
+  const [administrations, setAdministrations] = useState<AdminitrationModal[]>(
+    []
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpError, setHttpError] = useState<string | null>(null);
 
+  const uniqueYears = Array.from(
+    new Set(administrations.map((admin) => admin.year))
+  );
+
+  // Check if an element is in the viewport
   const isInViewport = (element: HTMLElement) => {
     const rect = element.getBoundingClientRect();
-    return (
-      rect.top < window.innerHeight &&
-      rect.bottom >= 0 &&
-      rect.left < window.innerWidth &&
-      rect.right >= 0
-    );
+    return rect.top < window.innerHeight && rect.bottom >= 0;
   };
 
+  // Apply animation on scroll
   const handleScroll = () => {
     teamRefs.current.forEach((teamItem) => {
       if (teamItem && isInViewport(teamItem)) {
@@ -26,136 +48,88 @@ export const Administration = () => {
     });
   };
 
+  // Add scroll event listener for animations
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Trigger on initial load
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const [administrations, setAdminitration] = useState<AdminitrationModal[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [httpError, setHttpError] = useState<string | null>(null);
-  const [years, setYears] = useState<YearModal[]>([]);
-
+  // Fetch administrations using axios
   useEffect(() => {
     const fetchAdministration = async () => {
       setIsLoading(true);
       setHttpError(null);
-      const baseUrl: string = `http://localhost:8080/api/administrations/all`;
-
       try {
-        const response = await fetch(baseUrl);
-
-        if (!response.ok) {
-          throw new Error("Something went wrong!");
-        }
-
-        const responseJson = await response.json();
-
-        const loadedadministration: AdminitrationModal[] = responseJson.map((administration: any) => ({
-          adminId: administration.adminId,
-          designation: administration.designation,
-          adminName: administration.adminName,
-          adminQualification: administration.adminQualification,
-          insta: administration.insta,
-          LinkedIn: administration.likedIn,
-          email: administration.email,
-          year: administration.year,
-          adminImg: administration.adminImg
-        }));
-
-        setAdminitration(loadedadministration);
-      } catch (error: any) {
-        console.error('Fetch error:', error);
-        setHttpError(error.message);
+        const response = await axios.get<AdminitrationModal[]>(
+          "http://localhost:8080/api/administrations/all"
+        );
+        setAdministrations(response.data);
+      } catch (error) {
+        setHttpError(
+          error instanceof Error ? error.message : "An error occurred"
+        );
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchAdministration();
   }, []);
 
-  useEffect(() => {
-    const fetchYears = async () => {
-      setIsLoading(true);
-      setHttpError(null);
-
-      const baseUrl: string = `http://localhost:8080/api/years`;
-
-      try {
-        const response = await fetch(baseUrl);
-
-        if (!response.ok) {
-          throw new Error("Something went wrong!");
-        }
-
-        const responseJson = await response.json();
-
-        const loadedYears: YearModal[] = responseJson.map((year: any) => ({
-          yearId: year.yearId,
-          yearValue: year.yearValue
-        }));
-
-        // Filter years based on the available administrations
-        const filteredYears = loadedYears.filter(year => 
-          administrations.some(admin => admin.year.yearValue === year.yearValue)
-        );
-
-        setYears(filteredYears);
-        setSelectedYear(filteredYears.length > 0 ? filteredYears[0].yearValue : 0);
-      } catch (error: any) {
-        console.error('Fetch error:', error);
-        setHttpError(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchYears();
-  }, [administrations]);
-
-  if (isLoading) {
-    return <SpinnerLoading />;
-  }
-
-  if (httpError) {
+  // Loading and error states
+  if (isLoading) return <SpinnerLoading />;
+  if (httpError)
     return (
       <div className="container m-5">
         <p>{httpError}</p>
       </div>
     );
-  }
+
+  // Carousel navigation handlers
+  const handlePreviousYear = () => {
+    const currentIndex = uniqueYears.findIndex((year) => year === selectedYear);
+    const prevIndex =
+      (currentIndex - 1 + uniqueYears.length) % uniqueYears.length;
+    setSelectedYear(uniqueYears[prevIndex]);
+  };
+
+  const handleNextYear = () => {
+    const currentIndex = uniqueYears.findIndex((year) => year === selectedYear);
+    const nextIndex = (currentIndex + 1) % uniqueYears.length;
+    setSelectedYear(uniqueYears[nextIndex]);
+  };
 
   return (
-    <div className="container-xxl py-5">
-      <div >
+    <div className="container py-5">
+      <div>
+        {/* Desktop Carousel */}
         <div
           id="carouselExampleControls"
           className="carousel carousel-dark slide mt-5 d-none d-lg-block"
           data-bs-interval="false"
         >
           <div className="carousel-inner align">
-            {years.map((year, yearIndex) => (
+            {uniqueYears.map((year) => (
               <div
-                className={`carousel-item ${year.yearValue === selectedYear ? "active" : ""}`}
-                key={year.yearId}
+                key={year}
+                className={`carousel-item ${
+                  year === selectedYear ? "active" : ""
+                }`}
               >
                 <div className="row d-flex justify-content-center align-items-center">
-                  <h1 className="mb-3">
-                    <b>S2O Administration - {year.yearValue}</b>
+                  <h1 className="mb-3 text-center text-white">
+                    <b>S2O Administration - {year}</b>
                   </h1>
-                  <p>
-                    Eirmod sed ipsum dolor sit rebum labore magna erat. Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed rebum vero dolor duo.
+                  <p className="text-white">
+                    Sample text describing the S2O administration for the
+                    selected year.
                   </p>
                 </div>
                 <div className="row g-4">
                   {administrations
-                    .filter(admin => admin.year.yearValue === year.yearValue)
+                    .filter((admin) => admin.year === year)
                     .map((admin, adminIndex) => (
-                      <div className="col-lg-3 col-md-6 " key={admin.adminId}>
+                      <div className="col-lg-3 col-md-6" key={admin.id}>
                         <div
                           className="team-item rounded overflow-hidden shadow-sm"
                           ref={(el) => (teamRefs.current[adminIndex] = el)}
@@ -163,11 +137,14 @@ export const Administration = () => {
                           <div className="position-relative">
                             <img
                               className="img-fluid"
-                              src={admin.adminImg || require("./../../../Images/logo.jpg")}
+                              src={
+                                admin.adminImages.url ||
+                                require("./../../../Images/logo.jpg")
+                              }
                               alt={admin.adminName || "Team Member"}
-                              onError={(e) => {
-                                e.currentTarget.src = require("./../../../Images/logo.jpg");
-                              }}
+                              onError={(e) =>
+                                (e.currentTarget.src = require("./../../../Images/logo.jpg"))
+                              }
                             />
                             <div className="position-absolute start-50 top-100 translate-middle d-flex align-items-center">
                               <a
@@ -190,7 +167,7 @@ export const Administration = () => {
                               </a>
                             </div>
                           </div>
-                          <div className="text-center p-4 mt-3">
+                          <div className="text-center p-4 mt-3 text-white">
                             <h5 className="fw-bold mb-0">{admin.adminName}</h5>
                             <small>{admin.designation}</small>
                           </div>
@@ -204,13 +181,7 @@ export const Administration = () => {
           <button
             className="carousel-control-prev btn1"
             type="button"
-            data-bs-target="#carouselExampleControls"
-            data-bs-slide="prev"
-            onClick={() => {
-              const currentIndex = years.findIndex(year => year.yearValue === selectedYear);
-              const prevIndex = (currentIndex - 1 + years.length) % years.length;
-              setSelectedYear(years[prevIndex].yearValue);
-            }}
+            onClick={handlePreviousYear}
           >
             <span
               className="carousel-control-prev-icon"
@@ -221,13 +192,7 @@ export const Administration = () => {
           <button
             className="carousel-control-next btn1"
             type="button"
-            data-bs-target="#carouselExampleControls"
-            data-bs-slide="next"
-            onClick={() => {
-              const currentIndex = years.findIndex(year => year.yearValue === selectedYear);
-              const nextIndex = (currentIndex + 1) % years.length;
-              setSelectedYear(years[nextIndex].yearValue);
-            }}
+            onClick={handleNextYear}
           >
             <span
               className="carousel-control-next-icon"
@@ -237,23 +202,22 @@ export const Administration = () => {
           </button>
         </div>
       </div>
-      {/*Mobile*/}
+      {/* Mobile Layout */}
       <div className="d-lg-none mt-3 container">
-        {years.map((year) => (
-          <div key={year.yearId}>
-            <div className="row d-flex justify-content-center align-items-center">
-              <h1 className="mb-3">
-                <b>S2O Administration - {year.yearValue}</b>
-              </h1>
-              <p>
-                Eirmod sed ipsum dolor sit rebum labore magna erat. Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed rebum vero dolor duo.
-              </p>
-            </div>
+        {uniqueYears.map((year) => (
+          <div key={year}>
+            <h1 className="mb-3">
+              <b>S2O Administration - {year}</b>
+            </h1>
+            <p>
+              Sample text describing the S2O administration for the selected
+              year.
+            </p>
             <div className="row g-4">
               {administrations
-                .filter(admin => admin.year.yearValue === year.yearValue)
+                .filter((admin) => admin.year === year)
                 .map((admin, adminIndex) => (
-                  <div className="col-lg-3 col-md-6" key={admin.adminId}>
+                  <div className="col-lg-3 col-md-6" key={admin.id}>
                     <div
                       className="team-item rounded overflow-hidden shadow-sm"
                       ref={(el) => (teamRefs.current[adminIndex] = el)}
@@ -261,11 +225,14 @@ export const Administration = () => {
                       <div className="position-relative">
                         <img
                           className="img-fluid"
-                          src={admin.adminImg || require("./../../../Images/logo.jpg")}
+                          src={
+                            admin.adminImages.url ||
+                            require("./../../../Images/logo.jpg")
+                          }
                           alt={admin.adminName || "Team Member"}
-                          onError={(e) => {
-                            e.currentTarget.src = require("./../../../Images/logo.jpg");
-                          }}
+                          onError={(e) =>
+                            (e.currentTarget.src = require("./../../../Images/logo.jpg"))
+                          }
                         />
                         <div className="position-absolute start-50 top-100 translate-middle d-flex align-items-center">
                           <a

@@ -1,12 +1,11 @@
 package com.S2O.webapp.Entity;
 
 import lombok.Data;
-
 import javax.persistence.*;
+import java.util.List;
 
 @Data
 @Entity
-@Table(name = "year")
 public class Year {
 
     @Id
@@ -16,4 +15,7 @@ public class Year {
 
     @Column(name = "year_value")
     private int yearValue;
+
+    @OneToMany(mappedBy = "year", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Term> terms;
 }

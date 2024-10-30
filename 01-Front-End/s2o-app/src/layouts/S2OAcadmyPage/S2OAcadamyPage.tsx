@@ -1,14 +1,9 @@
 import { AcademyHome } from "./components/AcademyHome";
 
-
-
-
-
-export const S2OAcadamy =()=>{
-    return(
-        <>
-       
-       <AcademyHome/>
-        </>
-    );
-}
+export const S2OAcadamy = () => {
+  return (
+    <>
+      <AcademyHome />
+    </>
+  );
+};

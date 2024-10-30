@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "student")
 public class Student {
 
     @Id
@@ -17,7 +16,10 @@ public class Student {
     @Column(name = "student_name")
     private String studentName;
 
-    @ManyToOne
-    @JoinColumn(name = "student_type_id")
-    private StudentType studentType;
+    @Column(name = "stream")
+    private String stream;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "year_year_id")
+    private Year year;
 }

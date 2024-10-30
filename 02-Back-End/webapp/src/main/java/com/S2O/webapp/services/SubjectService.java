@@ -1,42 +1,43 @@
-package com.S2O.webapp.services;// SubjectService.java
+package com.S2O.webapp.Service;
 
 import com.S2O.webapp.Entity.Subject;
 import com.S2O.webapp.dao.SubjectRepository;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SubjectService {
-    private final SubjectRepository subjectRepository;
 
-    public SubjectService(SubjectRepository subjectRepository) {
-        this.subjectRepository = subjectRepository;
-    }
+    @Autowired
+    private SubjectRepository subjectRepository;
 
     public List<Subject> getAllSubjects() {
         return subjectRepository.findAll();
     }
 
-    public Subject getSubjectById(int id) {
-        return subjectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
+    public Optional<Subject> getSubjectById(int subjectId) {
+        return subjectRepository.findById(subjectId);
     }
 
-    public Subject createSubject(Subject subject) {
+    public Subject saveSubject(Subject subject) {
         return subjectRepository.save(subject);
     }
 
-    public Subject updateSubject(int id, Subject subjectDetails) {
-        Subject subject = subjectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
-        subject.setSubjectName(subjectDetails.getSubjectName());
-        return subjectRepository.save(subject);
+    public Subject updateSubject(int subjectId, Subject subjectDetails) {
+        return subjectRepository.findById(subjectId)
+                .map(subject -> {
+                    subject.setSubjectName(subjectDetails.getSubjectName());
+                    subject.setTerm(subjectDetails.getTerm());
+                    subject.setStudentMark(subjectDetails.getStudentMark());
+                    return subjectRepository.save(subject);
+                })
+                .orElseGet(() -> subjectRepository.save(subjectDetails));
     }
 
-    public void deleteSubject(int id) {
-        Subject subject = subjectRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subject not found"));
-        subjectRepository.delete(subject);
+    public void deleteSubject(int subjectId) {
+        subjectRepository.deleteById(subjectId);
     }
 }
-
-// Repeat similarly for TermService, YearService, StudentTypeService, StudentService, and StudentMarkService

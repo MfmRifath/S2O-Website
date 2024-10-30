@@ -1,39 +1,23 @@
-class GalleryImageModel{
+class GalleryImageModel {
   id: number;
   event: string;
   description?: string;
   date?: string;
-  img?:string;
-  img1?:string;
-  img2?:string;
-  img3?:string;
-  img4?:string;
-  img5?:string;
-  
+  img: Array<File | string>; // Use File for uploads or string for URLs
 
-  constructor(id: number,
+  constructor(
+    id: number,
     event: string,
-    description: string,
-    date: string,
-    img:string,
-    img1:string,
-    img2:string,
-    img3:string,
-    img4:string,
-    img5?:string){
-      this.id=id;
-      this.event=event;
-      this.description =description;
-      this.date=date;
-      this.img=img;
-      this.img1=img1;
-      this.img2=img2;
-      this.img3=img3;
-      this.img4 =img4;
-      this.img5=img5;
-      
-    }
+    img: Array<File | string>,
+    description?: string,
+    date?: string
+  ) {
+    this.id = id;
+    this.event = event;
+    this.img = img;
+    this.description = description;
+    this.date = date;
+  }
 }
-
 
 export default GalleryImageModel;

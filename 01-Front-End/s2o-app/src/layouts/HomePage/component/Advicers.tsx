@@ -39,13 +39,13 @@ const Advicers = () => {
 
   return (
     <div className="carousel-container mt-5">
-        <div className='d-flex justify-content-center'><h1>Advisor</h1></div>
+        <div className='d-flex justify-content-center'><h1 style={{color:'#FFFFFF'}}>Advisor</h1></div>
       <Slider {...settings}>
         {slidesData.map((slide, index) => (
           <div key={index} className="carousel-slide">
             <img src={slide.image} alt={`Slide ${index + 1}`} />
             <div className="carousel-content">
-              <h5>{slide.content}</h5>
+              <h5> {slide.content}</h5>
             </div>
           </div>
         ))}

@@ -1,7 +1,9 @@
 package com.S2O.webapp.controller;
 
 import com.S2O.webapp.Entity.StudentMark;
-import com.S2O.webapp.services.StudentMarkService;
+import com.S2O.webapp.Service.StudentMarkService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,11 +11,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/student-marks")
 public class StudentMarkController {
-    private final StudentMarkService studentMarkService;
 
-    public StudentMarkController(StudentMarkService studentMarkService) {
-        this.studentMarkService = studentMarkService;
-    }
+    @Autowired
+    private StudentMarkService studentMarkService;
 
     @GetMapping
     public List<StudentMark> getAllStudentMarks() {
@@ -21,22 +21,26 @@ public class StudentMarkController {
     }
 
     @GetMapping("/{id}")
-    public StudentMark getStudentMarkById(@PathVariable int id) {
-        return studentMarkService.getStudentMarkById(id);
+    public ResponseEntity<StudentMark> getStudentMarkById(@PathVariable int id) {
+        return studentMarkService.getStudentMarkById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public StudentMark createStudentMark(@RequestBody StudentMark studentMark) {
-        return studentMarkService.createStudentMark(studentMark);
+        return studentMarkService.saveStudentMark(studentMark);
     }
 
     @PutMapping("/{id}")
-    public StudentMark updateStudentMark(@PathVariable int id, @RequestBody StudentMark studentMarkDetails) {
-        return studentMarkService.updateStudentMark(id, studentMarkDetails);
+    public ResponseEntity<StudentMark> updateStudentMark(@PathVariable int id, @RequestBody StudentMark studentMarkDetails) {
+        StudentMark updatedMark = studentMarkService.updateStudentMark(id, studentMarkDetails);
+        return ResponseEntity.ok(updatedMark);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteStudentMark(@PathVariable int id) {
+    public ResponseEntity<Void> deleteStudentMark(@PathVariable int id) {
         studentMarkService.deleteStudentMark(id);
+        return ResponseEntity.noContent().build();
     }
 }

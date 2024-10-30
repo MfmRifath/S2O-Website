@@ -1,10 +1,16 @@
 package com.S2O.webapp.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Data;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "articleId")
 @Entity
 @Data
 @Table(name = "article")
@@ -31,13 +37,10 @@ public class Article {
     @Column(name = "date")
     private LocalDate date;
 
-    @Column(name = "img")
-    private String img;
+    @JsonManagedReference
+    @BatchSize(size = 10)// Indicate the parent side
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "article")
+    private List<Image> images;
 
-    @Column(name="img1")
-    private String img1;
-
-    @Column(name = "img2")
-    private String img2;
 
 }

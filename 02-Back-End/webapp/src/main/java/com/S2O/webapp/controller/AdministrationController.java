@@ -3,10 +3,13 @@ package com.S2O.webapp.controller;
 import com.S2O.webapp.Entity.Administration;
 import com.S2O.webapp.RequesModal.AdminitrationRequestModal;
 import com.S2O.webapp.services.AdministrationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,10 +19,12 @@ import java.util.List;
 public class AdministrationController {
 
     private final AdministrationService administrationService;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public AdministrationController(AdministrationService administrationService) {
+    public AdministrationController(AdministrationService administrationService, ObjectMapper objectMapper) {
         this.administrationService = administrationService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping("/all")
@@ -28,93 +33,45 @@ public class AdministrationController {
             List<Administration> administrations = administrationService.getAllAdministrations();
             return new ResponseEntity<>(administrations, HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping("/add/admin-member")
-    public ResponseEntity<String> addAdministrationMember(@RequestBody AdminitrationRequestModal administration) {
+    @PostMapping(value = "/add/admin-member", consumes = "multipart/form-data")
+    public ResponseEntity<String> addAdministrationMember(
+            @RequestPart("administration") String administrationRequest,
+            @RequestPart("image") MultipartFile image
+    ) {
         try {
-            if (administration == null) {
-                throw new IllegalArgumentException("Request body cannot be null");
-            }
-            if (administration.getDesignation() == null || administration.getDesignation().isEmpty()) {
-                throw new IllegalArgumentException("Designation is required");
-            }
-            if (administration.getAdminName() == null || administration.getAdminName().isEmpty()) {
-                throw new IllegalArgumentException("Admin name is required");
-            }
-            if (administration.getAdminQualification() == null || administration.getAdminQualification().isEmpty()) {
-                throw new IllegalArgumentException("Admin qualification is required");
-            }
-            if (administration.getInsta() == null || administration.getInsta().isEmpty()) {
-                throw new IllegalArgumentException("Instagram link is required");
-            }
-            if (administration.getLinkedIn() == null || administration.getLinkedIn().isEmpty()) {
-                throw new IllegalArgumentException("LinkedIn link is required");
-            }
-            if (administration.getEmail() == null || administration.getEmail().isEmpty()) {
-                throw new IllegalArgumentException("Email is required");
-            }
-            if (administration.getYear() == null) {
-                throw new IllegalArgumentException("Year is required");
-            }
-            if (administration.getAdminImg() == null || administration.getAdminImg().isEmpty()) {
-                throw new IllegalArgumentException("Admin image is required");
-            }
+            // Convert JSON string to AdminitrationRequestModal
+            AdminitrationRequestModal adminRequest = objectMapper.readValue(administrationRequest, AdminitrationRequestModal.class);
 
-            administrationService.createAdministration(administration);
-
+            // Create a new administration with the provided data and image
+            administrationService.createAdministration(adminRequest, image);
             return new ResponseEntity<>("Admin added successfully", HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Invalid input: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (JsonProcessingException e) {
+            return new ResponseEntity<>("Failed to parse administration data: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            e.printStackTrace();
             return new ResponseEntity<>("Failed to add admin: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/edit/admin-member/{id}")
-    public ResponseEntity<String> editAdministrationMember(@PathVariable Long id, @RequestBody AdminitrationRequestModal administration) {
+    public ResponseEntity<String> editAdministrationMember(
+            @PathVariable Long id,
+            @RequestPart("administration") String administrationRequest,
+            @RequestPart(value = "image", required = false) MultipartFile image
+    ) {
         try {
-            if (administration == null) {
-                throw new IllegalArgumentException("Request body cannot be null");
-            }
-            if (administration.getDesignation() == null || administration.getDesignation().isEmpty()) {
-                throw new IllegalArgumentException("Designation is required");
-            }
-            if (administration.getAdminName() == null || administration.getAdminName().isEmpty()) {
-                throw new IllegalArgumentException("Admin name is required");
-            }
-            if (administration.getAdminQualification() == null || administration.getAdminQualification().isEmpty()) {
-                throw new IllegalArgumentException("Admin qualification is required");
-            }
-            if (administration.getInsta() == null || administration.getInsta().isEmpty()) {
-                throw new IllegalArgumentException("Instagram link is required");
-            }
-            if (administration.getLinkedIn() == null || administration.getLinkedIn().isEmpty()) {
-                throw new IllegalArgumentException("LinkedIn link is required");
-            }
-            if (administration.getEmail() == null || administration.getEmail().isEmpty()) {
-                throw new IllegalArgumentException("Email is required");
-            }
-            if (administration.getYear() == null) {
-                throw new IllegalArgumentException("Year is required");
-            }
-            if (administration.getAdminImg() == null || administration.getAdminImg().isEmpty()) {
-                throw new IllegalArgumentException("Admin image is required");
-            }
+            // Convert JSON string to AdminitrationRequestModal
+            AdminitrationRequestModal adminRequest = objectMapper.readValue(administrationRequest, AdminitrationRequestModal.class);
 
-            administrationService.updateAdministration(id, administration);
-
+            // Update the administration member's information
+            administrationService.updateAdministration(id, adminRequest, image);
             return new ResponseEntity<>("Admin updated successfully", HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Invalid input: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (JsonProcessingException e) {
+            return new ResponseEntity<>("Failed to parse administration data: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            e.printStackTrace();
             return new ResponseEntity<>("Failed to update admin: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -122,10 +79,15 @@ public class AdministrationController {
     @DeleteMapping("/delete/admin-member/{id}")
     public ResponseEntity<String> deleteAdministrationMember(@PathVariable Long id) {
         try {
+            // Check if the administration member exists before deletion
+            if (!administrationService.existsById(id)) {
+                return new ResponseEntity<>("Admin member not found", HttpStatus.NOT_FOUND);
+            }
+
+            // Delete the administration member
             administrationService.deleteAdministration(id);
             return new ResponseEntity<>("Admin deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
-            e.printStackTrace();
             return new ResponseEntity<>("Failed to delete admin: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

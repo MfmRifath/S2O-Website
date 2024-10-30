@@ -1,40 +1,41 @@
 package com.S2O.webapp.services;
 
 import com.S2O.webapp.Entity.Year;
-import com.S2O.webapp.dao.YearRepository;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class YearService {
-    private final YearRepository yearRepository;
 
-    public YearService(YearRepository yearRepository) {
-        this.yearRepository = yearRepository;
-    }
+    @Autowired
+    private com.S2O.webapp.dao.YearRepository yearRepository;
 
     public List<Year> getAllYears() {
         return yearRepository.findAll();
     }
 
-    public Year getYearById(int id) {
-        return yearRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Year not found"));
+    public Optional<Year> getYearById(int yearId) {
+        return yearRepository.findById(yearId);
     }
 
-    public Year createYear(Year year) {
+    public Year saveYear(Year year) {
         return yearRepository.save(year);
     }
 
-    public Year updateYear(int id, Year yearDetails) {
-        Year year = yearRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Year not found"));
-        year.setYearValue(yearDetails.getYearValue());
-        return yearRepository.save(year);
+    public Year updateYear(int yearId, Year yearDetails) {
+        return yearRepository.findById(yearId)
+                .map(year -> {
+                    year.setYearValue(yearDetails.getYearValue());
+                    year.setTerms(yearDetails.getTerms());
+                    return yearRepository.save(year);
+                })
+                .orElseGet(() -> yearRepository.save(yearDetails));
     }
 
-    public void deleteYear(int id) {
-        Year year = yearRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Year not found"));
-        yearRepository.delete(year);
+    public void deleteYear(int yearId) {
+        yearRepository.deleteById(yearId);
     }
 }

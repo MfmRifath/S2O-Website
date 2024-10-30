@@ -1,24 +1,57 @@
-// src/components/Content.tsx
-import React from 'react';
-import ArticleModal from '../../Model/ArticleModal';
-import './Content.css';
+import React from "react";
 
+interface ContentProps {
+  articleId: string;
+  title: string;
+  author: string;
+  authorQualification: string;
+  date: string;
+  content: string;
+  img?: { url: string }[]; // Optional if img can be undefined
+}
 
+import "./Content.css";
 
-const Content: React.FC<ArticleModal> = ({ title, author, authorQualification, date, content, img,img1,img2 }) => {
+const Content: React.FC<ContentProps> = ({
+  title,
+  author,
+  authorQualification,
+  date,
+  content,
+  img,
+}) => {
   return (
-    <div className='container-article content mt-5 mb-5'>
-      <h1 className='title'>{title}</h1>
-      <h3 className='author'>{author}</h3>
-      <p className='author'>{authorQualification}</p>
-      <p className='publishedDate'>{new Date(date).toDateString()}</p>
-      <div className='paragraph '>{content.split('\n').map((line, index) => <p className='cont' key={index}>{line}</p>)}</div>
-      <div className='d-flex justify-content-center'>
-      <img className='image' src={img}/>
-      <img className='image' src={img1}/>
-      <img className='image' src={img2}/>
+    <div className="article-container mt-5 mb-5">
+      <header className="article-header">
+        <h1 className="article-title">{title}</h1>
+        <div className="article-author-info">
+          <h3 className="author">{author}</h3>
+          <p className="author-qualification">{authorQualification}</p>
+          <p className="published-date">{new Date(date).toDateString()}</p>
+        </div>
+      </header>
+
+      <hr className="section-divider" />
+
+      <section className="article-content">
+        {content.split("\n").map((line, index) => (
+          <p className="content-line bamini-font" key={index}>
+            {line}
+          </p>
+        ))}
+      </section>
+
+      <div className="article-gallery">
+        {img &&
+          img.map((image, index) => (
+            <img
+              key={index}
+              className="gallery-image"
+              src={image.url}
+              alt={`Gallery image ${index + 1}`}
+            />
+          ))}
       </div>
-      
     </div>
   );
 };

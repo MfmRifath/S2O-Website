@@ -1,5 +1,6 @@
 package com.S2O.webapp.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -11,9 +12,8 @@ public class Administration {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "admin_id")
-    private Long adminId;
-
+    @Column(name = "id") // Make sure this column exists in the database
+    private Long id;
     @Column(name = "designation")
     private String designation;
 
@@ -26,17 +26,16 @@ public class Administration {
     @Column(name = "insta")
     private String insta;
 
-    @Column(name = "linked_in")
-    private String linkedIn;
+    @Column(name = "linkedin")
+    private String LinkedIn;
 
     @Column(name = "email")
     private String email;
 
-    @ManyToOne
-    @JoinColumn(name = "year_id")
-    private Year year;
+    @Column(name = "year")
+    private int year;
 
-
-    @Column(name = "admin_img",length = 100000)
-    private String adminImg;
+    @OneToOne(mappedBy = "administration", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Image adminImages;
 }

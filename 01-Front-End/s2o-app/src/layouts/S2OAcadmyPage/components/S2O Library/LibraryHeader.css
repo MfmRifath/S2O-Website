@@ -1,20 +1,9 @@
 .header-library {
-    height: 95vh !important;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.529), rgba(0, 0, 0, 0.375)),
-      url(./../../../../Images/S2O-Library.jpg);
-    background-size: cover;
-    background-position: top;
-    background-attachment: fixed;
-    position: relative;
-    animation: backgroundScroll 30s linear infinite;
-  }
-  
-  @keyframes backgroundScroll {
-    0% {
-      background-position: top;
-    }
-    100% {
-      background-position: bottom;
-    }
-  }
-  
+  height: 95vh !important;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.529), rgba(0, 0, 0, 0.375)),
+    url(./../../../../Images/S2O-Library.jpg);
+  background-size: cover;
+  background-position: top;
+  background-attachment: fixed;
+  position: relative;
+}

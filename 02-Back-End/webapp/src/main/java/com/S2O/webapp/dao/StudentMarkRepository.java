@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StudentMarkRepository extends JpaRepository<StudentMark, Integer> {
     Page<StudentMark> findAll(Pageable pageable);
+
+
 }

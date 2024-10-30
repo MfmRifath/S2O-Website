@@ -1,9 +1,11 @@
 package com.S2O.webapp.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity
@@ -23,22 +25,7 @@ public class Gallery {
     @Column(name = "date")
     private LocalDate date;
 
-    @Column(name = "img")
-    private String img;
-
-    @Column(name = "img1")
-    private String img1;
-
-    @Column(name = "img2")
-    private String img2;
-
-    @Column(name = "img3")
-    private String img3;
-
-    @Column(name = "img4")
-    private String img4;
-
-    @Column(name = "img5")
-    private String img5;
-
+    @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonBackReference
+    private List<Image> images;
 }

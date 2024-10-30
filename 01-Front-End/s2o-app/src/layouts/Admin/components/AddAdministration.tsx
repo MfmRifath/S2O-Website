@@ -1,217 +1,233 @@
-import React, { useState, useEffect } from 'react';
-import YearModal from '../../../Model/YearModal';
+import React, { useState } from "react";
+import axios from "axios";
+
+interface Image {
+  url: string;
+  keyName: string;
+}
+
+interface AdministrationModal {
+  id?: number;
+  designation: string;
+  adminName: string;
+  adminQualification: string;
+  insta: string;
+  LinkedIn: string;
+  email: string;
+  year: number;
+  adminImages?: Image;
+}
 
 export const AddEditAdministration: React.FC = () => {
-    const [designation, setDesignation] = useState('');
-    const [adminName, setAdminName] = useState('');
-    const [adminQualification, setAdminQualification] = useState('');
-    const [insta, setInsta] = useState('');
-    const [linkedIn, setLinkedIn] = useState('');
-    const [email, setEmail] = useState('');
-    const [year, setYear] = useState<YearModal | null>(null);
-    const [selectedImage, setSelectedImage] = useState<string | ArrayBuffer | null>(null);
-    const [years, setYears] = useState<YearModal[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [httpError, setHttpError] = useState<string | null>(null);
-    const [displayWarning, setDisplayWarning] = useState(false);
-    const [displaySuccess, setDisplaySuccess] = useState(false);
-    const [adminId, setAdminId] = useState<number | null>(null);
+  const [formData, setFormData] = useState<AdministrationModal>({
+    designation: "",
+    adminName: "",
+    adminQualification: "",
+    insta: "",
+    LinkedIn: "",
+    email: "",
+    year: new Date().getFullYear(),
+  });
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [displayWarning, setDisplayWarning] = useState(false);
+  const [displaySuccess, setDisplaySuccess] = useState(false);
 
-    const base64ConversionForImages = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            getBase64(file);
-        }
-    };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-    const getBase64 = (file: File) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-            setSelectedImage(reader.result);
-        };
-        reader.onerror = (error) => {
-            console.error('Error reading file:', error);
-        };
-    };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setSelectedImage(file || null);
+  };
 
-    const submitAdminMember = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const resetFormFields = () => {
+    setFormData({
+      designation: "",
+      adminName: "",
+      adminQualification: "",
+      insta: "",
+      LinkedIn: "",
+      email: "",
+      year: new Date().getFullYear(),
+    });
+    setSelectedImage(null);
+  };
 
-        const url = adminId
-            ? `http://localhost:8080/api/administrations/edit/admin-member/${adminId}`
-            : `http://localhost:8080/api/administrations/add/admin-member`;
+  const submitAdminMember = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        if (designation && adminName && adminQualification && insta && linkedIn && email && year && selectedImage) {
-            const admin = {
-                designation,
-                adminName,
-                adminQualification,
-                insta,
-                linkedIn,
-                email,
-                year,
-                adminImg: selectedImage
-            };
+    const url = formData.id
+      ? `http://localhost:8080/api/administrations/edit/admin-member/${formData.id}`
+      : `http://localhost:8080/api/administrations/add/admin-member`;
 
-            const requestOptions: RequestInit = {
-                method: adminId ? 'PUT' : 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(admin)
-            };
+    if (
+      formData.designation &&
+      formData.adminName &&
+      formData.adminQualification &&
+      formData.insta &&
+      formData.LinkedIn &&
+      formData.email &&
+      formData.year &&
+      selectedImage
+    ) {
+      const data = new FormData();
+      data.append("administration", JSON.stringify(formData));
+      data.append("image", selectedImage);
 
-            try {
-                const response = await fetch(url, requestOptions);
-                if (!response.ok) {
-                    throw new Error('Failed to add/update admin member');
-                }
-                setDesignation('');
-                setAdminName('');
-                setAdminQualification('');
-                setInsta('');
-                setLinkedIn('');
-                setEmail('');
-                setYear(null);
-                setSelectedImage(null);
-                setAdminId(null);
-                setDisplayWarning(false);
-                setDisplaySuccess(true);
-            } catch (error) {
-                console.error('Error submitting admin member:', error);
-                setDisplaySuccess(false);
-                setDisplayWarning(true);
-            }
+      try {
+        const response = await axios({
+          method: formData.id ? "put" : "post",
+          url,
+          data,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          resetFormFields();
+          setDisplaySuccess(true);
         } else {
-            setDisplayWarning(true);
+          throw new Error("Failed to add/update administration member");
         }
-    };
-
-    const deleteAdminMember = async (id: number) => {
-        const url = `http://localhost:8080/api/administrations/delete/admin-member/${id}`;
-        try {
-            const response = await fetch(url, { method: 'DELETE' });
-            if (!response.ok) {
-                throw new Error('Failed to delete admin member');
-            }
-            setDisplaySuccess(true);
-        } catch (error) {
-            console.error('Error deleting admin member:', error);
-            setDisplaySuccess(false);
+      } catch (error) {
+        // Log the error response from Axios for better debugging
+        if (axios.isAxiosError(error) && error.response) {
+          console.error("Error response data:", error.response.data);
+          console.error("Error response status:", error.response.status);
+        } else {
+          console.error("Error submitting administration member:", error);
         }
-    };
+        setDisplayWarning(true);
+      }
+    } else {
+      setDisplayWarning(true);
+    }
+  };
 
-    useEffect(() => {
-        const fetchYears = async () => {
-            setIsLoading(true);
-            setHttpError(null);
-
-            const baseUrl: string = `http://localhost:8080/api/years`;
-
-            try {
-                const response = await fetch(baseUrl);
-
-                if (!response.ok) {
-                    throw new Error("Something went wrong!");
-                }
-
-                const responseJson = await response.json();
-
-                const loadedYears: YearModal[] = responseJson.map((year: any) => ({
-                    yearId: year.yearId,
-                    yearValue: year.yearValue
-                }));
-
-                setYears(loadedYears);
-            } catch (error: any) {
-                console.error('Fetch error:', error);
-                setHttpError(error.message);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchYears();
-    }, []);
-
-    const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const selectedYear = e.target.value;
-        const selectedYearObj = years.find(year => year.yearValue.toString() === selectedYear) || null;
-        setYear(selectedYearObj);
-    };
-
-    return (
-        <div className="container mt-5 mb-5">
-            {displaySuccess &&
-                <div className="alert alert-success" role="alert">
-                    Admin added/updated successfully.
-                </div>
-            }
-            {displayWarning &&
-                <div className="alert alert-danger" role="alert">
-                    All fields must be filled out.
-                </div>
-            }
-            <div className="card">
-                <div className="card-header">
-                    {adminId ? 'Edit Administration Member' : 'Add Administration Member'}
-                </div>
-                <div className="card-body">
-                    <form onSubmit={submitAdminMember}>
-                        <div className="row">
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Designation</label>
-                                <input type="text" className="form-control" name="Designation" required
-                                    onChange={e => setDesignation(e.target.value)} value={designation} />
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Name</label>
-                                <input type="text" className="form-control" name="Name" required
-                                    onChange={e => setAdminName(e.target.value)} value={adminName} />
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Qualification</label>
-                                <input type="text" className="form-control" name="Qualification" required
-                                    onChange={e => setAdminQualification(e.target.value)} value={adminQualification} />
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Instagram Link</label>
-                                <input type="text" className="form-control" name="Insta" required
-                                    onChange={e => setInsta(e.target.value)} value={insta} />
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">LinkedIn Link</label>
-                                <input type="text" className="form-control" name="LinkedIn" required
-                                    onChange={e => setLinkedIn(e.target.value)} value={linkedIn} />
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Email</label>
-                                <input type="email" className="form-control" name="Email" required
-                                    onChange={e => setEmail(e.target.value)} value={email} />
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Year</label>
-                                <select className="form-control" value={year?.yearValue || ''} onChange={handleYearChange} required>
-                                    <option value="">Select Year</option>
-                                    {years.map(year => (
-                                        <option key={year.yearId} value={year.yearValue}>{year.yearValue}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="col-md-6 mb-3">
-                                <label className="form-label">Upload Image</label>
-                                <input type="file" className="form-control" onChange={(e) => base64ConversionForImages(e)} />
-                            </div>
-                        </div>
-                        <button type="submit" className="btn btn-primary mt-3">
-                            {adminId ? 'Update Administration Member' : 'Add Administration Member'}
-                        </button>
-                    </form>
-                </div>
-            </div>
+  return (
+    <div className="container mt-5 mb-5">
+      {displaySuccess && (
+        <div className="alert alert-success" role="alert">
+          Admin added/updated successfully.
         </div>
-    );
+      )}
+      {displayWarning && (
+        <div className="alert alert-danger" role="alert">
+          All fields must be filled out.
+        </div>
+      )}
+      <div className="card">
+        <div className="card-header">
+          {formData.id
+            ? "Edit Administration Member"
+            : "Add Administration Member"}
+        </div>
+        <div className="card-body">
+          <form onSubmit={submitAdminMember}>
+            <div className="row">
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Designation</label>
+                <input
+                  type="text"
+                  name="designation"
+                  className="form-control"
+                  required
+                  onChange={handleInputChange}
+                  value={formData.designation}
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Name</label>
+                <input
+                  type="text"
+                  name="adminName"
+                  className="form-control"
+                  required
+                  onChange={handleInputChange}
+                  value={formData.adminName}
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Qualification</label>
+                <input
+                  type="text"
+                  name="adminQualification"
+                  className="form-control"
+                  required
+                  onChange={handleInputChange}
+                  value={formData.adminQualification}
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Instagram Link</label>
+                <input
+                  type="text"
+                  name="insta"
+                  className="form-control"
+                  required
+                  onChange={handleInputChange}
+                  value={formData.insta}
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label className="form-label">LinkedIn Link</label>
+                <input
+                  type="text"
+                  name="LinkedIn"
+                  className="form-control"
+                  required
+                  onChange={handleInputChange}
+                  value={formData.LinkedIn}
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  className="form-control"
+                  required
+                  onChange={handleInputChange}
+                  value={formData.email}
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Year</label>
+                <input
+                  type="number"
+                  name="year"
+                  className="form-control"
+                  required
+                  onChange={handleInputChange}
+                  value={formData.year}
+                />
+              </div>
+              <div className="col-md-6 mb-3">
+                <label className="form-label">Upload Image</label>
+                <input
+                  type="file"
+                  className="form-control"
+                  onChange={handleFileChange}
+                />
+              </div>
+            </div>
+            <button type="submit" className="btn btn-primary mt-3">
+              {formData.id
+                ? "Update Administration Member"
+                : "Add Administration Member"}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 };
 
-// Add this line to make it a module
-export {};
+// Export component
+export default AddEditAdministration;

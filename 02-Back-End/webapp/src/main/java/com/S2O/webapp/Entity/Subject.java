@@ -1,12 +1,11 @@
 package com.S2O.webapp.Entity;
 
 import lombok.Data;
-
 import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "subject")
+
 public class Subject {
 
     @Id
@@ -16,4 +15,11 @@ public class Subject {
 
     @Column(name = "subject_name")
     private String subjectName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "term_term_id")
+    private Term term;
+
+    @OneToOne(mappedBy = "subject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private StudentMark studentMark;
 }

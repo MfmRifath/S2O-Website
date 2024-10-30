@@ -55,7 +55,7 @@ export const FounderPage = () => {
     return (
         <section className="py-5">
             <div className="text-center mb-5">
-                <h1><b>Founder</b></h1>
+                <h1 ><b className='founder'>Founder</b></h1>
                 <img
                     ref={imageRef}
                     src={founderInfo.image}

@@ -15,8 +15,11 @@ public class Book {
     private String title;
     @Column(name = "author")
     private String author;
-    @Column(name = "cover_image")
-    private String coverImage;
+
+
+    @ManyToOne
+    @JoinColumn(name = "cover_image_id")
+    private Image coverImage;
     @Column(name = "discription")
     private String description;
     @Column(name = "publisher")

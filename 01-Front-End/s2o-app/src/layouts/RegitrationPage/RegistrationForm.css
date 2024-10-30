@@ -1,0 +1,128 @@
+/* Container and Header Styling */
+.form-container {
+  max-width: 600px;
+  margin: auto;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.form-container:hover {
+  transform: scale(1.01);
+}
+
+.form-header {
+  text-align: center;
+}
+
+.form-logo {
+  transition: transform 0.3s ease;
+  max-width: 100px;
+  margin-bottom: 1rem;
+}
+
+.form-logo:hover {
+  transform: scale(1.05);
+}
+
+.form-title {
+  font-size: 1.8rem;
+  color: #333;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+/* Label and Input Styling */
+.form-label {
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 0.3rem;
+}
+
+.form-input,
+.form-textarea {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  background-color: #f9f9f9;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+  outline: none;
+  background-color: #ffffff;
+}
+
+/* Checkbox Styling */
+.form-check {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.form-check-input {
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-check-label {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.form-check-input:checked {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+/* Submit Button Styling */
+.form-submit-btn {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-top: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.form-submit-btn:hover {
+  background: linear-gradient(135deg, #0056b3, #003a80);
+  transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-container {
+    padding: 1.5rem;
+  }
+
+  .form-title {
+    font-size: 1.5rem;
+  }
+
+  .form-input,
+  .form-textarea {
+    font-size: 0.95rem;
+  }
+
+  .form-submit-btn {
+    font-size: 1rem;
+    padding: 0.6rem 1.2rem;
+  }
+}

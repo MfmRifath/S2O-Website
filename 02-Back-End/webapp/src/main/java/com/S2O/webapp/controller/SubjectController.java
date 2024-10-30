@@ -1,8 +1,7 @@
 package com.S2O.webapp.controller;
 
-
 import com.S2O.webapp.Entity.Subject;
-import com.S2O.webapp.dao.SubjectRepository;
+import com.S2O.webapp.Service.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,36 +13,34 @@ import java.util.List;
 public class SubjectController {
 
     @Autowired
-    private SubjectRepository subjectRepository;
+    private SubjectService subjectService;
 
     @GetMapping
     public List<Subject> getAllSubjects() {
-        return subjectRepository.findAll();
+        return subjectService.getAllSubjects();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Subject> getSubjectById(@PathVariable int id) {
+        return subjectService.getSubjectById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public Subject createSubject(@RequestBody Subject subject) {
-        return subjectRepository.save(subject);
+        return subjectService.saveSubject(subject);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Subject> updateSubject(@PathVariable Long id, @RequestBody Subject subjectDetails) {
-        return subjectRepository.findById(Math.toIntExact(id))
-                .map(subject -> {
-                    subject.setSubjectName(subjectDetails.getSubjectName());
-                    Subject updatedSubject = subjectRepository.save(subject);
-                    return ResponseEntity.ok(updatedSubject);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Subject> updateSubject(@PathVariable int id, @RequestBody Subject subjectDetails) {
+        Subject updatedSubject = subjectService.updateSubject(id, subjectDetails);
+        return ResponseEntity.ok(updatedSubject);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteSubject(@PathVariable Long id) {
-        return subjectRepository.findById(Math.toIntExact(id))
-                .map(subject -> {
-                    subjectRepository.delete(subject);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Void> deleteSubject(@PathVariable int id) {
+        subjectService.deleteSubject(id);
+        return ResponseEntity.noContent().build();
     }
 }

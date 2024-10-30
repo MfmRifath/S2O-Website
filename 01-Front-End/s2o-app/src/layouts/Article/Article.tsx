@@ -1,8 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import HeadofArticlePage from "./HeadofArticlePage";
 
-import HeadofArticlePage from './HeadofArticlePage';
-import Content from './content';
-import ArticleModal from '../../Model/ArticleModal';
+import Content from "./content";
+
+// Define the ArticleModal type
+interface ArticleModal {
+  articleId: string;
+  title: string;
+  author: string;
+  authorQualification: string;
+  date: string;
+  content: string;
+  img?: { url: string }[];
+}
 
 export const Article: React.FC = () => {
   const [articles, setArticles] = useState<ArticleModal[]>([]);
@@ -10,17 +20,19 @@ export const Article: React.FC = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/articles/all');
+        const response = await fetch("http://localhost:8080/api/articles/all");
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         const data: ArticleModal[] = await response.json();
 
         // Sort articles by date in descending order
-        const sortedArticles = data.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        const sortedArticles = data.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
         setArticles(sortedArticles);
       } catch (error) {
-        console.error('Error fetching articles:', error);
+        console.error("Error fetching articles:", error);
       }
     };
 
@@ -30,18 +42,16 @@ export const Article: React.FC = () => {
   return (
     <>
       <HeadofArticlePage />
-      {articles.map((article, index) => (
+      {articles.map((article) => (
         <Content
-          key={index}
+          key={article.articleId}
           articleId={article.articleId}
           title={article.title}
           author={article.author}
           authorQualification={article.authorQualification}
           date={article.date}
           content={article.content}
-          img={article.img}
-          img1={article.img1}
-          img2={article.img2}
+          img={article.img ?? []} // Default to an empty array if undefined
         />
       ))}
     </>

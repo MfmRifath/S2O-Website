@@ -1,52 +1,42 @@
-package com.S2O.webapp.services;
+package com.S2O.webapp.Service;
 
 import com.S2O.webapp.Entity.Student;
-import com.S2O.webapp.Entity.StudentType;
-import com.S2O.webapp.dao.StudentRepository;
-import com.S2O.webapp.dao.StudentTypeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
-    private final StudentRepository studentRepository;
-    private final StudentTypeRepository studentTypeRepository;
 
-    public StudentService(StudentRepository studentRepository, StudentTypeRepository studentTypeRepository) {
-        this.studentRepository = studentRepository;
-        this.studentTypeRepository = studentTypeRepository;
-    }
+    @Autowired
+    private com.S2O.webapp.dao.StudentRepository studentRepository;
 
     public List<Student> getAllStudents() {
         return studentRepository.findAll();
     }
 
-    public Student getStudentById(Long id) {
-        return studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id " + id));
+    public Optional<Student> getStudentById(int studentId) {
+        return studentRepository.findById(studentId);
     }
 
-    public Student createStudent(Student student) {
-        StudentType studentType = studentTypeRepository.findById(student.getStudentType().getStudentTypeId())
-                .orElseThrow(() -> new RuntimeException("StudentType not found with id " + student.getStudentType().getStudentTypeId()));
-        student.setStudentType(studentType);
+    public Student saveStudent(Student student) {
         return studentRepository.save(student);
     }
 
-    public Student updateStudent(Long id, Student studentDetails) {
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id " + id));
-        StudentType studentType = studentTypeRepository.findById(studentDetails.getStudentType().getStudentTypeId())
-                .orElseThrow(() -> new RuntimeException("StudentType not found with id " + studentDetails.getStudentType().getStudentTypeId()));
-        student.setStudentName(studentDetails.getStudentName());
-        student.setStudentType(studentType);
-        return studentRepository.save(student);
+    public Student updateStudent(int studentId, Student studentDetails) {
+        return studentRepository.findById(studentId)
+                .map(student -> {
+                    student.setStudentName(studentDetails.getStudentName());
+                    student.setStream(studentDetails.getStream());
+                    student.setYear(studentDetails.getYear());
+                    return studentRepository.save(student);
+                })
+                .orElseGet(() -> studentRepository.save(studentDetails));
     }
 
-    public void deleteStudent(Long id) {
-        Student student = studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Student not found with id " + id));
-        studentRepository.delete(student);
+    public void deleteStudent(int studentId) {
+        studentRepository.deleteById(studentId);
     }
 }

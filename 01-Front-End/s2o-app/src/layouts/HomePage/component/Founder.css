@@ -5,16 +5,19 @@
     border: 5px solid #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
+.founder{
+    color: #FFFFFF;
+}
 .founder-name {
     font-size: 1.5rem;
     font-weight: bold;
     margin-top: 1rem;
+    color: #FFFFFF;
 }
 
 .founder-description {
     font-size: 1rem;
-    color: #120202;
+    color: #FFFFFF;
     max-width: 600px;
     margin: 0 auto;
 }

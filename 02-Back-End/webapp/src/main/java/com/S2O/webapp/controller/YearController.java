@@ -2,6 +2,8 @@ package com.S2O.webapp.controller;
 
 import com.S2O.webapp.Entity.Year;
 import com.S2O.webapp.services.YearService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -9,11 +11,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/years")
 public class YearController {
-    private final YearService yearService;
 
-    public YearController(YearService yearService) {
-        this.yearService = yearService;
-    }
+    @Autowired
+    private YearService yearService;
 
     @GetMapping
     public List<Year> getAllYears() {
@@ -21,22 +21,26 @@ public class YearController {
     }
 
     @GetMapping("/{id}")
-    public Year getYearById(@PathVariable int id) {
-        return yearService.getYearById(id);
+    public ResponseEntity<Year> getYearById(@PathVariable int id) {
+        return yearService.getYearById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
     public Year createYear(@RequestBody Year year) {
-        return yearService.createYear(year);
+        return yearService.saveYear(year);
     }
 
     @PutMapping("/{id}")
-    public Year updateYear(@PathVariable int id, @RequestBody Year yearDetails) {
-        return yearService.updateYear(id, yearDetails);
+    public ResponseEntity<Year> updateYear(@PathVariable int id, @RequestBody Year yearDetails) {
+        Year updatedYear = yearService.updateYear(id, yearDetails);
+        return ResponseEntity.ok(updatedYear);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteYear(@PathVariable int id) {
+    public ResponseEntity<Void> deleteYear(@PathVariable int id) {
         yearService.deleteYear(id);
+        return ResponseEntity.noContent().build();
     }
 }
