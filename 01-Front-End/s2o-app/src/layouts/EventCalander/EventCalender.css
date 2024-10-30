@@ -1,0 +1,188 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+.event-page {
+  font-family: "Poppins", sans-serif;
+  background: #f7f9fc;
+  border-radius: 10px;
+  padding: 20px;
+  color: #333;
+}
+
+.page-title {
+  font-size: 3em;
+  color: #00796b;
+  font-weight: 700;
+  margin-bottom: 25px;
+}
+
+/* Calendar Container */
+.calendar-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.react-calendar {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+/* Calendar Header - Change font color */
+.react-calendar__navigation button {
+  background: #00796b;
+  color: #ffffff;
+  font-weight: 600;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  transition: 0.3s;
+}
+
+/* Change font color of dates */
+.react-calendar__tile {
+  color: #333333; /* Default date color */
+  font-weight: 500;
+}
+
+/* Change font color of weekend dates */
+.react-calendar__month-view__days__day--weekend {
+  color: #e64a19; /* Distinct color for weekends */
+  font-weight: 600;
+}
+
+/* Change font color of today's date */
+.react-calendar__tile--now {
+  background: #ffd700;
+  border-radius: 50%;
+  color: #333;
+  font-weight: 700;
+}
+
+/* Active date font and background color */
+.react-calendar__tile--active {
+  background: #ff9800;
+  color: #ffffff; /* White text on active date */
+  border-radius: 50%;
+}
+
+/* Hover effect on dates */
+.react-calendar__tile:hover {
+  background: #00796b;
+  color: #ffffff;
+}
+
+/* Event List Section */
+.event-list-section {
+  margin-top: 40px;
+}
+
+.section-title {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.event-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.event-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s;
+}
+
+.event-card:hover {
+  transform: scale(1.05);
+}
+
+.event-card-content {
+  padding: 20px;
+}
+
+.event-title {
+  font-size: 1.5em;
+  color: #00796b;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.event-date {
+  font-size: 1em;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.event-description {
+  font-size: 1em;
+  color: #333;
+}
+
+.delete-btn {
+  background-color: #ff5722;
+  border: none;
+  color: white;
+  padding: 10px;
+  width: 100%;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+.delete-btn:hover {
+  background-color: #e64a19;
+}
+
+.add-event-section {
+  margin-top: 40px;
+  background-color: #e0f2f1;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+}
+
+.add-event-form {
+  max-width: 600px;
+  margin: auto;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+.btn-primary {
+  background-color: #00796b;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1em;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: #004d40;
+}
+
+.alert {
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.alert-success {
+  background-color: #d1e7dd;
+  color: #2e7d32;
+}
+
+.alert-danger {
+  background-color: #ffccbc;
+  color: #d32f2f;
+}

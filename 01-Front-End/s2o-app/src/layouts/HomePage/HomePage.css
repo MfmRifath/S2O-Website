@@ -1,0 +1,23 @@
+hr {
+  border: 0;
+  height: 2px; /* A clean, thin line */
+  width: 100%; /* Wide enough to create a clear separation */
+  background: linear-gradient(to right, #ccc, #333, #ccc); /* Neutral gradient */
+  position: relative;
+  margin: 40px auto;
+  border-radius: 2px; /* Slight rounding for a refined look */
+}
+
+hr.center-elegant::before {
+  content: ".";
+  width: 15px;
+  height: 15px;
+  background: linear-gradient(to right, #ccc, #333, #ccc); /* Darker color for the center decoration */
+  display: inline-block;
+  border-radius: 50%; /* Subtle circle in the center */
+  position: absolute;
+  top: -7px; /* Centered on the line */
+  left: 50%;
+  margin-left: -7.5px; /* Proper centering */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+}
