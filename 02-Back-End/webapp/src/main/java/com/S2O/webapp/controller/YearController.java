@@ -1,46 +1,25 @@
-package com.S2O.webapp.controller;
+// Year.java
 
-import com.S2O.webapp.Entity.Year;
-import com.S2O.webapp.services.YearService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.S2O.webapp.Entity.Term;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Data;
 
+import javax.persistence.*;
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:3000")
-@RestController
-@RequestMapping("/api/years")
-public class YearController {
 
-    @Autowired
-    private YearService yearService;
+@Data
+@Entity
+public class Year {
 
-    @GetMapping
-    public List<Year> getAllYears() {
-        return yearService.getAllYears();
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "year_id")
+    private int yearId;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Year> getYearById(@PathVariable int id) {
-        return yearService.getYearById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
+    @Column(name = "year_value")
+    private int yearValue;
 
-    @PostMapping
-    public Year createYear(@RequestBody Year year) {
-        return yearService.saveYear(year);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Year> updateYear(@PathVariable int id, @RequestBody Year yearDetails) {
-        Year updatedYear = yearService.updateYear(id, yearDetails);
-        return ResponseEntity.ok(updatedYear);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteYear(@PathVariable int id) {
-        yearService.deleteYear(id);
-        return ResponseEntity.noContent().build();
-    }
+    @JsonManagedReference
+    @OneToMany(mappedBy = "year", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Term> terms;
 }
