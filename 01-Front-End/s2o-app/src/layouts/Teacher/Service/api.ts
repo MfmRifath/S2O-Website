@@ -1,178 +1,164 @@
-// src/api/api.ts
-import axios from "axios";
-import { Student, StudentMark, Subject, Term, Year } from "./interfaces";
+import axios, { AxiosResponse } from "axios";
+import { Year, Term, Subject, StudentMark, Student } from "./interfaces";
 
-// Base API URL
-const API_URL = "http://localhost:8080/api";
+const BASE_URL = "http://localhost:8080/api";
 
-// Student Endpoints
-export const fetchStudents = async (): Promise<Student[]> => {
-  const response = await axios.get<Student[]>(`${API_URL}/students`);
-  return response.data;
+// Utility function to handle HTTP requests
+const request = async <T>(
+  method: "get" | "post" | "put" | "delete",
+  url: string,
+  data?: any
+): Promise<AxiosResponse<T> | undefined> => {
+  try {
+    return await axios({ method, url, data });
+  } catch (error: any) {
+    console.error(
+      `Error during ${method.toUpperCase()} request to ${url}:`,
+      error.response?.data || error.message
+    );
+    throw error;
+  }
 };
+// Year Service Functions
+export const getAllYears = async (): Promise<
+  AxiosResponse<Year[]> | undefined
+> => request("get", `${BASE_URL}/years`);
 
-export const fetchStudentById = async (id: number): Promise<Student> => {
-  const response = await axios.get<Student>(`${API_URL}/students/${id}`);
-  return response.data;
-};
-
-export const createStudent = async (
-  studentData: Omit<Student, "studentId">
-): Promise<Student> => {
-  const response = await axios.post<Student>(
-    `${API_URL}/students`,
-    studentData
-  );
-  return response.data;
-};
-
-export const updateStudent = async (
-  id: number,
-  studentData: Partial<Student>
-): Promise<Student> => {
-  const response = await axios.put<Student>(
-    `${API_URL}/students/${id}`,
-    studentData
-  );
-  return response.data;
-};
-
-export const deleteStudent = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/students/${id}`);
-};
-
-// Student Mark Endpoints
-export const fetchStudentMarks = async (): Promise<StudentMark[]> => {
-  const response = await axios.get<StudentMark[]>(`${API_URL}/student-marks`);
-  return response.data;
-};
-
-export const fetchStudentMarkById = async (
+export const getYearById = async (
   id: number
-): Promise<StudentMark> => {
-  const response = await axios.get<StudentMark>(
-    `${API_URL}/student-marks/${id}`
-  );
-  return response.data;
-};
-
-export const createStudentMark = async (
-  studentMarkData: Omit<StudentMark, "markId">
-): Promise<StudentMark> => {
-  const response = await axios.post<StudentMark>(
-    `${API_URL}/student-marks`,
-    studentMarkData
-  );
-  return response.data;
-};
-
-export const updateStudentMark = async (
-  id: number,
-  studentMarkData: Partial<StudentMark>
-): Promise<StudentMark> => {
-  const response = await axios.put<StudentMark>(
-    `${API_URL}/student-marks/${id}`,
-    studentMarkData
-  );
-  return response.data;
-};
-
-export const deleteStudentMark = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/student-marks/${id}`);
-};
-
-// Subject Endpoints
-export const fetchSubjects = async (): Promise<Subject[]> => {
-  const response = await axios.get<Subject[]>(`${API_URL}/subjects`);
-  return response.data;
-};
-
-export const fetchSubjectById = async (id: number): Promise<Subject> => {
-  const response = await axios.get<Subject>(`${API_URL}/subjects/${id}`);
-  return response.data;
-};
-
-export const createSubject = async (
-  subjectData: Omit<Subject, "subjectId">
-): Promise<Subject> => {
-  const response = await axios.post<Subject>(
-    `${API_URL}/subjects`,
-    subjectData
-  );
-  return response.data;
-};
-
-export const updateSubject = async (
-  id: number,
-  subjectData: Partial<Subject>
-): Promise<Subject> => {
-  const response = await axios.put<Subject>(
-    `${API_URL}/subjects/${id}`,
-    subjectData
-  );
-  return response.data;
-};
-
-export const deleteSubject = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/subjects/${id}`);
-};
-
-// Term Endpoints
-export const fetchTerms = async (): Promise<Term[]> => {
-  const response = await axios.get<Term[]>(`${API_URL}/terms`);
-  return response.data;
-};
-
-export const fetchTermById = async (id: number): Promise<Term> => {
-  const response = await axios.get<Term>(`${API_URL}/terms/${id}`);
-  return response.data;
-};
-
-export const createTerm = async (
-  termData: Omit<Term, "termId">
-): Promise<Term> => {
-  const response = await axios.post<Term>(`${API_URL}/terms`, termData);
-  return response.data;
-};
-
-export const updateTerm = async (
-  id: number,
-  termData: Partial<Term>
-): Promise<Term> => {
-  const response = await axios.put<Term>(`${API_URL}/terms/${id}`, termData);
-  return response.data;
-};
-
-export const deleteTerm = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/terms/${id}`);
-};
-
-// Year Endpoints
-export const fetchYears = async (): Promise<Year[]> => {
-  const response = await axios.get<Year[]>(`${API_URL}/years`);
-  return response.data;
-};
-
-export const fetchYearById = async (id: number): Promise<Year> => {
-  const response = await axios.get<Year>(`${API_URL}/years/${id}`);
-  return response.data;
-};
+): Promise<AxiosResponse<Year> | undefined> =>
+  request("get", `${BASE_URL}/years/${id}`);
 
 export const createYear = async (
-  yearData: Omit<Year, "yearId">
-): Promise<Year> => {
-  const response = await axios.post<Year>(`${API_URL}/years`, yearData);
-  return response.data;
-};
+  year: Year
+): Promise<AxiosResponse<Year> | undefined> =>
+  request("post", `${BASE_URL}/years`, year);
 
 export const updateYear = async (
   id: number,
-  yearData: Partial<Year>
-): Promise<Year> => {
-  const response = await axios.put<Year>(`${API_URL}/years/${id}`, yearData);
-  return response.data;
+  yearDetails: Year
+): Promise<AxiosResponse<Year> | undefined> =>
+  request("put", `${BASE_URL}/years/${id}`, yearDetails);
+
+export const deleteYear = async (
+  id: number
+): Promise<AxiosResponse<void> | undefined> =>
+  request("delete", `${BASE_URL}/years/${id}`);
+
+// Term Service Functions
+export const getAllTerms = async (): Promise<
+  AxiosResponse<Term[]> | undefined
+> => request("get", `${BASE_URL}/terms`);
+
+export const getTermById = async (
+  id: number
+): Promise<AxiosResponse<Term> | undefined> =>
+  request("get", `${BASE_URL}/terms/${id}`);
+
+export const createTerm = async (
+  term: Term
+): Promise<AxiosResponse<Term> | undefined> =>
+  request("post", `${BASE_URL}/terms`, term);
+
+export const updateTerm = async (
+  id: number,
+  termDetails: Term
+): Promise<AxiosResponse<Term> | undefined> =>
+  request("put", `${BASE_URL}/terms/${id}`, termDetails);
+
+export const deleteTerm = async (
+  id: number
+): Promise<AxiosResponse<void> | undefined> =>
+  request("delete", `${BASE_URL}/terms/${id}`);
+
+// Subject Service Functions
+export const getAllSubjects = async (): Promise<
+  AxiosResponse<Subject[]> | undefined
+> => request("get", `${BASE_URL}/subjects`);
+
+export const getSubjectById = async (
+  id: number
+): Promise<AxiosResponse<Subject> | undefined> =>
+  request("get", `${BASE_URL}/subjects/${id}`);
+
+export const createSubject = async (
+  subject: Subject
+): Promise<AxiosResponse<Subject> | undefined> =>
+  request("post", `${BASE_URL}/subjects`, subject);
+
+export const updateSubject = async (
+  id: number,
+  subjectDetails: Subject
+): Promise<AxiosResponse<Subject> | undefined> =>
+  request("put", `${BASE_URL}/subjects/${id}`, subjectDetails);
+
+export const deleteSubject = async (
+  id: number
+): Promise<AxiosResponse<void> | undefined> =>
+  request("delete", `${BASE_URL}/subjects/${id}`);
+
+// StudentMark Service Functions
+export const getAllStudentMarks = async (): Promise<
+  AxiosResponse<StudentMark[]> | undefined
+> => request("get", `${BASE_URL}/student-marks`);
+
+export const getStudentMarkById = async (
+  id: number
+): Promise<AxiosResponse<StudentMark> | undefined> =>
+  request("get", `${BASE_URL}/student-marks/${id}`);
+
+export const createStudentMark = async (
+  studentMark: StudentMark
+): Promise<AxiosResponse<StudentMark> | undefined> =>
+  request("post", `${BASE_URL}/student-marks`, studentMark);
+
+export const updateStudentMark = async (
+  id: number,
+  studentMarkDetails: StudentMark
+): Promise<AxiosResponse<StudentMark> | undefined> =>
+  request("put", `${BASE_URL}/student-marks/${id}`, studentMarkDetails);
+
+export const deleteStudentMark = async (
+  id: number
+): Promise<AxiosResponse<void> | undefined> =>
+  request("delete", `${BASE_URL}/student-marks/${id}`);
+
+// Student Service Functions
+export const getAllStudents = async (): Promise<
+  AxiosResponse<Student[]> | undefined
+> => request("get", `${BASE_URL}/students`);
+
+export const getStudentById = async (
+  id: number
+): Promise<AxiosResponse<Student> | undefined> =>
+  request("get", `${BASE_URL}/students/${id}`);
+
+export const createStudent = async (
+  student: Student
+): Promise<AxiosResponse<Student> | undefined> =>
+  request("post", `${BASE_URL}/students`, student);
+
+export const updateStudent = async (
+  id: number,
+  studentDetails: Student
+): Promise<AxiosResponse<Student> | undefined> =>
+  request("put", `${BASE_URL}/students/${id}`, studentDetails);
+
+export const deleteStudent = async (
+  id: number
+): Promise<AxiosResponse<void> | undefined> =>
+  request("delete", `${BASE_URL}/students/${id}`);
+
+// Fetch terms by year ID
+export const getTermsByYearId = async (
+  yearId: number
+): Promise<AxiosResponse<Term[]>> => {
+  return await axios.get(`${BASE_URL}/years/${yearId}/terms`);
 };
 
-export const deleteYear = async (id: number): Promise<void> => {
-  await axios.delete(`${API_URL}/years/${id}`);
+// Fetch subjects by term ID
+export const getSubjectsByTermId = async (
+  termId: number
+): Promise<AxiosResponse<Subject[]>> => {
+  return await axios.get(`${BASE_URL}/terms/${termId}/subjects`);
 };

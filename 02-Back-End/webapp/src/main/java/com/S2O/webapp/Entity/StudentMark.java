@@ -10,7 +10,7 @@ public class StudentMark {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "mark_id")
-    private int markId;
+    private Long markId;
 
     @Column(name = "mark")
     private int mark;

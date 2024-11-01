@@ -1,4 +1,4 @@
-package com.S2O.webapp.exception;
+package com.S2O.webapp.config;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

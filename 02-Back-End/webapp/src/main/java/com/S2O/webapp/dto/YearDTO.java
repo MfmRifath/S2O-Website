@@ -1,19 +1,28 @@
 package com.S2O.webapp.dto;
 
+import java.util.List;
 
-import com.S2O.webapp.Entity.Year;
-import lombok.Data;
-
-@Data
 public class YearDTO {
-    private int yearId;
-    private int yearValue;
+    private Long yearId;
+    private Long yearValue;
+    private List<TermDTO> terms;  // Optional terms list
 
-    // Constructor to map Year to YearDTO
-    public YearDTO(Year year) {
-        this.yearId = year.getYearId();
-        this.yearValue = year.getYearValue();
+    // Constructor without terms
+    public YearDTO(Long yearId, Long yearValue) {
+        this.yearId = yearId;
+        this.yearValue = yearValue;
+        this.terms = null; // Default to null if not provided
     }
 
-    // Getters and setters...
+    // Constructor with optional terms
+    public YearDTO(Long yearId, Long yearValue, List<TermDTO> terms) {
+        this.yearId = yearId;
+        this.yearValue = yearValue;
+        this.terms = terms;
+    }
+
+    // Getters and setters
+    public Long getYearId() { return yearId; }
+    public Long getYearValue() { return yearValue; }
+    public List<TermDTO> getTerms() { return terms; }
 }

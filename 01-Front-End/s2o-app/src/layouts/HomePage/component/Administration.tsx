@@ -54,6 +54,12 @@ export const Administration = () => {
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  // Set the initial selectedYear to the first year in uniqueYears after data loads
+  useEffect(() => {
+    if (uniqueYears.length > 0 && selectedYear === null) {
+      setSelectedYear(uniqueYears[0]);
+    }
+  }, [uniqueYears]);
 
   // Fetch administrations using axios
   useEffect(() => {

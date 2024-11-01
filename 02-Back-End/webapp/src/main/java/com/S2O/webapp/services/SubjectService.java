@@ -17,7 +17,9 @@ public class SubjectService {
     public List<Subject> getAllSubjects() {
         return subjectRepository.findAll();
     }
-
+    public List<Subject> getSubjectsByTermId(Long termId) {
+        return subjectRepository.findByTermTermId(termId);
+    }
     public Optional<Subject> getSubjectById(int subjectId) {
         return subjectRepository.findById(subjectId);
     }

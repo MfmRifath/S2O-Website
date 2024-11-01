@@ -38,6 +38,7 @@ export const AddEditAdministration: React.FC = () => {
       ...prev,
       [name]: value,
     }));
+    console.log(`Updated field ${name}:`, value); // Debugging log
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

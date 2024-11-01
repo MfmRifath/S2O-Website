@@ -27,7 +27,7 @@ public class Administration {
     private String insta;
 
     @Column(name = "linkedin")
-    private String LinkedIn;
+    private String linkedIn;
 
     @Column(name = "email")
     private String email;

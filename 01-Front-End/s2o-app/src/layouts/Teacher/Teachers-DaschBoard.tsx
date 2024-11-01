@@ -1,49 +1,51 @@
-// src/components/TeachersDashboard.tsx
-import React, { useEffect, useState } from "react";
-import {
-  Student,
-  StudentMark,
-  Subject,
-  Term,
-  Year,
-} from "./Service/interfaces";
-import AnalysisPanel from "./Components/AnalysePanal";
-import MarksPanel from "./Components/MarksPanal";
-import StudentsPanel from "./Components/StudentPanal";
-import {
-  fetchStudents,
-  fetchStudentMarks,
-  fetchSubjects,
-  fetchTerms,
-  fetchYears,
-} from "./Service/api";
+import React, { useState } from "react";
+import Header from "./Components/Header";
 
-const TeachersDashboard = () => {
-  const [students, setStudents] = useState<Student[]>([]);
-  const [marks, setMarks] = useState<StudentMark[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [terms, setTerms] = useState<Term[]>([]);
-  const [years, setYears] = useState<Year[]>([]);
+import AnalyticsReports from "./Components/AnalysePanal";
+import MarksManagement from "./Components/MarksPanal";
+import "./TeachersDashboard.css";
+import Sidebar from "./Components/SideBar";
+import StudentManagement from "./Components/StudentPanal";
 
-  useEffect(() => {
-    const loadData = async () => {
-      setStudents(await fetchStudents());
-      setMarks(await fetchStudentMarks());
-      setSubjects(await fetchSubjects());
-      setTerms(await fetchTerms());
-      setYears(await fetchYears());
-    };
-    loadData();
-  }, []);
+const TeacherDashboard: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [activeSection, setActiveSection] = useState("studentManagement"); // Track active section
+
+  // Function to handle sidebar item selection
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+  };
 
   return (
-    <div className="dashboard">
-      <h1>Teacher's Dashboard</h1>
-      <StudentsPanel students={students} setStudents={setStudents} />
-      <MarksPanel marks={marks} setMarks={setMarks} />
-      <AnalysisPanel marks={marks} subjects={subjects} />
+    <div className="teacher-dashboard">
+      <Header />
+      <Sidebar
+        isOpen={isSidebarOpen}
+        toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+        onSelectSection={handleSectionChange} // Pass function to Sidebar
+      />
+      <div className={`main-content ${isSidebarOpen ? "open" : "collapsed"}`}>
+        {activeSection === "studentManagement" && (
+          <div className="card">
+            <h2>Student Management</h2>
+            <StudentManagement />
+          </div>
+        )}
+        {activeSection === "marksManagement" && (
+          <div className="card">
+            <h2>Marks Management</h2>
+            <MarksManagement />
+          </div>
+        )}
+        {activeSection === "analyticsReports" && (
+          <div className="card">
+            <h2>Analytics & Reports</h2>
+            <AnalyticsReports />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default TeachersDashboard;
+export default TeacherDashboard;
