@@ -1,14 +1,14 @@
 package com.S2O.webapp.controller;
 
 import com.S2O.webapp.Entity.Student;
-import com.S2O.webapp.dao.YearRepository;
+import com.S2O.webapp.dao.StudentRepository;
 import com.S2O.webapp.dto.StudentDTO;
-import com.S2O.webapp.dto.YearDTO;
-import com.S2O.webapp.dto.YearWithStudentsDTO;
 import com.S2O.webapp.services.StudentService;
 import com.S2O.webapp.services.YearService;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,13 +21,15 @@ public class StudentController {
     private StudentService studentService;
 
     @Autowired
-    private YearService yearService;
+    private StudentRepository studentRepository;
 
-    @GetMapping
-    public ResponseEntity<List<Student>> getAllYearsWithStudents() {
-        List<Student> students = studentService.getAllStudents();
-        return ResponseEntity.ok(students);
+    @Autowired
+    private YearService yearService;
+    public StudentController(StudentService studentService, StudentRepository studentRepository) {
+        this.studentService = studentService;
+        this.studentRepository = studentRepository;
     }
+
 
 
     @GetMapping("/{id}")
@@ -35,6 +37,10 @@ public class StudentController {
         return studentService.getStudentById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+    @GetMapping("/with-details")
+    public List<StudentDTO> getAllStudentsWithDetails() {
+        return studentService.getAllStudentsWithDetails();
     }
 
     @PostMapping

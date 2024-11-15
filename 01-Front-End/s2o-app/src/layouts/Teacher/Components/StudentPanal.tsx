@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  getAllStudents,
+  getAllStudentsWithDetails,
   updateStudent,
   createStudent,
   deleteStudent,
@@ -21,7 +21,9 @@ import { Student, Year, Term, Subject } from "../Service/interfaces";
 
 const StudentManagement: React.FC = () => {
   const [students, setStudents] = useState<Student[]>([]);
-  const [studentDetails, setStudentDetails] = useState<Student | null>(null);
+  const [studentDetails, setStudentDetails] = useState<Student | undefined>(
+    undefined
+  );
   const [years, setYears] = useState<Year[]>([]);
   const [yearDetails, setYearDetails] = useState<Year | null>(null);
   const [terms, setTerms] = useState<Term[]>([]);
@@ -40,100 +42,153 @@ const StudentManagement: React.FC = () => {
   }, []);
 
   const loadStudents = async () => {
-    const response = await getAllStudents();
-    if (response) setStudents(response.data);
+    try {
+      const response = await getAllStudentsWithDetails();
+      if (response) {
+        setStudents(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to load students:", error);
+    }
   };
 
   const loadYears = async () => {
-    const response = await getAllYears();
-    if (response) setYears(response.data);
+    try {
+      const response = await getAllYears();
+      if (response) {
+        setYears(response.data);
+      }
+    } catch (error) {
+      console.error("Failed to load years:", error);
+    }
   };
 
   const loadTerms = async (yearId: number) => {
     try {
       const response = await getTermsByYearId(yearId);
-      setTerms(response?.data || []); // Ensure `terms` is an array even if the API response is unexpected
+      setTerms(response.data || []);
     } catch (error) {
       console.error("Error loading terms:", error);
-      setTerms([]); // Set an empty array in case of an error to avoid breaking the component
+      setTerms([]);
     }
   };
 
   const loadSubjects = async (termId: number) => {
-    const response = await getSubjectsByTermId(termId);
-    if (response) setSubjects(response.data);
+    try {
+      const response = await getSubjectsByTermId(termId);
+      setSubjects(response.data);
+    } catch (error) {
+      console.error("Error loading subjects:", error);
+      setSubjects([]);
+    }
   };
 
+  // Student handlers
   const handleSaveStudent = async () => {
     if (studentDetails) {
-      if (isEditMode) {
-        await updateStudent(studentDetails.studentId, studentDetails);
-      } else {
-        await createStudent(studentDetails);
+      try {
+        if (isEditMode) {
+          await updateStudent(studentDetails.studentId, studentDetails);
+        } else {
+          await createStudent(studentDetails);
+        }
+        setStudentDetails(undefined);
+        setIsEditMode(false);
+        loadStudents();
+      } catch (error) {
+        console.error("Error saving student:", error);
       }
-      setStudentDetails(null);
-      setIsEditMode(false);
-      loadStudents();
-    }
-  };
-
-  const handleSaveYear = async () => {
-    if (yearDetails) {
-      if (isYearEditMode) {
-        await updateYear(yearDetails.yearId, yearDetails);
-      } else {
-        await createYear(yearDetails);
-      }
-      setYearDetails(null);
-      setIsYearEditMode(false);
-      loadYears();
-    }
-  };
-
-  const handleSaveTerm = async () => {
-    if (termDetails) {
-      if (isTermEditMode) {
-        await updateTerm(termDetails.termId, termDetails);
-      } else {
-        await createTerm({ ...termDetails, year: yearDetails });
-      }
-      setTermDetails(null);
-      setIsTermEditMode(false);
-      if (yearDetails) loadTerms(yearDetails.yearId);
-    }
-  };
-
-  const handleSaveSubject = async () => {
-    if (subjectDetails && termDetails) {
-      if (isSubjectEditMode) {
-        await updateSubject(subjectDetails.subjectId, subjectDetails);
-      } else {
-        await createSubject({ ...subjectDetails, term: termDetails });
-      }
-      setSubjectDetails(null);
-      setIsSubjectEditMode(false);
-      loadSubjects(termDetails.termId);
     }
   };
 
   const handleDeleteStudent = async (id: number) => {
-    await deleteStudent(id);
-    loadStudents();
+    try {
+      await deleteStudent(id);
+      loadStudents();
+    } catch (error) {
+      console.error("Error deleting student:", error);
+    }
+  };
+
+  // Year handlers
+  const handleSaveYear = async () => {
+    if (yearDetails) {
+      try {
+        if (isYearEditMode) {
+          await updateYear(yearDetails.yearId, yearDetails);
+        } else {
+          await createYear(yearDetails);
+        }
+        setYearDetails(null);
+        setIsYearEditMode(false);
+        loadYears();
+      } catch (error) {
+        console.error("Error saving year:", error);
+      }
+    }
   };
 
   const handleDeleteYear = async (id: number) => {
-    await deleteYear(id);
-    loadYears();
+    try {
+      await deleteYear(id);
+      loadYears();
+    } catch (error) {
+      console.error("Error deleting year:", error);
+    }
+  };
+
+  // Term handlers
+  const handleSaveTerm = async () => {
+    if (termDetails && yearDetails) {
+      try {
+        if (isTermEditMode) {
+          await updateTerm(termDetails.termId, termDetails);
+        } else {
+          await createTerm({ ...termDetails, year: yearDetails });
+        }
+        setTermDetails(null);
+        setIsTermEditMode(false);
+        loadTerms(yearDetails.yearId);
+      } catch (error) {
+        console.error("Error saving term:", error);
+      }
+    }
   };
 
   const handleDeleteTerm = async (id: number) => {
-    await deleteTerm(id);
-    if (yearDetails) loadTerms(yearDetails.yearId);
+    try {
+      await deleteTerm(id);
+      if (yearDetails) loadTerms(yearDetails.yearId);
+    } catch (error) {
+      console.error("Error deleting term:", error);
+    }
+  };
+
+  // Subject handlers
+  const handleSaveSubject = async () => {
+    if (subjectDetails && termDetails) {
+      try {
+        if (isSubjectEditMode) {
+          await updateSubject(subjectDetails.subjectId, subjectDetails);
+        } else {
+          await createSubject({ ...subjectDetails, term: termDetails });
+        }
+        setSubjectDetails(null);
+        setIsSubjectEditMode(false);
+        loadSubjects(termDetails.termId);
+      } catch (error) {
+        console.error("Error saving subject:", error);
+      }
+    }
   };
 
   const handleDeleteSubject = async (id: number) => {
-    await deleteSubject(id);
-    if (termDetails) loadSubjects(termDetails.termId);
+    try {
+      await deleteSubject(id);
+      if (termDetails) loadSubjects(termDetails.termId);
+    } catch (error) {
+      console.error("Error deleting subject:", error);
+    }
   };
 
   return (
@@ -175,14 +230,13 @@ const StudentManagement: React.FC = () => {
           ))}
         </tbody>
       </table>
-
       <button
         onClick={() => {
           setStudentDetails({
             studentId: 0,
             studentName: "",
             stream: "",
-            year: null,
+            year: undefined,
           });
           setIsEditMode(false);
         }}
@@ -218,7 +272,8 @@ const StudentManagement: React.FC = () => {
               setStudentDetails({
                 ...studentDetails,
                 year:
-                  years.find((year) => year.yearId === +e.target.value) || null,
+                  years.find((year) => year.yearId === +e.target.value) ||
+                  undefined,
               })
             }
           >
@@ -232,7 +287,7 @@ const StudentManagement: React.FC = () => {
           <button onClick={handleSaveStudent}>
             {isEditMode ? "Update" : "Save"}
           </button>
-          <button onClick={() => setStudentDetails(null)}>Cancel</button>
+          <button onClick={() => setStudentDetails(undefined)}>Cancel</button>
         </div>
       )}
 
@@ -258,7 +313,7 @@ const StudentManagement: React.FC = () => {
                   onClick={() => {
                     setYearDetails(year);
                     setIsYearEditMode(true);
-                    loadTerms(year.yearId); // Load terms for the selected year
+                    loadTerms(year.yearId);
                   }}
                 >
                   Edit
@@ -290,10 +345,7 @@ const StudentManagement: React.FC = () => {
             type="number"
             value={yearDetails.yearValue}
             onChange={(e) =>
-              setYearDetails({
-                ...yearDetails,
-                yearValue: +e.target.value,
-              })
+              setYearDetails({ ...yearDetails, yearValue: +e.target.value })
             }
             placeholder="Year Value"
           />
@@ -328,7 +380,7 @@ const StudentManagement: React.FC = () => {
                       onClick={() => {
                         setTermDetails(term);
                         setIsTermEditMode(true);
-                        loadSubjects(term.termId); // Load subjects for the selected term
+                        loadSubjects(term.termId);
                       }}
                     >
                       Edit
@@ -449,4 +501,5 @@ const StudentManagement: React.FC = () => {
     </div>
   );
 };
+
 export default StudentManagement;

@@ -1,27 +1,34 @@
 package com.S2O.webapp.dto;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import java.util.List;
 
 public class StudentDTO {
 
     private Long studentId;
-
-    @NotNull(message = "Student name cannot be null")
-    @Size(min = 1, max = 50, message = "Student name must be between 1 and 50 characters")
     private String studentName;
-
-    @Size(max = 30, message = "Stream cannot exceed 30 characters")
     private String stream;
-
     private YearDTO year;
+    private List<TermDTO> terms; // New field for terms
 
-    public StudentDTO(Long studentId, String studentName, String stream, YearDTO year) {
+    // Updated constructor to include terms
+    public StudentDTO(Long studentId, String studentName, String stream, YearDTO year, List<TermDTO> terms) {
         this.studentId = studentId;
         this.studentName = studentName;
         this.stream = stream;
-        this.year = year; // No need to create a new instance if it's provided as a YearDTO
+        this.year = year;
+        this.terms = terms;
     }
 
     // Getters and setters...
+    public Long getStudentId() { return studentId; }
+    public String getStudentName() { return studentName; }
+    public String getStream() { return stream; }
+    public YearDTO getYear() { return year; }
+    public List<TermDTO> getTerms() { return terms; }
+
+    public void setStudentId(Long studentId) { this.studentId = studentId; }
+    public void setStudentName(String studentName) { this.studentName = studentName; }
+    public void setStream(String stream) { this.stream = stream; }
+    public void setYear(YearDTO year) { this.year = year; }
+    public void setTerms(List<TermDTO> terms) { this.terms = terms; }
 }

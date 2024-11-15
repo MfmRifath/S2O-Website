@@ -20,7 +20,6 @@ public class Student {
     @Column(name = "stream")
     private String stream;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "year_year_id")
     @JsonBackReference
@@ -33,7 +32,5 @@ public class Student {
         this.year = year;
     }
 
-    public Student() {
-
-    }
+    public Student() {}
 }

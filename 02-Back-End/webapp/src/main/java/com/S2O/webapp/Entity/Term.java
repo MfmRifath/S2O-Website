@@ -25,7 +25,7 @@ public class Term {
     @JsonBackReference
     private Year year;
 
-    @OneToMany(mappedBy = "term", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "term", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Subject> subjects;
 

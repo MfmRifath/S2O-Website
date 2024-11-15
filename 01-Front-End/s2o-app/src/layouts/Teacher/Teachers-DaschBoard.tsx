@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import Header from "./Components/Header";
 
-import AnalyticsReports from "./Components/AnalysePanal";
 import MarksManagement from "./Components/MarksPanal";
 import "./TeachersDashboard.css";
 import Sidebar from "./Components/SideBar";
 import StudentManagement from "./Components/StudentPanal";
+import StudentMarksAnalysis from "./Components/MarksAnalysis/Pages/MarksAnalysisPage";
 
 const TeacherDashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -40,7 +40,7 @@ const TeacherDashboard: React.FC = () => {
         {activeSection === "analyticsReports" && (
           <div className="card">
             <h2>Analytics & Reports</h2>
-            <AnalyticsReports />
+            <StudentMarksAnalysis />
           </div>
         )}
       </div>

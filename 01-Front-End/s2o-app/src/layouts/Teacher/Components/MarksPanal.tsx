@@ -1,195 +1,372 @@
 import React, { useEffect, useState } from "react";
 import {
-  getAllStudents,
-  getAllSubjects,
-  getAllStudentMarks,
+  getAllStudentsWithDetails,
   createStudentMark,
   updateStudentMark,
-  deleteStudentMark,
 } from "../Service/api";
-import { Student, Subject, StudentMark } from "../Service/interfaces";
+import {
+  StudentDetailsDTO,
+  TermDTO,
+  SubjectDTO,
+  YearDTO,
+} from "../Service/interfaces";
+import "./MarksPanel.css"; // CSS file for custom styles
 
 const MarksPanel: React.FC = () => {
-  const [marks, setMarks] = useState<StudentMark[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [markDetails, setMarkDetails] = useState<StudentMark | null>(null);
-
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [studentDetails, setStudentDetails] = useState<StudentDetailsDTO[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  // Load students, subjects, and marks on component mount
+  // States for filters and search
+  const [searchName, setSearchName] = useState("");
+  const [filterYearId, setFilterYearId] = useState<number | null>(null);
+  const [filterTermId, setFilterTermId] = useState<number | null>(null);
+  const [filterSubjectId, setFilterSubjectId] = useState<number | null>(null);
+
+  // States for form to add or update marks
+  const [selectedYearId, setSelectedYearId] = useState<number | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
+    null
+  );
+  const [selectedTermId, setSelectedTermId] = useState<number | null>(null);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<number | null>(
+    null
+  );
+  const [mark, setMark] = useState<number | null>(null);
+
   useEffect(() => {
-    loadStudents();
-    loadSubjects();
-    loadMarks();
+    loadStudentDetails();
   }, []);
 
-  const loadStudents = async () => {
-    const response = await getAllStudents();
-    if (response && Array.isArray(response.data)) setStudents(response.data);
-  };
-
-  const loadSubjects = async () => {
-    const response = await getAllSubjects();
-    if (response && Array.isArray(response.data)) {
-      setSubjects(response.data);
-    } else {
-      setSubjects([]); // Fallback to an empty array if data is not an array
-    }
-  };
-
-  const loadMarks = async () => {
+  const loadStudentDetails = async () => {
     setIsLoading(true);
-    const response = await getAllStudentMarks();
-    if (response && Array.isArray(response.data)) {
-      setMarks(response.data);
-    } else {
-      setMarks([]); // Fallback to an empty array if data is not an array
+    try {
+      const response = await getAllStudentsWithDetails();
+      if (response && response.data) {
+        setStudentDetails(response.data);
+      }
+    } catch (error) {
+      setErrorMessage("Failed to load student details");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleSaveMark = async () => {
-    setIsLoading(true);
-    if (markDetails) {
-      if (isEditMode) {
-        await updateStudentMark(markDetails.markId, markDetails);
-      } else {
-        await createStudentMark(markDetails);
+    if (selectedStudentId && selectedSubjectId && mark !== null) {
+      try {
+        const existingMark = studentDetails
+          .find((student) => student.studentId === selectedStudentId)
+          ?.terms?.flatMap((term) => term.subjects || [])
+          .find(
+            (subject) => subject.subjectId === selectedSubjectId
+          )?.studentMarkDTO;
+
+        if (existingMark) {
+          await updateStudentMark(existingMark.markId, {
+            markId: existingMark.markId,
+            mark,
+          });
+          setErrorMessage("Mark updated successfully!");
+        } else {
+          await createStudentMark(selectedSubjectId, mark);
+          setErrorMessage("Mark added successfully!");
+        }
+
+        loadStudentDetails();
+        resetForm();
+      } catch (error) {
+        setErrorMessage("Failed to save mark");
       }
-      setMarkDetails(null);
-      setIsEditMode(false);
-      loadMarks();
-      setShowModal(false);
-    }
-    setIsLoading(false);
-  };
-
-  const handleDeleteMark = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this mark?")) {
-      await deleteStudentMark(id);
-      loadMarks();
+    } else {
+      setErrorMessage("Please fill in all fields to save the mark.");
     }
   };
 
-  const openModal = (mark: StudentMark | null = null) => {
-    setMarkDetails(mark);
-    setIsEditMode(!!mark);
-    setShowModal(true);
+  const resetForm = () => {
+    setSelectedYearId(null);
+    setSelectedStudentId(null);
+    setSelectedTermId(null);
+    setSelectedSubjectId(null);
+    setMark(null);
+  };
+
+  // Function to filter rows based on search and filter criteria
+  const getFilteredRows = () => {
+    return studentDetails
+      .filter((student) =>
+        student.studentName.toLowerCase().includes(searchName.toLowerCase())
+      )
+      .filter((student) =>
+        filterYearId ? student.year?.yearId === filterYearId : true
+      )
+      .flatMap(
+        (student) =>
+          student.terms?.flatMap((term) =>
+            term.subjects
+              ?.filter((subject) => {
+                const matchesTerm = filterTermId
+                  ? term.termId === filterTermId
+                  : true;
+                const matchesSubject = filterSubjectId
+                  ? subject.subjectId === filterSubjectId
+                  : true;
+                return matchesTerm && matchesSubject;
+              })
+              .map((subject) => ({
+                studentName: student.studentName,
+                yearValue: student.year?.yearValue ?? "N/A",
+                termName: term.termName,
+                subjectName: subject.subjectName,
+                mark: subject.studentMarkDTO?.mark ?? "N/A",
+              }))
+          ) || []
+      );
   };
 
   return (
-    <div>
-      <h2>Marks Management</h2>
-
-      {isLoading && <div className="spinner"></div>}
-
-      <table>
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Subject</th>
-            <th>Mark</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(marks) &&
-            marks.map((mark) => (
-              <tr key={mark.markId}>
-                <td>{mark.student?.studentName}</td>
-                <td>{mark.subject?.subjectName}</td>
-                <td>{mark.mark}</td>
-                <td>
-                  <button
-                    className="button-primary"
-                    onClick={() => openModal(mark)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="button-danger"
-                    onClick={() => handleDeleteMark(mark.markId)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-
-      <button className="button-primary" onClick={() => openModal()}>
-        Add Mark
-      </button>
-
-      {showModal && (
-        <div className="modal">
-          <h3>{isEditMode ? "Edit Mark" : "Add Mark"}</h3>
-          <select
-            value={markDetails?.student?.studentId || ""}
-            onChange={(e) =>
-              setMarkDetails({
-                ...markDetails!,
-                student:
-                  students.find(
-                    (student) => student.studentId === +e.target.value
-                  ) || null,
-              })
-            }
-          >
-            <option value="">Select Student</option>
-            {Array.isArray(students) &&
-              students.map((student) => (
-                <option key={student.studentId} value={student.studentId}>
-                  {student.studentName}
-                </option>
-              ))}
-          </select>
-          <select
-            value={markDetails?.subject?.subjectId || ""}
-            onChange={(e) =>
-              setMarkDetails({
-                ...markDetails!,
-                subject:
-                  subjects.find(
-                    (subject) => subject.subjectId === +e.target.value
-                  ) || null,
-              })
-            }
-          >
-            <option value="">Select Subject</option>
-            {Array.isArray(subjects) &&
-              subjects.map((subject) => (
-                <option key={subject.subjectId} value={subject.subjectId}>
-                  {subject.subjectName}
-                </option>
-              ))}
-          </select>
-          <input
-            type="number"
-            value={markDetails?.mark || ""}
-            onChange={(e) =>
-              setMarkDetails({
-                ...markDetails!,
-                mark: +e.target.value,
-              })
-            }
-            placeholder="Enter Mark"
-          />
-          <button className="button-primary" onClick={handleSaveMark}>
-            {isEditMode ? "Update" : "Save"}
-          </button>
-          <button
-            className="button-secondary"
-            onClick={() => setShowModal(false)}
-          >
-            Cancel
-          </button>
+    <div className="marks-panel">
+      <h2>Student Marks Management</h2>
+      {isLoading && <div className="spinner">Loading...</div>}
+      {errorMessage && (
+        <div className="alert alert-error" onClick={() => setErrorMessage("")}>
+          {errorMessage}
         </div>
       )}
+
+      <div className="card">
+        <h3>Add or Update Student Marks</h3>
+
+        {/* Form to Add or Update Marks */}
+        <div className="form-group">
+          <label>Year:</label>
+          <select
+            value={selectedYearId ?? ""}
+            onChange={(e) => {
+              setSelectedYearId(Number(e.target.value));
+              setSelectedStudentId(null);
+              setSelectedTermId(null);
+              setSelectedSubjectId(null);
+            }}
+            className="dropdown"
+          >
+            <option value="">Select Year</option>
+            {Array.from(new Set(studentDetails.map((student) => student.year)))
+              .filter((year): year is YearDTO => year !== undefined)
+              .map((year) => (
+                <option key={year.yearId} value={year.yearId}>
+                  {year.yearValue}
+                </option>
+              ))}
+          </select>
+        </div>
+
+        {selectedYearId && (
+          <div className="form-group">
+            <label>Student:</label>
+            <select
+              value={selectedStudentId ?? ""}
+              onChange={(e) => {
+                setSelectedStudentId(Number(e.target.value));
+                setSelectedTermId(null);
+                setSelectedSubjectId(null);
+              }}
+              className="dropdown"
+            >
+              <option value="">Select Student</option>
+              {studentDetails
+                .filter((student) => student.year?.yearId === selectedYearId)
+                .map((student) => (
+                  <option key={student.studentId} value={student.studentId}>
+                    {student.studentName}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
+
+        {selectedStudentId && (
+          <div className="form-group">
+            <label>Term:</label>
+            <select
+              value={selectedTermId ?? ""}
+              onChange={(e) => {
+                setSelectedTermId(Number(e.target.value));
+                setSelectedSubjectId(null);
+              }}
+              className="dropdown"
+            >
+              <option value="">Select Term</option>
+              {studentDetails
+                .find((student) => student.studentId === selectedStudentId)
+                ?.terms?.map((term) => (
+                  <option key={term.termId} value={term.termId}>
+                    {term.termName}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
+
+        {selectedTermId && (
+          <div className="form-group">
+            <label>Subject:</label>
+            <select
+              value={selectedSubjectId ?? ""}
+              onChange={(e) => setSelectedSubjectId(Number(e.target.value))}
+              className="dropdown"
+            >
+              <option value="">Select Subject</option>
+              {studentDetails
+                .find((student) => student.studentId === selectedStudentId)
+                ?.terms?.find((term) => term.termId === selectedTermId)
+                ?.subjects?.map((subject) => (
+                  <option key={subject.subjectId} value={subject.subjectId}>
+                    {subject.subjectName}
+                  </option>
+                ))}
+            </select>
+          </div>
+        )}
+
+        <div className="form-group">
+          <label>Mark:</label>
+          <input
+            type="number"
+            value={mark ?? ""}
+            onChange={(e) => setMark(Number(e.target.value))}
+            placeholder="Enter mark"
+            className="input-mark"
+          />
+        </div>
+        <button
+          onClick={handleSaveMark}
+          className="btn-save"
+          disabled={!selectedStudentId || !selectedSubjectId || mark === null}
+        >
+          Save Mark
+        </button>
+      </div>
+
+      {/* Display Filtered Results with Filters in Table Header */}
+      <div className="table-container">
+        <table className="marks-table">
+          <thead>
+            <tr>
+              <th>
+                Student Name
+                <input
+                  type="text"
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  placeholder="Enter name"
+                  className="input-filter"
+                />
+              </th>
+              <th>
+                Year
+                <select
+                  value={filterYearId ?? ""}
+                  onChange={(e) => setFilterYearId(Number(e.target.value))}
+                  className="dropdown-filter"
+                >
+                  <option value="">All Years</option>
+                  {Array.from(
+                    new Set(
+                      studentDetails.map((student) => student.year?.yearId)
+                    )
+                  )
+                    .filter((yearId) => yearId !== undefined)
+                    .map((yearId) => {
+                      const year = studentDetails.find(
+                        (student) => student.year?.yearId === yearId
+                      )?.year;
+                      return (
+                        <option key={year?.yearId} value={year?.yearId}>
+                          {year?.yearValue}
+                        </option>
+                      );
+                    })}
+                </select>
+              </th>
+              <th>
+                Term
+                <select
+                  value={filterTermId ?? ""}
+                  onChange={(e) => setFilterTermId(Number(e.target.value))}
+                  className="dropdown-filter"
+                >
+                  <option value="">All Terms</option>
+                  {Array.from(
+                    new Set(
+                      studentDetails.flatMap((student) =>
+                        student.terms?.map((term) => term.termId)
+                      )
+                    )
+                  )
+                    .filter((termId) => termId !== undefined)
+                    .map((termId) => {
+                      const term = studentDetails
+                        .flatMap((student) => student.terms)
+                        .find((term) => term?.termId === termId);
+                      return (
+                        <option key={term?.termId} value={term?.termId}>
+                          {term?.termName}
+                        </option>
+                      );
+                    })}
+                </select>
+              </th>
+              <th>
+                Subject
+                <select
+                  value={filterSubjectId ?? ""}
+                  onChange={(e) => setFilterSubjectId(Number(e.target.value))}
+                  className="dropdown-filter"
+                >
+                  <option value="">All Subjects</option>
+                  {Array.from(
+                    new Set(
+                      studentDetails.flatMap((student) =>
+                        student.terms?.flatMap((term) =>
+                          term.subjects?.map((subject) => subject.subjectId)
+                        )
+                      )
+                    )
+                  )
+                    .filter((subjectId) => subjectId !== undefined)
+                    .map((subjectId) => {
+                      const subject = studentDetails
+                        .flatMap((student) => student.terms)
+                        .flatMap((term) => term?.subjects || [])
+                        .find((subject) => subject?.subjectId === subjectId);
+                      return (
+                        <option
+                          key={subject?.subjectId}
+                          value={subject?.subjectId}
+                        >
+                          {subject?.subjectName}
+                        </option>
+                      );
+                    })}
+                </select>
+              </th>
+              <th>Mark</th>
+            </tr>
+          </thead>
+          <tbody>
+            {getFilteredRows().map((row, index) => (
+              <tr key={index}>
+                <td>{row?.studentName}</td>
+                <td>{row?.yearValue}</td>
+                <td>{row?.termName}</td>
+                <td>{row?.subjectName}</td>
+                <td>{row?.mark}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

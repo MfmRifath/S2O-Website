@@ -4,12 +4,14 @@ import com.S2O.webapp.Entity.Student;
 import com.S2O.webapp.Entity.Year;
 import com.S2O.webapp.dao.StudentRepository;
 import com.S2O.webapp.dao.YearRepository;
+import com.S2O.webapp.dto.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,21 +31,53 @@ public class StudentService {
         this.studentRepository = studentRepository; this.yearRepository = yearRepository;
 
     }
-    @Transactional(readOnly = true)
-    public List<Student> getAllStudents() {
-        logger.info("Fetching all students with associated year data");
 
-        List<Student> studentDTOs = studentRepository.findAll().stream()
-                .map(student -> new Student(
-                        student.getStudentId(),
-                        student.getStudentName(),
-                        student.getStream(),
-                        student.getYear() != null ? new Year(student.getYear().getYearId(), student.getYear().getYearValue()) : null
-                )).collect(Collectors.toList());
 
-        logger.debug("Mapped StudentDTOs: {}", studentDTOs);
-        return studentDTOs;
+
+
+    @Transactional
+    public List<StudentDTO> getAllStudentsWithDetails() {
+        return studentRepository.findAllWithYear().stream()
+                .map(student -> {
+                    List<TermDTO> termDTOs = Optional.ofNullable(student.getYear())
+                            .map(year -> year.getTerms())
+                            .orElse(Collections.emptyList())
+                            .stream()
+                            .map(term -> new TermDTO(
+                                    term.getTermId(),
+                                    term.getTermName(),
+                                    Optional.ofNullable(term.getSubjects())
+                                            .orElse(Collections.emptyList())
+                                            .stream()
+                                            .map(subject -> new SubjectDTO(
+                                                    subject.getSubjectId(),
+                                                    subject.getSubjectName(),
+                                                    Optional.ofNullable(subject.getStudentMark())
+                                                            .map(mark -> new StudentMarkDTO(
+                                                                    mark.getMarkId(),
+                                                                    mark.getMark()
+                                                            )).orElse(null)
+                                            )).collect(Collectors.toList())
+                            )).collect(Collectors.toList());
+
+                    YearDTO yearDTO = Optional.ofNullable(student.getYear())
+                            .map(year -> new YearDTO(
+                                    year.getYearId(),
+                                    year.getYearValue()
+                            )).orElse(null);
+
+                    return new StudentDTO(
+                            student.getStudentId(),
+                            student.getStudentName(),
+                            student.getStream(),
+                            yearDTO,
+                            termDTOs
+                    );
+                }).collect(Collectors.toList());
     }
+
+
+
 
     public Optional<Student> getStudentById(Long studentId) {
         return studentRepository.findById(studentId);

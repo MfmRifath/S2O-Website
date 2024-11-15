@@ -47,13 +47,10 @@ public class YearService {
 
 
 
-
-
     public Optional<Year> getYearById(Long yearId) {
         logger.info("Fetching year by ID: {}", yearId);
         return yearRepository.findById(yearId);
     }
-
     public Year saveYear(Year year) {
         logger.info("Saving new year with value: {}", year.getYearValue());
         return yearRepository.save(year);

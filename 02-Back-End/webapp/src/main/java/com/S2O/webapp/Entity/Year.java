@@ -18,15 +18,17 @@ public class Year {
     @Column(name = "year_value")
     private Long yearValue;
 
-    @OneToMany(mappedBy = "year", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "year", fetch = FetchType.EAGER)
     @JsonManagedReference
-    private List<Term> terms;  // Converted to Set
+    private List<Term> terms;
 
     @OneToMany(mappedBy = "year", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Student> students;
 
     public Year(Long yearId, Long yearValue) {
+        this.yearId = yearId;
+        this.yearValue = yearValue;
     }
 
     public Year(Long yearId, List<Term> terms, List<Student> students, Long yearValue) {
@@ -36,17 +38,13 @@ public class Year {
         this.yearValue = yearValue;
     }
 
-    public Year() {
-
-    }
+    public Year() {}
 
     @Override
     public String toString() {
         return "Year{" +
                 "yearId=" + yearId +
                 ", yearValue=" + yearValue +
-                // Avoid printing terms to prevent circular references
                 '}';
     }
-// Converted to Set
 }

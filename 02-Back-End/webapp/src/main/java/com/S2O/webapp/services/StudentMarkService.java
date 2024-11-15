@@ -1,12 +1,15 @@
-package com.S2O.webapp.Service;
+package com.S2O.webapp.services;
 
 import com.S2O.webapp.Entity.StudentMark;
 import com.S2O.webapp.dao.StudentMarkRepository;
+import com.S2O.webapp.dao.SubjectRepository;
+import com.S2O.webapp.dto.StudentMarkDTO;
+import com.amazonaws.services.cloudfront.model.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentMarkService {
@@ -14,28 +17,45 @@ public class StudentMarkService {
     @Autowired
     private StudentMarkRepository studentMarkRepository;
 
-    public List<StudentMark> getAllStudentMarks() {
-        return studentMarkRepository.findAll();
+    @Autowired
+    private SubjectRepository subjectRepository;
+
+    // Retrieve all student marks
+    public List<StudentMarkDTO> getAllStudentMarks() {
+        return studentMarkRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    public Optional<StudentMark> getStudentMarkById(int markId) {
-        return studentMarkRepository.findById(markId);
+    // Retrieve a specific student mark by ID
+    public StudentMarkDTO getStudentMarkById(Long id) {
+        return studentMarkRepository.findById(id)
+                .map(this::convertToDTO)
+                .orElse(null);
     }
 
-    public StudentMark saveStudentMark(StudentMark studentMark) {
-        return studentMarkRepository.save(studentMark);
+
+
+
+    // Update an existing student mark by ID
+    public StudentMarkDTO updateStudentMark(Long id, StudentMarkDTO studentMarkDTO) {
+        StudentMark studentMark = studentMarkRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Student mark not found"));
+        studentMark.setMark(studentMarkDTO.getMark());
+        studentMarkRepository.save(studentMark);
+        return convertToDTO(studentMark);
     }
 
-    public StudentMark updateStudentMark(int markId, StudentMark studentMarkDetails) {
-        return studentMarkRepository.findById(markId)
-                .map(mark -> {
-                    mark.setMark(studentMarkDetails.getMark());
-                    return studentMarkRepository.save(mark);
-                })
-                .orElseGet(() -> studentMarkRepository.save(studentMarkDetails));
+    // Delete student mark by ID
+    public void deleteStudentMark(Long id) {
+        studentMarkRepository.deleteById(id);
     }
 
-    public void deleteStudentMark(int markId) {
-        studentMarkRepository.deleteById(markId);
+    // Helper method to convert entity to DTO
+    private StudentMarkDTO convertToDTO(StudentMark studentMark) {
+        return new StudentMarkDTO(
+                studentMark.getMarkId(),
+                studentMark.getMark()
+        );
     }
 }

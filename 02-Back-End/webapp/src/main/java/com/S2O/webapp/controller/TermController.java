@@ -2,6 +2,7 @@ package com.S2O.webapp.controller;
 
 import com.S2O.webapp.Entity.Subject;
 import com.S2O.webapp.Entity.Term;
+import com.S2O.webapp.services.SubjectService;
 import com.S2O.webapp.services.TermService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ public class TermController {
     private TermService termService;
 
     @Autowired
-    private com.S2O.webapp.Service.SubjectService subjectService;
+    private SubjectService subjectService;
     @GetMapping
     public List<Term> getAllTerms() {
         return termService.getAllTerms();

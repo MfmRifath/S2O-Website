@@ -14,7 +14,7 @@ public class YearDTO {
         this.terms = null; // Default to null if not provided
     }
 
-    // Constructor with optional terms
+    // Constructor with terms
     public YearDTO(Long yearId, Long yearValue, List<TermDTO> terms) {
         this.yearId = yearId;
         this.yearValue = yearValue;
@@ -25,4 +25,8 @@ public class YearDTO {
     public Long getYearId() { return yearId; }
     public Long getYearValue() { return yearValue; }
     public List<TermDTO> getTerms() { return terms; }
+
+    public void setYearId(Long yearId) { this.yearId = yearId; }
+    public void setYearValue(Long yearValue) { this.yearValue = yearValue; }
+    public void setTerms(List<TermDTO> terms) { this.terms = terms; }
 }

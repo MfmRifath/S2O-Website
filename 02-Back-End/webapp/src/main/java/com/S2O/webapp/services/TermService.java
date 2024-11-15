@@ -34,6 +34,7 @@ public class TermService {
         return term;
     }
 
+    @Transactional
     public List<Term> getTermsByYearId(Long yearId) {
         List<Term> terms = termRepository.findByYearYearId(yearId);
         terms.forEach(term -> Hibernate.initialize(term.getSubjects())); // Initialize subjects collection

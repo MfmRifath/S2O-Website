@@ -1,7 +1,8 @@
 package com.S2O.webapp.controller;
 
 import com.S2O.webapp.Entity.Subject;
-import com.S2O.webapp.Service.SubjectService;
+import com.S2O.webapp.dto.StudentMarkDTO;
+import com.S2O.webapp.services.SubjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class SubjectController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Subject> getSubjectById(@PathVariable int id) {
+    public ResponseEntity<Subject> getSubjectById(@PathVariable Long id) {
         return subjectService.getSubjectById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -33,13 +34,27 @@ public class SubjectController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Subject> updateSubject(@PathVariable int id, @RequestBody Subject subjectDetails) {
+    public ResponseEntity<Subject> updateSubject(@PathVariable Long id, @RequestBody Subject subjectDetails) {
         Subject updatedSubject = subjectService.updateSubject(id, subjectDetails);
         return ResponseEntity.ok(updatedSubject);
     }
 
+    @PostMapping("/{subjectId}/student-marks")
+    public ResponseEntity<StudentMarkDTO> addStudentMark(
+            @PathVariable Long subjectId,
+            @RequestBody StudentMarkDTO studentMarkDTO) {
+
+        System.out.println("Received Subject ID: " + subjectId);
+        System.out.println("Received Mark Data: " + studentMarkDTO.getMark());
+
+        // Call the service to save the mark for the specified subject
+        StudentMarkDTO savedMark = subjectService.addStudentMarkToSubject(subjectId, studentMarkDTO.getMark());
+        return ResponseEntity.ok(savedMark);
+    }
+
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSubject(@PathVariable int id) {
+    public ResponseEntity<Void> deleteSubject(@PathVariable Long id) {
         subjectService.deleteSubject(id);
         return ResponseEntity.noContent().build();
     }

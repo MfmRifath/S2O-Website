@@ -108,9 +108,10 @@ export const getStudentMarkById = async (
   request("get", `${BASE_URL}/student-marks/${id}`);
 
 export const createStudentMark = async (
-  studentMark: StudentMark
+  subjectId: number,
+  mark: number
 ): Promise<AxiosResponse<StudentMark> | undefined> =>
-  request("post", `${BASE_URL}/student-marks`, studentMark);
+  request("post", `${BASE_URL}/subjects/${subjectId}/student-marks`, { mark });
 
 export const updateStudentMark = async (
   id: number,
@@ -161,4 +162,19 @@ export const getSubjectsByTermId = async (
   termId: number
 ): Promise<AxiosResponse<Subject[]>> => {
   return await axios.get(`${BASE_URL}/terms/${termId}/subjects`);
+};
+// Fetch student marks by subject ID
+export const getStudentMarksBySubjectId = async (
+  subjectId: number
+): Promise<AxiosResponse<StudentMark[]> | undefined> => {
+  return request("get", `${BASE_URL}/subjects/${subjectId}/student-marks`);
+};
+export const getAllStudentsWithDetails = async () => {
+  try {
+    const response = await axios.get(`${BASE_URL}/students/with-details`);
+    return response;
+  } catch (error) {
+    console.error("Failed to fetch students with details", error);
+    throw error;
+  }
 };
