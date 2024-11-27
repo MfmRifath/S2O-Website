@@ -1,0 +1,2 @@
+CREATE DATABASE s2o_web;
+USE s2o_web;
