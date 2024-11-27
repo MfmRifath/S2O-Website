@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import "./Gallery.css";
 import GalleryImageModel from "../../Model/GalleryImageModel";
 
-function Gallery() {
+const Gallery: React.FC = () => {
   const [galleries, setGalleries] = useState<GalleryImageModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [httpError, setHttpError] = useState<string | null>(null);
@@ -22,9 +22,11 @@ function Gallery() {
         }
 
         const galleriesJson: GalleryImageModel[] = await response.json();
+        console.log("Fetched galleries:", galleriesJson); // Debugging
         setGalleries(galleriesJson);
         setIsLoading(false);
       } catch (error: any) {
+        console.error("Error fetching galleries:", error);
         setIsLoading(false);
         setHttpError(error.message);
       }
@@ -35,11 +37,12 @@ function Gallery() {
 
   // Generate URLs for image files in each gallery
   const images = galleries.flatMap((gallery) =>
-    gallery.img.map((imgFile) => {
-      const imgUrl =
-        typeof imgFile === "string" ? imgFile : URL.createObjectURL(imgFile);
-      return { original: imgUrl, thumbnail: imgUrl };
-    })
+    Array.isArray(gallery.images)
+      ? gallery.images.map((img) => {
+          const imgUrl = img.file ? URL.createObjectURL(img.file) : img.url;
+          return { original: imgUrl, thumbnail: imgUrl };
+        })
+      : []
   );
 
   return (
@@ -69,6 +72,6 @@ function Gallery() {
       )}
     </div>
   );
-}
+};
 
 export default Gallery;

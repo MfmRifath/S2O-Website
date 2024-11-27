@@ -1,20 +1,23 @@
+import Image from "./Image";
+
 class GalleryImageModel {
   id: number;
   event: string;
   description?: string;
   date?: string;
-  img: Array<File | string>; // Use File for uploads or string for URLs
+  images: Array<Image>;
+
 
   constructor(
     id: number,
     event: string,
-    img: Array<File | string>,
+    images: Array<Image>,
     description?: string,
     date?: string
   ) {
     this.id = id;
     this.event = event;
-    this.img = img;
+    this.images = images;
     this.description = description;
     this.date = date;
   }

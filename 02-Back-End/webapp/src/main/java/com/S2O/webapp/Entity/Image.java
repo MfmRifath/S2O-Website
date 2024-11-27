@@ -28,18 +28,19 @@ public class Image {
     @Column(name = "file")
     File file;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id", insertable = false, updatable = false) // Ensure unique column name and settings
-    @JsonBackReference
+    @JsonBackReference("article-Image")
     private Article article;
 
-    @ManyToOne
-    @JoinColumn(name = "gallery_id", insertable = false, updatable = false) // Ensure unique column name and settings
-    @JsonBackReference
-    private Gallery gallery;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gallery_id", nullable = false) // Ensures association with a gallery
+    @JsonBackReference("gallery-images")
+    private Gallery gallery; // Remove unnecessary relationships with Article/Administration
 
     @OneToOne
     @JoinColumn(name = "administration_id", referencedColumnName = "id") // Unique name to avoid conflict with primary key
     @JsonBackReference
     private Administration administration;
+
 }

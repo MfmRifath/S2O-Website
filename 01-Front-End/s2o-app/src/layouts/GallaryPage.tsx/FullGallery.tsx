@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import GalleryImageModel from "../../Model/GalleryImageModel";
+import Image from "../../Model/Image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearchPlus,
@@ -87,11 +88,10 @@ export const FullGallery: React.FC = () => {
                     showStatus={false}
                     className="gallery-carousel"
                   >
-                    {gallery.img.filter(Boolean).map((imgFile, index) => {
+                    {gallery.images.map((image, index) => {
+                      // Determine image source
                       const imgSrc =
-                        typeof imgFile === "string"
-                          ? imgFile
-                          : URL.createObjectURL(imgFile); // For File objects, create a URL
+                        image.file ? URL.createObjectURL(image.file) : image.url;
 
                       return (
                         <div

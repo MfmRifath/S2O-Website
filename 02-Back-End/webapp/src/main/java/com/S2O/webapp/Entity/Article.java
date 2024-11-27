@@ -37,7 +37,7 @@ public class Article {
     @Column(name = "date")
     private LocalDate date;
 
-    @JsonManagedReference
+    @JsonManagedReference("article-Image")
     @BatchSize(size = 10)// Indicate the parent side
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "article")
     private List<Image> images;

@@ -1,8 +1,8 @@
 import {
   BrowserRouter as Router,
-  Redirect,
   Route,
-  Switch,
+  Routes,
+  Navigate,
 } from "react-router-dom";
 import "./App.css";
 import { Navbar } from "./layouts/NavbarAndFooter/Navbar";
@@ -14,117 +14,46 @@ import RegistrationForm from "./layouts/RegitrationPage/RegistrationForm";
 import { S2OAcadamy } from "./layouts/S2OAcadmyPage/S2OAcadamyPage";
 import { ResultPortal } from "./layouts/S2OAcadmyPage/components/ExamPortal/ResultPortal";
 import Dashboard from "./layouts/Admin/components/Dashboard";
-import Home from "./layouts/Admin/Pages/Home";
-import Reports from "./layouts/Admin/Pages/Reports";
-import Users from "./layouts/Admin/Pages/Users";
-import Analytics from "./layouts/Admin/Pages/Analytics";
-import Donation from "./layouts/Donation/DonationForm";
-import DonationSuccess from "./layouts/Donation/DonationSuccess";
-import DonationNotify from "./layouts/Donation/DonationNotify";
-import DonationCancel from "./layouts/Donation/DonationCancel";
-import DonationManagement from "./layouts/Admin/Pages/DonationManagement";
-import SiteSettings from "./layouts/Admin/Pages/SiteSettings";
-import SecuritySettings from "./layouts/Admin/Pages/SecuritySettings";
+import EditAdministration from "./layouts/Admin/components/EditAdministration";
+import TeacherHome from "./layouts/Teacher/TeacherDashBoard";
+import StudentManagement from "./layouts/Teacher/Pages/StudentManagment";
+import MarksManagement from "./layouts/Teacher/Pages/MarksManagement";
+import PerformanceTracking from "./layouts/Teacher/Pages/PerformanceTracking";
 import { ContentManagement } from "./layouts/Admin/Pages/ContentMangement.tsx";
-
-import { EditAdministration } from "./layouts/Admin/components/EditAdministration";
-import { Article } from "./layouts/Article/Article";
-import ChatWithAdmin from "./layouts/ChatWithAdmin/ChatWithAdmin";
+import Article from "./layouts/Article/Article";
 import { S2OLibrary } from "./layouts/S2OAcadmyPage/components/S2OLibrary";
 import Bookshelf from "./layouts/S2OAcadmyPage/components/S2O Library/BookShelf";
 import EventCalendar from "./layouts/EventCalander/EventCalander";
-import TeachersDashboard from "./layouts/Teacher/Teachers-DaschBoard";
+
+
 
 function App() {
   return (
     <Router>
-      <div>
-        <Navbar />
-        <div>
-          <Switch>
-            <Route path="/" exact>
-              <Redirect to="/home" />
-            </Route>
-            <Route path="/home">
-              <HomePage />
-            </Route>
-            <Route path="/gallery">
-              <FullGallery />
-            </Route>
-            <Route path="/login">
-              <LoginPage />
-            </Route>
-            <Route path="/Register">
-              <RegistrationForm />
-            </Route>
-            <Route path="/s2oAcademy">
-              <S2OAcadamy />
-            </Route>
-            <Route path="/resultPortal">
-              <ResultPortal />
-            </Route>
-            <Route path="/admin">
-              <Dashboard />
-            </Route>
-            <Route path="/adminHome">
-              <Home />
-            </Route>
-            <Route path="/adminReports">
-              <Reports />
-            </Route>
-            <Route path="/adminUsers">
-              <Users />
-            </Route>
-            <Route path="/adminAnalytics">
-              <Analytics />
-            </Route>
-            <Route path="/siteSettings">
-              <SiteSettings />
-            </Route>
-            <Route path="/securitySettings">
-              <SecuritySettings />
-            </Route>
-            <Route path="/adminDonation">
-              <Donation />
-            </Route>
-            <Route path="/donationSuccess">
-              <DonationSuccess />
-            </Route>
-            <Route path="/donationCancel">
-              <DonationCancel />
-            </Route>
-            <Route path="/donationNotify">
-              <DonationNotify />
-            </Route>
-            <Route path="/adminDonationManagment">
-              <DonationManagement />
-            </Route>
-            <Route path="/content">
-              <ContentManagement />
-            </Route>
-            <Route path="/edit-admin/:id" component={EditAdministration} />
-            <Route path="/article">
-              <Article />
-            </Route>
-            <Route path="/chat">
-              <ChatWithAdmin />
-            </Route>
-            <Route path="/S2OLibrary">
-              <S2OLibrary />
-            </Route>
-            <Route path="/bookShelf">
-              <Bookshelf />
-            </Route>
-            <Route path="/eventCalaender">
-              <EventCalendar />
-            </Route>
-            <Route path="/Teacher">
-              <TeachersDashboard />
-            </Route>
-          </Switch>
-        </div>
-        <Footer />
-      </div>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Navigate to="/home" />} />
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/gallery" element={<FullGallery />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegistrationForm />} />
+        <Route path="/s2oAcademy" element={<S2OAcadamy />} />
+        <Route path="/resultPortal" element={<ResultPortal />} />
+        <Route path="/admin" element={<Dashboard />} />
+        <Route path="/edit-admin/:id" element={<EditAdministration />} />
+        <Route path="/Teacher" element={<TeacherHome />} />
+        <Route path="/students" element={<StudentManagement />} />
+        <Route path="/marks" element={<MarksManagement />} />
+        <Route path="/performance" element={<PerformanceTracking/>} />
+        <Route path="/content" element={<ContentManagement  />}/>
+        <Route path="/article" element={<Article  />}/>
+        <Route path="/S2OLibrary" element={<S2OLibrary  />}/>
+        <Route path="/bookShelf" element={<Bookshelf />}/>
+        <Route path="/eventCalaender" element={<EventCalendar/>}/>
+        
+        
+      </Routes>
+      <Footer />
     </Router>
   );
 }

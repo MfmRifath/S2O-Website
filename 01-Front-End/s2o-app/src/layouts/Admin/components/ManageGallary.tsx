@@ -12,6 +12,7 @@ export const ManageGallery: React.FC = () => {
   const [isAddEditModalOpen, setIsAddEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  // Fetch galleries on mount
   useEffect(() => {
     const fetchGalleries = async () => {
       try {
@@ -28,34 +29,41 @@ export const ManageGallery: React.FC = () => {
     fetchGalleries();
   }, []);
 
+  // Add a new gallery
   const handleAddGallery = () => {
     setEditGalleryItem(null);
     setIsAddEditModalOpen(true);
   };
 
+  // Edit an existing gallery
   const handleEditGallery = (galleryItem: GalleryImageModel) => {
     setEditGalleryItem(galleryItem);
     setIsAddEditModalOpen(true);
   };
 
+  // Delete a gallery
   const handleDeleteGallery = (galleryItem: GalleryImageModel) => {
     setDeleteGalleryItem(galleryItem);
     setIsDeleteModalOpen(true);
   };
 
+  // Save gallery changes
   const handleSaveGallery = (updatedGallery: GalleryImageModel) => {
     if (editGalleryItem) {
+      // Update existing item
       setGalleryItems((prevItems) =>
         prevItems.map((item) =>
           item.id === updatedGallery.id ? updatedGallery : item
         )
       );
     } else {
+      // Add new item
       setGalleryItems((prevItems) => [...prevItems, updatedGallery]);
     }
     setIsAddEditModalOpen(false);
   };
 
+  // Confirm gallery deletion
   const handleConfirmDelete = async () => {
     if (deleteGalleryItem) {
       try {
@@ -104,17 +112,14 @@ export const ManageGallery: React.FC = () => {
               <td>{item.description}</td>
               <td>
                 <div className="image-thumbnails">
-                  {item.img.map((imageFile, index) => (
+                  {(item.images || []).map((image, index) => (
                     <img
-                      key={index}
-                      src={
-                        typeof imageFile === "string"
-                          ? imageFile
-                          : URL.createObjectURL(imageFile)
-                      } // Use URL.createObjectURL for file preview
-                      alt={`Gallery image ${index + 1}`}
-                      className="thumbnail"
-                    />
+                    key={index}
+                    src={image.url} // Use the URL for the image
+                    alt={`Gallery image ${index + 1}`}
+                    className="thumbnail"
+                    style={{ width: "100px", height: "100px", objectFit: "cover" }} // Define size and maintain aspect ratio
+                  />
                   ))}
                 </div>
               </td>

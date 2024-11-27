@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./addGallery.css";
 import GalleryImageModel from "../../../Model/GalleryImageModel";
+import Image from "../../../Model/Image";
 
 interface AddEditGalleryModalProps {
   galleryItem: GalleryImageModel | null;
@@ -14,50 +15,62 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
   onClose,
 }) => {
   const [item, setItem] = useState<GalleryImageModel>(
-    galleryItem || {
-      id: 0,
-      event: "",
-      description: "",
-      date: "",
-      img: [], // Use an array for images
-    }
+    galleryItem || new GalleryImageModel(0, "", [], "", "")
   );
+
   const [error, setError] = useState("");
 
-  const handleImageUpload = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
     if (file) {
       setItem((prevItem) => {
-        const newImages = [...prevItem.img];
-        newImages[index] = file; // Replace the image at the specified index
-        return { ...prevItem, images: newImages };
+        const updatedImages = [...prevItem.images];
+        const newImage = new Image(0, "", file); // Create a new Image object
+        updatedImages[index] = newImage;
+        return new GalleryImageModel(
+          prevItem.id,
+          prevItem.event,
+          updatedImages,
+          prevItem.description,
+          prevItem.date
+        );
       });
     }
   };
 
   const addImageField = () => {
-    setItem((prevItem) => ({
-      ...prevItem,
-      images: [...prevItem.img, null],
-    }));
+    setItem((prevItem) => {
+      const updatedImages = [...prevItem.images, new Image(0, "", undefined)];
+      return new GalleryImageModel(
+        prevItem.id,
+        prevItem.event,
+        updatedImages,
+        prevItem.description,
+        prevItem.date
+      );
+    });
   };
 
   const removeImageField = (index: number) => {
     setItem((prevItem) => {
-      const newImages = [...prevItem.img];
-      newImages.splice(index, 1);
-      return { ...prevItem, images: newImages };
+      const updatedImages = [...prevItem.images];
+      updatedImages.splice(index, 1);
+      return new GalleryImageModel(
+        prevItem.id,
+        prevItem.event,
+        updatedImages,
+        prevItem.description,
+        prevItem.date
+      );
     });
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setItem((prevItem) => ({ ...prevItem, [name]: value }));
+    setItem((prevItem) => ({
+      ...prevItem,
+      [name]: value,
+    }));
   };
 
   const addGallery = async () => {
@@ -66,15 +79,24 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
       "gallery",
       JSON.stringify({
         event: item.event,
-        description: item.description,
+        description: item.description || "",
         date: item.date,
       })
     );
 
-    // Append each image file if it exists
-    item.img.forEach((image, index) => {
-      if (image) formData.append("images", image);
+    item.images.forEach((image) => {
+      if (image.file) {
+        formData.append("images", image.file); // Append only File objects
+      }
     });
+
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`${key}: ${value.name}`);
+      } else {
+        console.log(`${key}:`, value);
+      }
+    }
 
     try {
       const response = await fetch("http://localhost:8080/api/galleries", {
@@ -82,7 +104,9 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
         body: formData,
       });
 
-      if (!response.ok) throw new Error("Failed to add gallery");
+      if (!response.ok) {
+        throw new Error("Failed to add gallery");
+      }
 
       const newGallery = await response.json();
       onSave(newGallery);
@@ -98,6 +122,12 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
       setError("Event name and date are required.");
       return;
     }
+
+    if (item.images.some((image) => !image.file && !image.url)) {
+      setError("All images must have a file or a URL.");
+      return;
+    }
+
     setError("");
     addGallery();
   };
@@ -135,7 +165,7 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
 
       <div className="image-upload-section">
         <label>Upload Images:</label>
-        {item.img.map((image, index) => (
+        {item.images.map((image, index) => (
           <div key={index} className="image-upload-thumbnail">
             <input
               type="file"
@@ -143,12 +173,14 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
               accept="image/*"
               className="file-input"
             />
-            {image && (
+            {image.file ? (
               <img
-                src={URL.createObjectURL(image as File)}
+                src={URL.createObjectURL(image.file)}
                 alt={`Uploaded ${index + 1}`}
                 className="thumbnail-preview"
               />
+            ) : (
+              <img src={image.url} alt={`Uploaded ${index + 1}`} className="thumbnail-preview" />
             )}
             <button
               onClick={() => removeImageField(index)}
@@ -175,5 +207,4 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
   );
 };
 
-// Export component
 export default AddEditGalleryModal;

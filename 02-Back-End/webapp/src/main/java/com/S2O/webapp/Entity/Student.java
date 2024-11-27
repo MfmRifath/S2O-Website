@@ -1,36 +1,33 @@
 package com.S2O.webapp.Entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+
+
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.UUID;
 
 @Data
 @Entity
+@Table(name = "student")
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_id")
-    private Long studentId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
 
-    @Column(name = "student_name")
-    private String studentName;
+    @Column(name = "name", nullable = false)
+    private String name;
 
-    @Column(name = "stream")
-    private String stream;
+    @Column(name = "stream", nullable = false)
+    private Stream stream;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "year_year_id")
-    @JsonBackReference
-    private Year year;
+    @Column(name = "year", nullable = false)
+    private int year;
 
-    public Student(Long studentId, String studentName, String stream, Year year) {
-        this.studentId = studentId;
-        this.studentName = studentName;
-        this.stream = stream;
-        this.year = year;
-    }
-
-    public Student() {}
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Marks> marks;
+    // Getters and setters
 }
+

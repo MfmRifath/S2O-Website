@@ -1,6 +1,6 @@
 package com.S2O.webapp.Entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.S2O.webapp.Entity.Image;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -9,23 +9,23 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "gallery")
+@Table(name = "gallery") // Ensure the table name matches your database schema
 public class Gallery {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "event")
+    @Column(nullable = false)
     private String event;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "date")
+    @Column(nullable = false)
     private LocalDate date;
 
-    @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonBackReference
+    @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Image> images;
+
+    // Getters and setters
 }

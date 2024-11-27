@@ -1,18 +1,17 @@
 package com.S2O.webapp.dao;
 
+
 import com.S2O.webapp.Entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
-@Repository
-public interface StudentRepository extends JpaRepository<Student, Long> {
+public interface StudentRepository extends JpaRepository<Student, UUID> {
 
-    @Query("SELECT s FROM Student s JOIN FETCH s.year y")
-    List<Student> findAllWithYear();
+    // Custom query to find students by stream
+    List<Student> findByStream(String stream);
 
-
-
+    // Custom query to find students by year
+    List<Student> findByYear(Integer year);
 }

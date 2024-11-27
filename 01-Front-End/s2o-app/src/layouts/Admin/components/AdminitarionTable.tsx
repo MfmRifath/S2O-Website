@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./AdministrationTable.css";
 
@@ -27,7 +27,7 @@ export const AdministrationTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [httpError, setHttpError] = useState<string | null>(null);
-  const history = useHistory();
+  const navigate = useNavigate();
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -65,7 +65,7 @@ export const AdministrationTable: React.FC = () => {
   };
 
   // Navigate to edit page for a specific admin member
-  const handleEdit = (id: number) => history.push(`/edit-admin/${id}`);
+  const handleEdit = (id: number) => navigate(`/edit-admin/${id}`);
 
   // Pagination: Get data for the current page
   const getPageData = () => {

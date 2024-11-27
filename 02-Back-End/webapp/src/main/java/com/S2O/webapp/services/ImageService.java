@@ -58,4 +58,19 @@ public class ImageService {
         URL url = s3Client.generatePresignedUrl(generatePresignedUrlRequest);
         return url.toString();
     }
+    public void deleteImage(String keyName) {
+        try {
+            // Delete the image from the S3 bucket
+            s3Client.deleteObject(bucketName, keyName);
+            System.out.println("Image with key " + keyName + " deleted from S3.");
+
+            // Delete the image record from the database
+            Image image = imageRepository.findByKeyName(keyName)
+                    .orElseThrow(() -> new RuntimeException("Image not found in the database with key: " + keyName));
+            imageRepository.delete(image);
+            System.out.println("Image record with key " + keyName + " deleted from the database.");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete image with key: " + keyName, e);
+        }
+    }
 }
