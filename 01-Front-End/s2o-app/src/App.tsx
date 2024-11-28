@@ -26,35 +26,168 @@ import EventCalendar from "./layouts/EventCalander/EventCalander";
 import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
 import Navbar from "./layouts/NavbarAndFooter/Navbar";
 
-
+function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* Navbar */}
+      <Navbar />
+      {/* Main Content */}
+      <main className="flex-1 pt-16 pb-8">{children}</main>
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
+}
 
 function App() {
   return (
     <Router>
-      <Navbar />
       <Routes>
-        <Route path="/" element={<Navigate to="/home" />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/gallery" element={<FullGallery />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegistrationForm />} />
-        <Route path="/s2oAcademy" element={<S2OAcadamy />} />
-        <Route path="/resultPortal" element={<ResultPortal />} />
-        <Route path="/admin" element={<Dashboard />} />
-        <Route path="/edit-admin/:id" element={<AddEditAdministration />} />
-        <Route path="/Teacher" element={<TeacherHome />} />
-        <Route path="/students" element={<StudentManagement />} />
-        <Route path="/marks" element={<MarksManagement />} />
-        <Route path="/performance" element={<PerformanceTracking/>} />
-        <Route path="/content" element={<ContentManagement  />}/>
-        <Route path="/article" element={<Article  />}/>
-        <Route path="/S2OLibrary" element={<S2OLibrary  />}/>
-        <Route path="/bookShelf" element={<Bookshelf />}/>
-        <Route path="/eventCalaender" element={<EventCalendar/>}/>
-        
-        
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <Navigate to="/home" />
+            </Layout>
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <Layout>
+              <HomePage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/gallery"
+          element={
+            <Layout>
+              <FullGallery />
+            </Layout>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <Layout>
+              <LoginPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <Layout>
+              <RegistrationForm />
+            </Layout>
+          }
+        />
+        <Route
+          path="/s2oAcademy"
+          element={
+            <Layout>
+              <S2OAcadamy />
+            </Layout>
+          }
+        />
+        <Route
+          path="/resultPortal"
+          element={
+            <Layout>
+              <ResultPortal />
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <Layout>
+              <Dashboard />
+            </Layout>
+          }
+        />
+        <Route
+          path="/edit-admin/:id"
+          element={
+            <Layout>
+              <AddEditAdministration />
+            </Layout>
+          }
+        />
+        <Route
+          path="/Teacher"
+          element={
+            <Layout>
+              <TeacherHome />
+            </Layout>
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            <Layout>
+              <StudentManagement />
+            </Layout>
+          }
+        />
+        <Route
+          path="/marks"
+          element={
+            <Layout>
+              <MarksManagement />
+            </Layout>
+          }
+        />
+        <Route
+          path="/performance"
+          element={
+            <Layout>
+              <PerformanceTracking />
+            </Layout>
+          }
+        />
+        <Route
+          path="/content"
+          element={
+            <Layout>
+              <ContentManagement />
+            </Layout>
+          }
+        />
+        <Route
+          path="/article"
+          element={
+            <Layout>
+              <Article />
+            </Layout>
+          }
+        />
+        <Route
+          path="/S2OLibrary"
+          element={
+            <Layout>
+              <S2OLibrary />
+            </Layout>
+          }
+        />
+        <Route
+          path="/bookShelf"
+          element={
+            <Layout>
+              <Bookshelf />
+            </Layout>
+          }
+        />
+        <Route
+          path="/eventCalaender"
+          element={
+            <Layout>
+              <EventCalendar />
+            </Layout>
+          }
+        />
       </Routes>
-      <Footer />
     </Router>
   );
 }

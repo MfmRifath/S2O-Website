@@ -32,7 +32,7 @@ const Navbar: React.FC = () => {
       initial={{ y: -100 }}
       animate={{ y: showNavbar ? 0 : -100 }}
       transition={{ type: "spring", stiffness: 80, damping: 15 }}
-      className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-white/70 to-blue-50 backdrop-blur-md border-b border-gray-200 shadow-lg rounded-b-2xl"
+      className="fixed top-0 left-0 w-full z-40 bg-gradient-to-r from-white/70 to-blue-50 backdrop-blur-md border-b border-gray-200 shadow-lg rounded-b-2xl"
     >
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center">
@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
             >
               <Link
                 to={link.to}
-                className={`no-underline text-sm font-medium px-4 py-2 rounded-full transition-all ${
+                className={`no-underline text-sm font-medium px-6 py-3 rounded-lg transition-all block ${
                   location.pathname === link.to
                     ? "bg-blue-600 text-white shadow-lg"
                     : "text-gray-700 hover:text-blue-600 hover:shadow-md"
@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
           >
             <Link
               to="/profile"
-              className={`px-4 py-2 border rounded-full shadow-md transition-all ${
+              className={`px-6 py-3 border rounded-lg shadow-md transition-all block ${
                 location.pathname === "/profile"
                   ? "bg-blue-600 text-white border-blue-600"
                   : "text-gray-800 border-gray-300 hover:bg-blue-600 hover:text-white"
@@ -98,7 +98,7 @@ const Navbar: React.FC = () => {
           >
             <Link
               to="/login"
-              className={`px-4 py-2 rounded-full font-medium shadow-md transition-all ${
+              className={`px-6 py-3 rounded-lg font-medium shadow-md transition-all block ${
                 location.pathname === "/login"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-800 hover:bg-blue-600 hover:text-white"
@@ -120,6 +120,7 @@ const Navbar: React.FC = () => {
         </motion.button>
       </div>
 
+      {/* Mobile Menu */}
       <motion.div
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: isMobileMenuOpen ? 1 : 0, y: isMobileMenuOpen ? 0 : -50 }}
@@ -146,7 +147,7 @@ const Navbar: React.FC = () => {
             >
               <Link
                 to={link.to}
-                className={`no-underline text-base font-medium px-4 py-2 rounded-full transition-all ${
+                className={`no-underline text-base font-medium px-6 py-4 rounded-lg transition-all block ${
                   location.pathname === link.to
                     ? "bg-blue-600 text-white shadow-lg"
                     : "text-gray-700 hover:text-blue-600 hover:shadow-md"

@@ -1,8 +1,10 @@
-import { AcademyHome } from "./components/AcademyHome";
+import AcademyHome from "./components/AcademyHome";
+
 
 export const S2OAcadamy = () => {
   return (
     <>
+    
       <AcademyHome />
     </>
   );
