@@ -17,7 +17,7 @@ interface AdminitrationModal {
   LinkedIn: string;
   email: string;
   year: number;
-  adminImages: Image;
+  adminImage: Image;
 }
 
 export const Administration = () => {
@@ -144,7 +144,7 @@ export const Administration = () => {
                             <img
                               className="img-fluid"
                               src={
-                                admin.adminImages.url ||
+                                admin.adminImage.url ||
                                 require("./../../../Images/logo.jpg")
                               }
                               alt={admin.adminName || "Team Member"}
@@ -232,7 +232,7 @@ export const Administration = () => {
                         <img
                           className="img-fluid"
                           src={
-                            admin.adminImages.url ||
+                            admin.adminImage.url ||
                             require("./../../../Images/logo.jpg")
                           }
                           alt={admin.adminName || "Team Member"}

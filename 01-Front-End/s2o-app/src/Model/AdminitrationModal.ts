@@ -10,7 +10,7 @@ class AdminitrationModal {
   LinkedIn: string;
   email: string;
   year: number;
-  adminImg?: Image;
+  adminImage?: Image;
 
   constructor(
     adminId: number,
@@ -21,7 +21,7 @@ class AdminitrationModal {
     LinkedIn: string,
     email: string,
     year: number,
-    adminImg: Image
+    adminImage: Image
   ) {
     this.adminId = adminId;
     this.designation = designation;
@@ -31,7 +31,7 @@ class AdminitrationModal {
     this.LinkedIn = LinkedIn;
     this.email = email;
     this.year = year;
-    this.adminImg = adminImg;
+    this.adminImage = adminImage;
   }
 }
 export default AdminitrationModal;

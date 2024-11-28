@@ -14,10 +14,10 @@ interface AdministrationModal {
   adminName: string;
   adminQualification: string;
   insta: string;
-  LinkedIn: string;
+  linkedin: string;
   email: string;
   year: number;
-  adminImages: Image;
+  adminImage: Image;
 }
 
 export const AdministrationTable: React.FC = () => {
@@ -127,7 +127,7 @@ export const AdministrationTable: React.FC = () => {
                   </td>
                   <td>
                     <a
-                      href={admin.LinkedIn}
+                      href={admin.linkedin}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -138,14 +138,17 @@ export const AdministrationTable: React.FC = () => {
                   <td>{admin.year}</td>
                   <td>
                     <img
-                      src={
-                        admin.adminImages.url || "/path/to/default-image.jpg"
-                      }
-                      alt={admin.adminName}
+                      src={admin.adminImage?.url || "/path/to/default-image.jpg"}
+                      alt={admin.adminName || "No Image Available"}
                       className="img-thumbnail"
                       onError={(e) =>
                         (e.currentTarget.src = "/path/to/fallback-image.jpg")
                       }
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                      }}
                     />
                   </td>
                   <td>
