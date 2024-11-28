@@ -14,7 +14,6 @@ import RegistrationForm from "./layouts/RegitrationPage/RegistrationForm";
 import { S2OAcadamy } from "./layouts/S2OAcadmyPage/S2OAcadamyPage";
 import { ResultPortal } from "./layouts/S2OAcadmyPage/components/ExamPortal/ResultPortal";
 import Dashboard from "./layouts/Admin/components/Dashboard";
-import EditAdministration from "./layouts/Admin/components/EditAdministration";
 import TeacherHome from "./layouts/Teacher/TeacherDashBoard";
 import StudentManagement from "./layouts/Teacher/Pages/StudentManagment";
 import MarksManagement from "./layouts/Teacher/Pages/MarksManagement";
@@ -24,6 +23,7 @@ import Article from "./layouts/Article/Article";
 import { S2OLibrary } from "./layouts/S2OAcadmyPage/components/S2OLibrary";
 import Bookshelf from "./layouts/S2OAcadmyPage/components/S2O Library/BookShelf";
 import EventCalendar from "./layouts/EventCalander/EventCalander";
+import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
 
 
 
@@ -40,7 +40,7 @@ function App() {
         <Route path="/s2oAcademy" element={<S2OAcadamy />} />
         <Route path="/resultPortal" element={<ResultPortal />} />
         <Route path="/admin" element={<Dashboard />} />
-        <Route path="/edit-admin/:id" element={<EditAdministration />} />
+        <Route path="/edit-admin/:id" element={<AddEditAdministration />} />
         <Route path="/Teacher" element={<TeacherHome />} />
         <Route path="/students" element={<StudentManagement />} />
         <Route path="/marks" element={<MarksManagement />} />

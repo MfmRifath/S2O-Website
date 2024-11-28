@@ -1,5 +1,8 @@
 package com.S2O.webapp.Entity;
 
+import com.S2O.webapp.Entity.Administration;
+import com.S2O.webapp.Entity.Article;
+import com.S2O.webapp.Entity.Gallery;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -26,21 +29,20 @@ public class Image {
     private String url; // Temporary URL for pre-signed link
 
     @Column(name = "file")
-    File file;
+    private File file;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "article_id", insertable = false, updatable = false) // Ensure unique column name and settings
+    @JoinColumn(name = "article_id", nullable = true) // Allow null for images not associated with an Article
     @JsonBackReference("article-Image")
     private Article article;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "gallery_id", nullable = false) // Ensures association with a gallery
+    @JoinColumn(name = "gallery_id", nullable = true) // Allow null for images not associated with a Gallery
     @JsonBackReference("gallery-images")
-    private Gallery gallery; // Remove unnecessary relationships with Article/Administration
+    private Gallery gallery;
 
     @OneToOne
-    @JoinColumn(name = "administration_id", referencedColumnName = "id") // Unique name to avoid conflict with primary key
+    @JoinColumn(name = "administration_id", nullable = true) // Allow null for images not associated with Administration
     @JsonBackReference
     private Administration administration;
-
 }

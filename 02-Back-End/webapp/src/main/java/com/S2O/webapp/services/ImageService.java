@@ -5,12 +5,17 @@ import com.S2O.webapp.dao.ImageRepository;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.UUID;
 
@@ -73,4 +78,28 @@ public class ImageService {
             throw new RuntimeException("Failed to delete image with key: " + keyName, e);
         }
     }
+    public byte[] getImageContent(String keyName) {
+        try {
+            S3Object s3Object = s3Client.getObject(bucketName, keyName);
+            try (S3ObjectInputStream inputStream = s3Object.getObjectContent()) {
+                return inputStream.readAllBytes(); // Read the image content
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch image content for key: " + keyName, e);
+        }
+    }
+
+    public File getFileFromS3(String keyName) {
+        try {
+            S3Object s3Object = s3Client.getObject(bucketName, keyName);
+            File file = new File(System.getProperty("java.io.tmpdir"), keyName);
+            try (S3ObjectInputStream inputStream = s3Object.getObjectContent()) {
+                Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            }
+            return file;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch file for key: " + keyName, e);
+        }
+    }
+
 }

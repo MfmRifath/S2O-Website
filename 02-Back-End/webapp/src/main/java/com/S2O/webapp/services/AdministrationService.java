@@ -2,16 +2,19 @@ package com.S2O.webapp.services;
 
 import com.S2O.webapp.Entity.Administration;
 import com.S2O.webapp.Entity.Image;
-import com.S2O.webapp.RequesModal.AdminitrationRequestModal;
+import com.S2O.webapp.RequesModal.AdministrationDTO;
+import com.S2O.webapp.RequesModal.ImageDTO;
 import com.S2O.webapp.dao.AdministrationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AdministrationService {
@@ -26,73 +29,100 @@ public class AdministrationService {
     }
 
     // Retrieve all administrations with their images
-    public List<Administration> getAllAdministrations() {
+    @Transactional
+    public List<AdministrationDTO> getAllAdministrations() {
         List<Administration> administrations = administrationRepository.findAll();
-        administrations.forEach(admin -> {
-            if (admin.getAdminImages() != null) {
-                String presignedUrl = imageService.getPresignedUrl(admin.getAdminImages().getKeyName());
-                admin.getAdminImages().setUrl(presignedUrl); // Set URL for each image
-            }
-        });
-        return administrations;
+        return administrations.stream()
+                .map(this::convertToAdministrationDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Convert `Administration` entity to `AdministrationDTO`
+    public AdministrationDTO convertToAdministrationDTO(Administration administration) {
+        // Create `ImageDTO` if `adminImages` exists
+        ImageDTO imageDTO = null;
+        if (administration.getAdminImages() != null) {
+            Image image = administration.getAdminImages();
+            imageDTO = new ImageDTO(image.getKeyName(), imageService.getPresignedUrl(image.getKeyName()));
+        }
+
+        // Return `AdministrationDTO` with image information
+        return new AdministrationDTO(
+                administration.getId(),
+                administration.getDesignation(),
+                administration.getAdminName(),
+                administration.getAdminQualification(),
+                administration.getInsta(),
+                administration.getLinkedIn(),
+                administration.getEmail(),
+                administration.getYear(),
+                imageDTO
+        );
     }
 
     // Retrieve an administration by ID
-    public Optional<Administration> getAdministrationById(Long id) {
-        return administrationRepository.findById(id);
+    public Optional<AdministrationDTO> getAdministrationById(Long id) {
+        return administrationRepository.findById(id).map(this::convertToAdministrationDTO);
     }
 
-    public void createAdministration(AdminitrationRequestModal adminRequest, MultipartFile adminImg) throws IOException {
-        // Step 1: Save Administration entity first
-        Administration administration = new Administration();
-        administration.setDesignation(adminRequest.getDesignation());
-        administration.setAdminName(adminRequest.getAdminName());
-        administration.setInsta(adminRequest.getInsta());
-        administration.setLinkedIn(adminRequest.getLinkedIn());
-        administration.setEmail(adminRequest.getEmail());
-        administration.setAdminQualification(adminRequest.getAdminQualification());
-        administration.setYear(adminRequest.getYear());
+    public void createAdministration(AdministrationDTO adminDTO, MultipartFile adminImg) throws IOException {
+        Administration administration = mapToEntity(adminDTO);
+        administration = administrationRepository.save(administration);
 
-        administration = administrationRepository.save(administration); // Save first to generate ID
-
-        // Step 2: Handle image upload and associate the saved Administration entity
         if (adminImg != null && !adminImg.isEmpty()) {
-            String imageKey = imageService.uploadImage(adminImg);
+            try {
+                String imageKey = imageService.uploadImage(adminImg); // Upload image to S3
+                Image adminImage = new Image();
+                adminImage.setKeyName(imageKey);
+                adminImage.setAdministration(administration);
+                adminImage.setFile(imageService.getFileFromS3(imageKey)); // Retrieve and set the file
 
-            // Create and save Image entity
-            Image adminImage = new Image();
-            adminImage.setKeyName(imageKey);
-            adminImage.setAdministration(administration); // Associate image with administration
-            imageService.saveImage(adminImage); // Save the image
+                imageService.saveImage(adminImage); // Save image entity to the database
 
-            // Associate the saved image with administration and update administration
-            administration.setAdminImages(adminImage);
-            administrationRepository.save(administration); // Update administration with the image
+                administration.setAdminImages(adminImage); // Link the image to the administration
+                administrationRepository.save(administration); // Save administration with the linked image
+            } catch (Exception e) {
+                System.err.println("Error uploading image: " + e.getMessage());
+                throw new IOException("Failed to upload and associate the image.", e);
+            }
+        } else {
+            System.err.println("No image provided for the administration.");
         }
     }
-
     @Transactional
-    public Administration updateAdministration(Long id, AdminitrationRequestModal adminRequest, MultipartFile adminImg) throws IOException {
+    public AdministrationDTO updateAdministration(Long id, AdministrationDTO adminDTO, MultipartFile adminImg) throws IOException {
         Administration administration = administrationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Administration not found with id " + id));
 
-        // Map request data to the existing administration
-        mapRequestToAdministration(adminRequest, administration);
+        // Update administration fields
+        mapToEntity(adminDTO, administration);
 
-        // Re-upload image if a new image is provided
         if (adminImg != null && !adminImg.isEmpty()) {
-            String imageKey = imageService.uploadImage(adminImg);
-            Image adminImage = new Image();
-            adminImage.setKeyName(imageKey); // Set new image key
-            adminImage.setAdministration(administration); // Link image to administration
+            Image existingImage = administration.getAdminImages();
 
-            administration.setAdminImages(adminImage); // Associate new image with administration
-            imageService.saveImage(adminImage); // Save updated image entity
+            if (existingImage != null) {
+                // Remove the association with the administration first
+                administration.setAdminImages(null);
+                administrationRepository.save(administration); // Save the administration without the image
+
+                // Delete the existing image from S3 and the database
+                imageService.deleteImage(existingImage.getKeyName());
+            }
+
+            // Upload and associate a new image
+            String newImageKey = imageService.uploadImage(adminImg);
+            Image newImage = new Image();
+            newImage.setKeyName(newImageKey);
+            newImage.setAdministration(administration);
+            imageService.saveImage(newImage);
+
+            administration.setAdminImages(newImage); // Link the new image
         }
 
-        return administrationRepository.save(administration); // Save updated administration
+        // Save the updated administration
+        administration = administrationRepository.save(administration);
+        return convertToAdministrationDTO(administration);
     }
-
     // Delete an administration by ID
     public void deleteAdministration(Long id) {
         Administration administration = administrationRepository.findById(id)
@@ -105,27 +135,28 @@ public class AdministrationService {
         return administrationRepository.existsById(id);
     }
 
-    // Utility to map request data to a new Administration entity
-    private Administration mapRequestToAdministration(AdminitrationRequestModal request) {
-        Administration administration = new Administration();
-        administration.setDesignation(request.getDesignation());
-        administration.setAdminName(request.getAdminName());
-        administration.setInsta(request.getInsta());
-        administration.setLinkedIn(request.getLinkedIn());
-        administration.setEmail(request.getEmail());
-        administration.setAdminQualification(request.getAdminQualification());
-        administration.setYear(request.getYear());
-        return administration;
+
+    // Map an AdministrationDTO to a new Administration entity
+    private Administration mapToEntity(AdministrationDTO dto) {
+        Administration admin = new Administration();
+        admin.setDesignation(dto.getDesignation());
+        admin.setAdminName(dto.getAdminName());
+        admin.setAdminQualification(dto.getAdminQualification());
+        admin.setInsta(dto.getInsta());
+        admin.setLinkedIn(dto.getLinkedIn());
+        admin.setEmail(dto.getEmail());
+        admin.setYear(dto.getYear());
+        return admin;
     }
 
-    // Overloaded utility to map request data to an existing Administration entity
-    private void mapRequestToAdministration(AdminitrationRequestModal request, Administration administration) {
-        administration.setDesignation(request.getDesignation());
-        administration.setAdminName(request.getAdminName());
-        administration.setInsta(request.getInsta());
-        administration.setLinkedIn(request.getLinkedIn());
-        administration.setEmail(request.getEmail());
-        administration.setAdminQualification(request.getAdminQualification());
-        administration.setYear(request.getYear());
+    // Update an existing Administration entity with data from AdministrationDTO
+    private void mapToEntity(AdministrationDTO dto, Administration admin) {
+        admin.setDesignation(dto.getDesignation());
+        admin.setAdminName(dto.getAdminName());
+        admin.setAdminQualification(dto.getAdminQualification());
+        admin.setInsta(dto.getInsta());
+        admin.setLinkedIn(dto.getLinkedIn());
+        admin.setEmail(dto.getEmail());
+        admin.setYear(dto.getYear());
     }
 }
