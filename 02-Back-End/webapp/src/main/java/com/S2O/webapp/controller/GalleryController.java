@@ -2,6 +2,8 @@ package com.S2O.webapp.controller;
 
 import com.S2O.webapp.Entity.Gallery;
 import com.S2O.webapp.RequesModal.GalleryDTO;
+import com.S2O.webapp.error.GalleryNotFoundException;
+import com.S2O.webapp.error.InvalidGalleryDataException;
 import com.S2O.webapp.services.GalleryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -78,14 +80,19 @@ public class GalleryController {
             GalleryDTO galleryDTO = galleryService.convertToGalleryDTO(updatedGallery);
 
             return ResponseEntity.ok(galleryDTO);
-        } catch (IOException e) {
-            System.err.println("Error while updating gallery: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: Unable to update gallery.");
-        } catch (RuntimeException e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
+        } catch (GalleryNotFoundException e) {
+            // Custom exception for gallery not found
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
+        } catch (InvalidGalleryDataException e) {
+            // Custom exception for invalid data
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        } catch (IOException e) {
+            // Handle file-related errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading images. Please try again.");
+        } catch (Exception e) {
+            // Catch-all for unexpected errors
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: An unexpected error occurred.");
         }
     }
     @GetMapping("/{id}")

@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import './Vision.css'; // Import the CSS file
 
 export const Vision = () => {
     const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -8,7 +7,7 @@ export const Vision = () => {
     const handleScroll = () => {
         cardRefs.current.forEach((card) => {
             if (card && isInViewport(card)) {
-                card.classList.add('animate');
+                card.classList.add('animate-fade-in');
             }
         });
     };
@@ -33,57 +32,58 @@ export const Vision = () => {
     }, []);
 
     return (
-        <section className="my-5">
-            <div>
-                <h3 className="text-center mb-4">Mission, Vision &amp; History</h3>
-                <div className="row">
-                    <div className="col-md-6 col-lg-3 mb-4">
-                        <div
-                            className="card h-100"
-                            ref={(el) => (cardRefs.current[0] = el)}
-                        >
-                            <div className="card-body text-center">
-                                <i className="fas fa-bullseye fa-3x mb-3 card-icon bounce"></i>
-                                <h4 className="card-title">Mission</h4>
-                                <p className="card-text">Comfort produce husband boy her had hearing. Law others theirs passed but wishes. You day real less till dear read. Considered use dispatched melancholy sympathize discretion led.</p>
-                            </div>
-                        </div>
+        <section className="py-12 bg-gradient-to-br from-blue-50 to-teal-50">
+            <div className="container mx-auto px-6 lg:px-20">
+                <h3 className="text-4xl font-extrabold text-center text-gray-800 mb-10">
+                    Mission, Vision &amp; History
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+                    {/* Mission */}
+                    <div
+                        className="bg-white shadow-lg rounded-3xl p-6 text-center transform transition hover:scale-105 hover:shadow-2xl animate-fade-in"
+                        ref={(el) => (cardRefs.current[0] = el)}
+                    >
+                        <i className="fas fa-bullseye fa-3x text-teal-600 mb-4"></i>
+                        <h4 className="text-xl font-bold text-gray-800 mb-3">Mission</h4>
+                        <p className="text-gray-600">
+                            Comfort produce husband boy her had hearing. Law others theirs passed but wishes.
+                        </p>
                     </div>
-                    <div className="col-md-6 col-lg-3 mb-4">
-                        <div
-                            className="card h-100"
-                            ref={(el) => (cardRefs.current[1] = el)}
-                        >
-                            <div className="card-body text-center">
-                                <i className="fas fa-eye fa-3x mb-3 card-icon rotate"></i>
-                                <h4 className="card-title">Vision</h4>
-                                <p className="card-text">Comfort produce husband boy her had hearing. Law others theirs passed but wishes. You day real less till dear read. Considered use dispatched melancholy sympathize discretion led.</p>
-                            </div>
-                        </div>
+
+                    {/* Vision */}
+                    <div
+                        className="bg-white shadow-lg rounded-3xl p-6 text-center transform transition hover:scale-105 hover:shadow-2xl animate-fade-in"
+                        ref={(el) => (cardRefs.current[1] = el)}
+                    >
+                        <i className="fas fa-eye fa-3x text-blue-600 mb-4"></i>
+                        <h4 className="text-xl font-bold text-gray-800 mb-3">Vision</h4>
+                        <p className="text-gray-600">
+                            Comfort produce husband boy her had hearing. Law others theirs passed but wishes.
+                        </p>
                     </div>
-                    <div className="col-md-6 col-lg-3 mb-4">
-                        <div
-                            className="card h-100"
-                            ref={(el) => (cardRefs.current[2] = el)}
-                        >
-                            <div className="card-body text-center">
-                                <i className="fas fa-history fa-3x mb-3 card-icon pulse"></i>
-                                <h4 className="card-title">History</h4>
-                                <p className="card-text">Comfort produce husband boy her had hearing. Law others theirs passed but wishes. You day real less till dear read. Considered use dispatched melancholy sympathize discretion led.</p>
-                            </div>
-                        </div>
+
+                    {/* History */}
+                    <div
+                        className="bg-white shadow-lg rounded-3xl p-6 text-center transform transition hover:scale-105 hover:shadow-2xl animate-fade-in"
+                        ref={(el) => (cardRefs.current[2] = el)}
+                    >
+                        <i className="fas fa-history fa-3x text-yellow-600 mb-4"></i>
+                        <h4 className="text-xl font-bold text-gray-800 mb-3">History</h4>
+                        <p className="text-gray-600">
+                            Comfort produce husband boy her had hearing. Law others theirs passed but wishes.
+                        </p>
                     </div>
-                    <div className="col-md-6 col-lg-3 mb-4">
-                        <div
-                            className="card h-100"
-                            ref={(el) => (cardRefs.current[3] = el)}
-                        >
-                            <div className="card-body text-center">
-                                <i className="fas fa-users fa-3x mb-3 card-icon bounce"></i>
-                                <h4 className="card-title">Our Team</h4>
-                                <p className="card-text">Comfort produce husband boy her had hearing. Law others theirs passed but wishes. You day real less till dear read. Considered use dispatched melancholy sympathize discretion led.</p>
-                            </div>
-                        </div>
+
+                    {/* Our Team */}
+                    <div
+                        className="bg-white shadow-lg rounded-3xl p-6 text-center transform transition hover:scale-105 hover:shadow-2xl animate-fade-in"
+                        ref={(el) => (cardRefs.current[3] = el)}
+                    >
+                        <i className="fas fa-users fa-3x text-purple-600 mb-4"></i>
+                        <h4 className="text-xl font-bold text-gray-800 mb-3">Our Team</h4>
+                        <p className="text-gray-600">
+                            Comfort produce husband boy her had hearing. Law others theirs passed but wishes.
+                        </p>
                     </div>
                 </div>
             </div>

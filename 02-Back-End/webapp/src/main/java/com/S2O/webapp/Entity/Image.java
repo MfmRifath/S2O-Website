@@ -45,4 +45,12 @@ public class Image {
     @JoinColumn(name = "administration_id", nullable = true) // Allow null for images not associated with Administration
     @JsonBackReference
     private Administration administration;
+
+    @Override
+    public String toString() {
+        return "Image{" +
+                "id=" + id +
+                ", keyName='" + keyName + '\'' +
+                '}'; // Avoid including 'gallery'
+    }
 }

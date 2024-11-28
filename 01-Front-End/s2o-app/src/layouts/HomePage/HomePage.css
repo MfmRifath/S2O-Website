@@ -1,23 +1,22 @@
-hr {
-  border: 0;
-  height: 2px; /* A clean, thin line */
-  width: 100%; /* Wide enough to create a clear separation */
-  background: linear-gradient(to right, #ccc, #333, #ccc); /* Neutral gradient */
+/* HomePage.css */
+.homepage-container {
+  background-image: url('./../../Images/bg-container.jpg');  /* Path relative to the public folder */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
   position: relative;
-  margin: 40px auto;
-  border-radius: 2px; /* Slight rounding for a refined look */
+
+  /* Apply a semi-transparent color with the gradient and opacity */
+  background-color: rgba(0, 0, 0, 0.3);  /* This gives a slight transparency to the background */
+  background-blend-mode: overlay;  /* Ensures the background image blends with the color */
 }
 
-hr.center-elegant::before {
-  content: ".";
-  width: 15px;
-  height: 15px;
-  background: linear-gradient(to right, #ccc, #333, #ccc); /* Darker color for the center decoration */
-  display: inline-block;
-  border-radius: 50%; /* Subtle circle in the center */
+/* Optional: Gradient Overlay */
+.homepage-container::before {
+  content: '';
   position: absolute;
-  top: -7px; /* Centered on the line */
-  left: 50%;
-  margin-left: -7.5px; /* Proper centering */
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+  inset: 0;
+  background: linear-gradient(to right, rgba(0, 0, 255, 0.3), rgba(0, 255, 255, 0.3));  /* Transparent gradient overlay */
+  z-index: -1; /* Ensure it's below the content */
 }

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import ImageGallery from "react-image-gallery";
 import "react-image-gallery/styles/scss/image-gallery.scss";
 import { Link } from "react-router-dom";
-import "./Gallery.css";
 import GalleryImageModel from "../../Model/GalleryImageModel";
 
 const Gallery: React.FC = () => {
@@ -22,7 +21,6 @@ const Gallery: React.FC = () => {
         }
 
         const galleriesJson: GalleryImageModel[] = await response.json();
-        console.log("Fetched galleries:", galleriesJson); // Debugging
         setGalleries(galleriesJson);
         setIsLoading(false);
       } catch (error: any) {
@@ -46,30 +44,37 @@ const Gallery: React.FC = () => {
   );
 
   return (
-    <div className="container mt-3">
-      <div className="homepage-carousel-title gallery-title">
-        <h3>
-          <b>S2O Gallery</b>
-        </h3>
-      </div>
-
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : httpError ? (
-        <div className="alert alert-danger">{httpError}</div>
-      ) : (
-        <div>
-          <ImageGallery items={images} />
-          <div className="homepage-carousel-title mt-4">
-            <Link
-              className="btn btn-secondary btn-outline-light view-more-btn mb-5"
-              to="/Gallery"
-            >
-              View More
-            </Link>
-          </div>
+    <div className="py-12 bg-gradient-to-br from-blue-50 to-teal-50">
+      <div className="container mx-auto px-6 lg:px-20">
+        {/* Title */}
+        <div className="text-center mb-6">
+          <h3 className="text-4xl font-extrabold text-gray-800">S2O Gallery</h3>
         </div>
-      )}
+
+        {/* Loading/Error States */}
+        {isLoading ? (
+          <div className="text-center text-gray-500">Loading...</div>
+        ) : httpError ? (
+          <div className="text-center text-red-500">{httpError}</div>
+        ) : (
+          <div>
+            {/* Image Gallery */}
+            <div className="shadow-lg rounded-lg overflow-hidden">
+              <ImageGallery items={images} />
+            </div>
+
+            {/* View More Button */}
+            <div className="text-center mt-6">
+              <Link
+                to="/Gallery"
+                className="inline-block px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white font-medium rounded-full shadow-md hover:from-teal-500 hover:to-blue-500 hover:shadow-lg transition-transform transform hover:scale-105"
+              >
+                View More
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,143 +1,133 @@
-/*
-COLORS:
-
-Light green: #7ed56f
-Medium green: #55c57a
-Dark green: #28b485
-
-*/
-
-* {
-  margin: 0;
-
-  padding: 0;
-  box-sizing: border-box;
-}
-
-.header {
-  height: 90vh !important;
-
-  background-image: linear-gradient(#00000046, #0000007f),
-    url(./../../../Images/bg-welcome.jpg);
-  background-size: cover;
-  background-position: top;
-  position: relative;
-}
-
-.logo-box {
-  position: absolute;
-  top: 40px;
-  left: 40px;
-}
-
-.logo {
-  height: 35px;
-}
-.heading-primary {
-  color: #ffff;
-  text-transform: uppercase;
-
-  backface-visibility: hidden;
-  margin-bottom: 60px;
-}
-
-.heading-primary-main {
-  display: inline;
-  font-size: 60px;
-  font-weight: 400;
-  letter-spacing: 10px;
-
-  animation-name: moveInLeft;
-  animation-duration: 2s;
-
-  animation-timing-function: ease-out;
-
-  /*
-  animation-iteration-count: 3;
+/* Welcome.css */
+@keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
   
-  */
-}
-
-.heading-primary-sub {
-  display: block;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 17.4px;
-
-  animation: moveInRight 1s ease-out;
-}
-
-.text-box {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-@keyframes moveInLeft {
-  0% {
-    opacity: 0;
-    transform: translateX(-100px);
+  .animate-fade-in {
+    animation: fade-in 2s ease-out forwards;
   }
-
-  80% {
-    transform: translateX(10px);
+  
+  @keyframes fade-in-content {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
   }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
+  
+  .animate-fade-in-content {
+    animation: fade-in-content 2s ease-out 0.5s forwards;
   }
-}
-@keyframes moveInRight {
-  0% {
-    opacity: 0;
-    transform: translateX(100px);
+  
+  @keyframes fade-in-subtitle {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-
-  80% {
-    transform: translateX(-10px);
+  
+  .animate-fade-in-subtitle {
+    animation: fade-in-subtitle 2s ease-out 1s forwards;
   }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
+  
+  @keyframes button-appear {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
-@keyframes moveInBottom {
-  0% {
-    opacity: 0;
-    transform: translateY(100px);
+  
+  .animate-button {
+    animation: button-appear 1.5s ease-out 1.5s forwards;
   }
-
-  100% {
-    opacity: 1;
-    transform: translateX(0);
+  
+  @keyframes gradient-animation {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
   }
-}
-
-.btn:link,
-.btn:visited {
-  text-transform: uppercase;
-  text-decoration: none;
-  padding: 15px 40px;
-  display: inline-block;
-  border-radius: 100px;
-  transition: all 0.2s;
-  position: relative;
-}
-
-.btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgb(0, 0, 0.2);
-}
-
-.btn:active {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 10px rgb(0, 0, 0);
-}
-
-.btn-animated {
-  animation: moveInBottom 0.5 ease-in-out 0.75s;
-  animation-fill-mode: backwards;
-}
+  
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-animation 6s ease infinite;
+  }
+  
+  @keyframes slow-move {
+    0% {
+      transform: translate(-50px, -50px);
+    }
+    50% {
+      transform: translate(50px, 50px);
+    }
+    100% {
+      transform: translate(-50px, -50px);
+    }
+  }
+  
+  .animate-slow-move {
+    animation: slow-move 10s ease-in-out infinite;
+  }
+  
+  @keyframes bounce-slow {
+    0%, 100% {
+      transform: translateY(-10px);
+    }
+    50% {
+      transform: translateY(10px);
+    }
+  }
+  
+  .animate-bounce-slow {
+    animation: bounce-slow 4s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  /* New Background Image */
+  header {
+    background-image: url('./../../../Images/togetherness.jpg');  /* Replace with the correct path to your image */
+    background-size: cover;  /* Ensures the image covers the entire container */
+    background-position: center;  /* Keeps the image centered */
+    background-repeat: no-repeat;  /* Prevents the image from repeating */
+  }
+  
+  /* Ensure the gradient overlay is still in place */
+  header .absolute.inset-0 {
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4));  /* Semi-transparent dark overlay for readability */
+  }

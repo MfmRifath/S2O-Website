@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion";
+import { useDropzone } from "react-dropzone";
+import { ClipLoader } from "react-spinners";
 
 interface Image {
   url: string;
@@ -19,7 +22,7 @@ interface AdministrationModal {
   adminImages?: Image;
 }
 
-export const AddEditAdministration: React.FC = () => {
+const AddEditAdministration: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<AdministrationModal>({
     designation: "",
@@ -31,32 +34,9 @@ export const AddEditAdministration: React.FC = () => {
     year: new Date().getFullYear(),
   });
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [displayWarning, setDisplayWarning] = useState(false);
-  const [displaySuccess, setDisplaySuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [httpError, setHttpError] = useState<string | null>(null);
-
-  // Fetch existing admin data if editing
-  useEffect(() => {
-    if (id) {
-      const fetchAdminData = async () => {
-        setIsLoading(true);
-        try {
-          const response = await axios.get(
-            `http://localhost:8080/api/administrations/${id}`
-          );
-          setFormData(response.data);
-        } catch (error) {
-          console.error("Error fetching admin data:", error);
-          setHttpError("Failed to load admin data.");
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      fetchAdminData();
-    }
-  }, [id]);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const resetFormFields = () => {
     setFormData({
@@ -69,11 +49,6 @@ export const AddEditAdministration: React.FC = () => {
       year: new Date().getFullYear(),
     });
     setSelectedImage(null);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setSelectedImage(file || null);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,19 +66,6 @@ export const AddEditAdministration: React.FC = () => {
       ? `http://localhost:8080/api/administrations/edit/${id}`
       : `http://localhost:8080/api/administrations/add`;
 
-    if (
-      !formData.designation ||
-      !formData.adminName ||
-      !formData.adminQualification ||
-      !formData.insta ||
-      !formData.linkedIn ||
-      !formData.email ||
-      !formData.year
-    ) {
-      setDisplayWarning(true);
-      return;
-    }
-
     const data = new FormData();
     data.append("administration", JSON.stringify(formData));
     if (selectedImage) {
@@ -111,6 +73,7 @@ export const AddEditAdministration: React.FC = () => {
     }
 
     try {
+      setIsLoading(true);
       const response = await axios({
         method: id ? "put" : "post",
         url,
@@ -121,140 +84,150 @@ export const AddEditAdministration: React.FC = () => {
       });
 
       if (response.status === 200 || response.status === 201) {
+        setSuccessMessage(`Admin ${id ? "updated" : "added"} successfully!`);
         resetFormFields();
-        setDisplaySuccess(true);
-        setDisplayWarning(false);
       } else {
-        throw new Error("Failed to add/update administration member");
+        throw new Error("Failed to save administration member.");
       }
     } catch (error) {
-      console.error("Error submitting administration member:", error);
-      setHttpError("Failed to save admin data.");
+      setHttpError("An error occurred while saving admin data.");
+    } finally {
+      setIsLoading(false);
+      setTimeout(() => setSuccessMessage(null), 3000);
     }
   };
 
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles) => {
+      setSelectedImage(acceptedFiles[0]);
+    },
+  });
+
   return (
-    <div className="container mt-5 mb-5">
-      {displaySuccess && (
-        <div className="alert alert-success" role="alert">
-          Admin {id ? "updated" : "added"} successfully.
-        </div>
-      )}
-      {displayWarning && (
-        <div className="alert alert-danger" role="alert">
-          All fields must be filled out.
-        </div>
+    <motion.div
+      className="container mx-auto max-w-3xl p-8 bg-gradient-to-br from-green-50 via-white to-gray-100 rounded-2xl shadow-2xl"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+    >
+      {successMessage && (
+        <motion.div
+          className="mb-6 p-4 bg-green-100 text-green-800 border border-green-300 rounded-xl shadow-md"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+        >
+          {successMessage}
+        </motion.div>
       )}
       {httpError && (
-        <div className="alert alert-danger" role="alert">
+        <motion.div
+          className="mb-6 p-4 bg-red-100 text-red-800 border border-red-300 rounded-xl shadow-md"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+        >
           {httpError}
-        </div>
+        </motion.div>
       )}
-      <div className="card">
-        <div className="card-header">
-          {id ? "Edit Administration Member" : "Add Administration Member"}
+      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+        {id ? "Edit Administration Member" : "Add Administration Member"}
+      </h1>
+      {isLoading ? (
+        <div className="flex justify-center items-center my-10">
+          <ClipLoader size={50} color="#4caf50" loading={isLoading} />
         </div>
-        <div className="card-body">
-          {isLoading && <p>Loading...</p>}
-          {!isLoading && (
-            <form onSubmit={submitAdminMember}>
-              <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Designation</label>
-                  <input
-                    type="text"
-                    name="designation"
-                    className="form-control"
-                    required
-                    onChange={handleInputChange}
-                    value={formData.designation}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Name</label>
-                  <input
-                    type="text"
-                    name="adminName"
-                    className="form-control"
-                    required
-                    onChange={handleInputChange}
-                    value={formData.adminName}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Qualification</label>
-                  <input
-                    type="text"
-                    name="adminQualification"
-                    className="form-control"
-                    required
-                    onChange={handleInputChange}
-                    value={formData.adminQualification}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Instagram Link</label>
-                  <input
-                    type="text"
-                    name="insta"
-                    className="form-control"
-                    required
-                    onChange={handleInputChange}
-                    value={formData.insta}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">LinkedIn Link</label>
-                  <input
-                    type="text"
-                    name="linkedIn"
-                    className="form-control"
-                    required
-                    onChange={handleInputChange}
-                    value={formData.linkedIn}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    className="form-control"
-                    required
-                    onChange={handleInputChange}
-                    value={formData.email}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Year</label>
-                  <input
-                    type="number"
-                    name="year"
-                    className="form-control"
-                    required
-                    onChange={handleInputChange}
-                    value={formData.year}
-                  />
-                </div>
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">Upload Image</label>
-                  <input
-                    type="file"
-                    className="form-control"
-                    onChange={handleFileChange}
-                  />
-                </div>
+      ) : (
+        <motion.form
+          onSubmit={submitAdminMember}
+          className="space-y-8"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { label: "Designation", name: "designation" },
+              { label: "Name", name: "adminName" },
+              { label: "Qualification", name: "adminQualification" },
+              { label: "Instagram Link", name: "insta" },
+              { label: "LinkedIn Link", name: "linkedIn" },
+              { label: "Email", name: "email", type: "email" },
+              { label: "Year", name: "year", type: "number" },
+            ].map((field) => (
+              <motion.div
+                key={field.name}
+                className="flex flex-col"
+                whileHover={{ scale: 1.03 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                <label className="text-lg font-semibold text-gray-600 mb-2">
+                  {field.label}
+                </label>
+                <input
+                  type={field.type || "text"}
+                  name={field.name}
+                  className="px-4 py-3 border rounded-lg shadow-sm border-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none"
+                  value={(formData as any)[field.name]}
+                  onChange={handleInputChange}
+                  required
+                />
+              </motion.div>
+            ))}
+            <motion.div
+              whileHover={{ scale: 1.03 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <label className="text-lg font-semibold text-gray-600 mb-2">
+                Upload Image
+              </label>
+              <div
+                {...getRootProps()}
+                className={`p-6 border-2 border-dashed rounded-xl text-center cursor-pointer transition-all ${
+                  isDragActive
+                    ? "border-green-400 bg-green-50"
+                    : "border-gray-300 hover:bg-gray-50"
+                }`}
+              >
+                <input {...getInputProps()} />
+                {selectedImage ? (
+                  <p className="text-sm text-gray-600 font-medium">
+                    {selectedImage.name}
+                  </p>
+                ) : (
+                  <p className="text-sm text-gray-400">
+                    Drag & drop an image here, or click to select one
+                  </p>
+                )}
               </div>
-              <button type="submit" className="btn btn-primary mt-3">
-                {id ? "Update Administration Member" : "Add Administration Member"}
-              </button>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
+              {selectedImage && (
+                <img
+                  src={URL.createObjectURL(selectedImage)}
+                  alt="Preview"
+                  className="mt-6 rounded-lg shadow-md w-40 h-40 object-cover mx-auto"
+                />
+              )}
+            </motion.div>
+          </div>
+          <motion.button
+            type="submit"
+            className={`mt-8 w-full md:w-auto px-8 py-4 text-white font-bold rounded-lg bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 shadow-lg transition-all ${
+              isLoading ? "opacity-50 cursor-not-allowed" : "hover:-translate-y-1"
+            }`}
+            whileTap={{ scale: 0.95 }}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ClipLoader size={20} color="#fff" />
+            ) : id ? (
+              "Update Member"
+            ) : (
+              "Add Member"
+            )}
+          </motion.button>
+        </motion.form>
+      )}
+    </motion.div>
   );
 };
 
-// Export component
 export default AddEditAdministration;

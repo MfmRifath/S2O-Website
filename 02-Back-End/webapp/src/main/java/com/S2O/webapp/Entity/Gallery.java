@@ -27,5 +27,14 @@ public class Gallery {
     @OneToMany(mappedBy = "gallery", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Image> images;
 
+    @Override
+    public String toString() {
+        return "Gallery{" +
+                "id=" + id +
+                ", event='" + event + '\'' +
+                ", description='" + description + '\'' +
+                ", date=" + date +
+                '}'; // Avoid including 'images'
+    }
     // Getters and setters
 }

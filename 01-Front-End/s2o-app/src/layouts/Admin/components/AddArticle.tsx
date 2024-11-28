@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 export const AddEditArticle: React.FC = () => {
   const [articleId, setArticleId] = useState<number | null>(null);
@@ -83,95 +83,106 @@ export const AddEditArticle: React.FC = () => {
   };
 
   return (
-    <div className="container mt-5 mb-5">
+    <div className="container mx-auto p-6 max-w-4xl bg-white rounded-lg shadow-lg">
       {displaySuccess && (
-        <div className="alert alert-success" role="alert">
+        <div className="mb-4 p-4 text-green-800 bg-green-50 border border-green-300 rounded">
           Article added/updated successfully.
         </div>
       )}
       {displayWarning && (
-        <div className="alert alert-danger" role="alert">
+        <div className="mb-4 p-4 text-red-800 bg-red-50 border border-red-300 rounded">
           All fields must be filled out.
         </div>
       )}
-      <div className="card">
-        <div className="card-header">
-          {articleId ? "Edit Article" : "Add Article"}
+      <h1 className="text-3xl font-bold mb-6 text-gray-700 text-center">
+        {articleId ? "Edit Article" : "Add Article"}
+      </h1>
+      <form onSubmit={submitArticle}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Title
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
+              name="title"
+              required
+              onChange={(e) => setTitle(e.target.value)}
+              value={title}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Author
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
+              name="author"
+              required
+              onChange={(e) => setAuthor(e.target.value)}
+              value={author}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Author Qualification
+            </label>
+            <input
+              type="text"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
+              name="authorQualification"
+              required
+              onChange={(e) => setAuthorQualification(e.target.value)}
+              value={authorQualification}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Published Date
+            </label>
+            <input
+              type="date"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
+              name="date"
+              required
+              onChange={handleDateChange}
+              value={date}
+            />
+          </div>
+          <div className="col-span-2">
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Content
+            </label>
+            <textarea
+              rows={8}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
+              name="content"
+              required
+              onChange={(e) => setContent(e.target.value)}
+              value={content}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Upload Images
+            </label>
+            <input
+              type="file"
+              className="block w-full text-sm text-gray-600 border border-gray-300 rounded-lg cursor-pointer focus:outline-none"
+              multiple
+              onChange={handleFileChange}
+            />
+          </div>
         </div>
-        <div className="card-body">
-          <form onSubmit={submitArticle}>
-            <div className="row">
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Title</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="title"
-                  required
-                  onChange={(e) => setTitle(e.target.value)}
-                  value={title}
-                />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Author</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="author"
-                  required
-                  onChange={(e) => setAuthor(e.target.value)}
-                  value={author}
-                />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Author Qualification</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="authorQualification"
-                  required
-                  onChange={(e) => setAuthorQualification(e.target.value)}
-                  value={authorQualification}
-                />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Published Date:</label>
-                <input
-                  type="date"
-                  className="form-control"
-                  name="date"
-                  required
-                  onChange={handleDateChange}
-                  value={date}
-                />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Content</label>
-                <textarea
-                  rows={10}
-                  className="form-control"
-                  name="content"
-                  required
-                  onChange={(e) => setContent(e.target.value)}
-                  value={content}
-                />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Upload Images</label>
-                <input
-                  type="file"
-                  className="form-control"
-                  multiple
-                  onChange={handleFileChange}
-                />
-              </div>
-            </div>
-            <button type="submit" className="btn btn-primary mt-3">
-              {articleId ? "Update Article" : "Add Article"}
-            </button>
-          </form>
-        </div>
-      </div>
+        <button
+          type="submit"
+          className="mt-6 px-6 py-3 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 focus:ring-2 focus:ring-green-400 transition-all"
+        >
+          {articleId ? "Update Article" : "Add Article"}
+        </button>
+      </form>
     </div>
   );
 };

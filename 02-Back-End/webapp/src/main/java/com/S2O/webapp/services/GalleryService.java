@@ -5,6 +5,8 @@ import com.S2O.webapp.Entity.Image;
 import com.S2O.webapp.RequesModal.GalleryDTO;
 import com.S2O.webapp.RequesModal.ImageDTO;
 import com.S2O.webapp.dao.GalleryRepository;
+import com.S2O.webapp.error.GalleryNotFoundException;
+import com.S2O.webapp.error.InvalidGalleryDataException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -83,39 +85,41 @@ public class GalleryService {
     }
     @Transactional
     public Gallery updateGallery(Long id, Gallery updatedGalleryDetails, List<MultipartFile> imageFiles) throws IOException {
-        // Find the existing gallery by ID
+        // Fetch the existing gallery
         Gallery existingGallery = galleryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Gallery not found with ID: " + id));
+                .orElseThrow(() -> new GalleryNotFoundException("Gallery not found with ID: " + id));
 
-        // Update gallery details
+        // Update basic details
+        if (updatedGalleryDetails.getEvent() == null || updatedGalleryDetails.getEvent().isEmpty()) {
+            throw new InvalidGalleryDataException("Gallery event name cannot be empty.");
+        }
         existingGallery.setEvent(updatedGalleryDetails.getEvent());
         existingGallery.setDescription(updatedGalleryDetails.getDescription());
         existingGallery.setDate(updatedGalleryDetails.getDate());
 
-        // Add new images if provided
+        // Handle image uploads
         if (imageFiles != null && !imageFiles.isEmpty()) {
-            List<Image> newImages = imageFiles.stream()
-                    .map(file -> {
-                        try {
-                            // Upload image and get the S3 key
-                            String keyName = imageService.uploadImage(file);
+            for (MultipartFile file : imageFiles) {
+                // Validate file type and size (optional)
+                if (!file.getContentType().startsWith("image/")) {
+                    throw new InvalidGalleryDataException("Only image files are allowed.");
+                }
+                if (file.getSize() > 5 * 1024 * 1024) { // Limit: 5MB
+                    throw new InvalidGalleryDataException("File size exceeds the maximum limit of 5MB.");
+                }
 
-                            // Create a new Image entity
-                            Image image = new Image();
-                            image.setKeyName(keyName);
-                            image.setGallery(existingGallery);
-                            return image;
-                        } catch (IOException e) {
-                            throw new RuntimeException("Failed to upload image", e);
-                        }
-                    })
-                    .collect(Collectors.toList());
+                // Upload image and get its key
+                String keyName = imageService.uploadImage(file);
 
-            // Add the new images to the gallery
-            existingGallery.getImages().addAll(newImages);
+                // Create a new Image entity and link it to the gallery
+                Image image = new Image();
+                image.setKeyName(keyName);
+                image.setGallery(existingGallery);
+                existingGallery.getImages().add(image);
+            }
         }
 
-        // Save the updated gallery in the repository
+        // Save the updated gallery
         return galleryRepository.save(existingGallery);
     }
     @Transactional

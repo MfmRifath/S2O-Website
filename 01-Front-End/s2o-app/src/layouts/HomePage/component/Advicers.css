@@ -1,122 +1,33 @@
-/* In your main CSS file or in the component */
-@import "~slick-carousel/slick/slick.css";
-@import "~slick-carousel/slick/slick-theme.css";
-
 /* Advicers.css */
 .carousel-container {
-	width: 80%;
+	padding: 0 1.5rem;
+	max-width: 1200px;
 	margin: 0 auto;
-	overflow: hidden;
   }
   
-  .carousel-slide {
-	position: relative;
-	text-align: center;
-	padding: 20px 0; /* Add some padding to center the images vertically */
-  }
-  
-  .carousel-slide img {
-	width: 150px; /* Set the width of the image */
-	height: 150px; /* Set the height of the image */
-	border-radius: 50%; /* Make the image round */
-	object-fit: cover; /* Ensure the image covers the entire area */
-	transition: transform 0.5s ease-in-out;
-	margin: 0 auto; /* Center the image horizontally */
-  }
-  
-  .carousel-content {
-	margin-top: 20px; /* Add some space between the image and the content */
-	background: rgba(0, 0, 0, 0.5);
-	color: #fff;
-	padding: 10px;
-	border-radius: 5px;
-	opacity: 0;
-	animation: fadeIn 1s forwards;
-  }
-  
-  @keyframes fadeIn {
-	from {
-	  opacity: 0;
-	}
-	to {
-	  opacity: 1;
-	}
-  }
-  
-  .slick-prev, .slick-next {
-	color: #fff;
-	z-index: 1;
+  /* Customize the dot navigation */
+  .slick-dots {
+	bottom: -40px;
   }
   
   .slick-dots li button:before {
-	color: #fff;
-  }
-  
-  .slick-dots li.slick-active button:before {
-	color: #ff6347;
-  }/* Advicers.css */
-.carousel-container {
-	width: 80%;
-	margin: 0 auto;
-	overflow: hidden;
-  }
-  
-  .carousel-slide {
-	position: relative;
-	text-align: center;
-	padding: 20px 0;
-  }
-  
-  .carousel-slide img {
-	width: 150px; /* Set the width of the image */
-	height: 150px; /* Set the height of the image */
-	border-radius: 50%; /* Make the image round */
-	object-fit: cover; /* Ensure the image covers the entire area */
-	margin: 0 auto;
-	animation: moveImage 5s linear infinite; /* Apply the animation */
-  }
-  
-  .carousel-content {
-	margin-top: 20px;
-	background: rgba(0, 0, 0, 0.5);
-	color: #fff;
-	padding: 10px;
-	border-radius: 5px;
-	opacity: 0;
-	animation: fadeIn 1s forwards;
-  }
-  
-  @keyframes fadeIn {
-	from {
-	  opacity: 0;
-	}
-	to {
-	  opacity: 1;
-	}
-  }
-  
-  @keyframes moveImage {
-	0% {
-	  transform: translateX(0);
-	}
-	50% {
-	  transform: translateX(20px); /* Move the image to the right */
-	}
-	100% {
-	  transform: translateX(0); /* Move the image back to the original position */
-	}
+	color: white;
+	font-size: 18px;
   }
   
   .slick-prev, .slick-next {
-	color: #fff;
-	z-index: 1;
+	z-index: 10;
   }
   
-  .slick-dots li button:before {
-	color: #fff;
+  /* Styling for the slides content inside */
+  .carousel-content {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 1.5rem;
+	background: rgba(0, 0, 0, 0.5);
+	color: white;
+	font-weight: bold;
+	font-size: 1.2rem;
   }
-  
-  .slick-dots li.slick-active button:before {
-	color: #ff6347;
-  }
-  

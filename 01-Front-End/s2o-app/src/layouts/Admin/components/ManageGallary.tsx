@@ -29,41 +29,34 @@ export const ManageGallery: React.FC = () => {
     fetchGalleries();
   }, []);
 
-  // Add a new gallery
   const handleAddGallery = () => {
     setEditGalleryItem(null);
     setIsAddEditModalOpen(true);
   };
 
-  // Edit an existing gallery
   const handleEditGallery = (galleryItem: GalleryImageModel) => {
     setEditGalleryItem(galleryItem);
     setIsAddEditModalOpen(true);
   };
 
-  // Delete a gallery
   const handleDeleteGallery = (galleryItem: GalleryImageModel) => {
     setDeleteGalleryItem(galleryItem);
     setIsDeleteModalOpen(true);
   };
 
-  // Save gallery changes
   const handleSaveGallery = (updatedGallery: GalleryImageModel) => {
     if (editGalleryItem) {
-      // Update existing item
       setGalleryItems((prevItems) =>
         prevItems.map((item) =>
           item.id === updatedGallery.id ? updatedGallery : item
         )
       );
     } else {
-      // Add new item
       setGalleryItems((prevItems) => [...prevItems, updatedGallery]);
     }
     setIsAddEditModalOpen(false);
   };
 
-  // Confirm gallery deletion
   const handleConfirmDelete = async () => {
     if (deleteGalleryItem) {
       try {
@@ -87,62 +80,71 @@ export const ManageGallery: React.FC = () => {
   };
 
   return (
-    <div>
-      <h4>Manage Gallery</h4>
-      <button onClick={handleAddGallery} className="btn btn-primary mb-3">
+    <div className="container mx-auto p-6">
+      <h4 className="text-2xl font-bold text-gray-700 mb-6">Manage Gallery</h4>
+      <button
+        onClick={handleAddGallery}
+        className="px-4 py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600 transition-all mb-4"
+      >
         Add Gallery Item
       </button>
-      <table className="table table-hover">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Event</th>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Images</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {galleryItems.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.event}</td>
-              <td>{item.date}</td>
-              <td>{item.description}</td>
-              <td>
-                <div className="image-thumbnails">
-                  {(item.images || []).map((image, index) => (
-                    <img
-                    key={index}
-                    src={image.url} // Use the URL for the image
-                    alt={`Gallery image ${index + 1}`}
-                    className="thumbnail"
-                    style={{ width: "100px", height: "100px", objectFit: "cover" }} // Define size and maintain aspect ratio
-                  />
-                  ))}
-                </div>
-              </td>
-              <td>
-                <button
-                  onClick={() => handleEditGallery(item)}
-                  className="btn btn-warning mx-1"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDeleteGallery(item)}
-                  className="btn btn-danger"
-                >
-                  Delete
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="table-auto w-full border-collapse border border-gray-300 shadow-lg rounded-lg">
+          <thead className="bg-gray-100">
+            <tr>
+              {["ID", "Event", "Date", "Description", "Images", "Actions"].map(
+                (header) => (
+                  <th
+                    key={header}
+                    className="px-4 py-2 text-left font-semibold text-gray-700 border-b border-gray-300"
+                  >
+                    {header}
+                  </th>
+                )
+              )}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {galleryItems.map((item) => (
+              <tr key={item.id} className="hover:bg-gray-50">
+                <td className="px-4 py-2 border-b border-gray-300">{item.id}</td>
+                <td className="px-4 py-2 border-b border-gray-300">{item.event}</td>
+                <td className="px-4 py-2 border-b border-gray-300">{item.date}</td>
+                <td className="px-4 py-2 border-b border-gray-300">
+                  {item.description}
+                </td>
+                <td className="px-4 py-2 border-b border-gray-300">
+                  <div className="flex flex-wrap gap-2">
+                    {(item.images || []).map((image, index) => (
+                      <img
+                        key={index}
+                        src={image.url}
+                        alt={`Gallery image ${index + 1}`}
+                        className="w-20 h-20 object-cover rounded shadow"
+                      />
+                    ))}
+                  </div>
+                </td>
+                <td className="px-4 py-2 border-b border-gray-300">
+                  <button
+                    onClick={() => handleEditGallery(item)}
+                    className="px-3 py-1 bg-yellow-500 text-white text-sm rounded hover:bg-yellow-600 transition-all mx-1"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteGallery(item)}
+                    className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition-all"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Add/Edit Modal */}
       {isAddEditModalOpen && (
         <AddEditGalleryModal
           galleryItem={editGalleryItem}
@@ -151,7 +153,6 @@ export const ManageGallery: React.FC = () => {
         />
       )}
 
-      {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && deleteGalleryItem && (
         <DeleteConfirmationModal
           galleryId={deleteGalleryItem.id}

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "./addGallery.css";
 import GalleryImageModel from "../../../Model/GalleryImageModel";
 import Image from "../../../Model/Image";
 
@@ -25,7 +24,7 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
     if (file) {
       setItem((prevItem) => {
         const updatedImages = [...prevItem.images];
-        const newImage = new Image(0, "", file); // Create a new Image object
+        const newImage = new Image(0, "", file);
         updatedImages[index] = newImage;
         return new GalleryImageModel(
           prevItem.id,
@@ -73,8 +72,9 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
     }));
   };
 
-  const addGallery = async () => {
+  const saveGallery = async () => {
     const formData = new FormData();
+
     formData.append(
       "gallery",
       JSON.stringify({
@@ -86,34 +86,32 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
 
     item.images.forEach((image) => {
       if (image.file) {
-        formData.append("images", image.file); // Append only File objects
+        formData.append("imageFiles", image.file);
       }
     });
 
-    for (let [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`${key}: ${value.name}`);
-      } else {
-        console.log(`${key}:`, value);
-      }
-    }
+    const url = galleryItem
+      ? `http://localhost:8080/api/galleries/${galleryItem.id}`
+      : "http://localhost:8080/api/galleries";
+
+    const method = galleryItem ? "PUT" : "POST";
 
     try {
-      const response = await fetch("http://localhost:8080/api/galleries", {
-        method: "POST",
+      const response = await fetch(url, {
+        method: method,
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Failed to add gallery");
+        throw new Error(`Failed to ${galleryItem ? "edit" : "add"} gallery`);
       }
 
-      const newGallery = await response.json();
-      onSave(newGallery);
+      const updatedGallery = await response.json();
+
+      onSave(updatedGallery);
       onClose();
     } catch (error) {
-      console.error("Error adding gallery:", error);
-      setError("Failed to add gallery. Please try again.");
+      setError(`Failed to ${galleryItem ? "edit" : "add"} gallery. Please try again.`);
     }
   };
 
@@ -129,79 +127,96 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
     }
 
     setError("");
-    addGallery();
+    saveGallery();
   };
 
   return (
-    <div className="modal-container">
-      <h5 className="modal-title">
-        {galleryItem ? "Edit Gallery Item" : "Add Gallery Item"}
-      </h5>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6">
+        <h5 className="text-xl font-bold text-gray-700 mb-4">
+          {galleryItem ? "Edit Gallery Item" : "Add Gallery Item"}
+        </h5>
 
-      {error && <p className="error-text">{error}</p>}
+        {error && <p className="text-red-600 mb-4">{error}</p>}
 
-      <input
-        name="event"
-        value={item.event}
-        onChange={handleChange}
-        placeholder="Event Name *"
-        className="input-field"
-      />
-      <textarea
-        name="description"
-        value={item.description}
-        onChange={handleChange}
-        placeholder="Description"
-        className="textarea-field"
-      />
-      <input
-        name="date"
-        value={item.date}
-        onChange={handleChange}
-        placeholder="Date *"
-        type="date"
-        className="input-field"
-      />
+        <div className="space-y-4">
+          <input
+            name="event"
+            value={item.event}
+            onChange={handleChange}
+            placeholder="Event Name *"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          />
+          <textarea
+            name="description"
+            value={item.description}
+            onChange={handleChange}
+            placeholder="Description"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          />
+          <input
+            name="date"
+            value={item.date}
+            onChange={handleChange}
+            placeholder="Date *"
+            type="date"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          />
 
-      <div className="image-upload-section">
-        <label>Upload Images:</label>
-        {item.images.map((image, index) => (
-          <div key={index} className="image-upload-thumbnail">
-            <input
-              type="file"
-              onChange={(e) => handleImageUpload(e, index)}
-              accept="image/*"
-              className="file-input"
-            />
-            {image.file ? (
-              <img
-                src={URL.createObjectURL(image.file)}
-                alt={`Uploaded ${index + 1}`}
-                className="thumbnail-preview"
-              />
-            ) : (
-              <img src={image.url} alt={`Uploaded ${index + 1}`} className="thumbnail-preview" />
-            )}
+          <div className="space-y-4">
+            <label className="text-gray-700 font-medium">Upload Images:</label>
+            {item.images.map((image, index) => (
+              <div key={index} className="flex items-center space-x-4">
+                <input
+                  type="file"
+                  onChange={(e) => handleImageUpload(e, index)}
+                  accept="image/*"
+                  className="file-input"
+                />
+                {image.file ? (
+                  <img
+                    src={URL.createObjectURL(image.file)}
+                    alt={`Uploaded ${index + 1}`}
+                    className="w-16 h-16 object-cover rounded shadow"
+                  />
+                ) : (
+                  <img
+                    src={image.url}
+                    alt={`Uploaded ${index + 1}`}
+                    className="w-16 h-16 object-cover rounded shadow"
+                  />
+                )}
+                <button
+                  onClick={() => removeImageField(index)}
+                  className="px-3 py-1 bg-red-500 text-white text-sm font-medium rounded hover:bg-red-600"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
             <button
-              onClick={() => removeImageField(index)}
-              className="remove-image-button"
+              onClick={addImageField}
+              className="px-4 py-2 bg-green-500 text-white font-medium rounded hover:bg-green-600"
             >
-              Remove
+              Add Image
             </button>
           </div>
-        ))}
-        <button onClick={addImageField} className="add-image-button">
-          Add Image
-        </button>
-      </div>
+        </div>
 
-      <div className="button-group">
-        <button onClick={handleSubmit} className="btn-save">
-          Save
-        </button>
-        <button onClick={onClose} className="btn-cancel">
-          Cancel
-        </button>
+        <div className="flex justify-end space-x-4 mt-6">
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600"
+          >
+            Save
+          </button>
+          <button
+            onClick={onClose}
+            className="px-6 py-2 bg-gray-300 text-gray-700 font-medium rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   );

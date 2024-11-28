@@ -1,28 +1,27 @@
 import React from 'react';
-import '@fortawesome/fontawesome-free/css/all.min.css';
-import './Service.css'; // Import the CSS file for animations
 
 interface ServiceCardProps {
-    icon: string;
-    title: string;
-    description: string;
-    link: string;
-    animationType?: 'bounce' | 'rotate' | 'pulse'; // Optional animation type
+  icon: string;
+  title: string;
+  description: string;
+  link: string;
+  animationType?: 'bounce' | 'rotate' | 'pulse'; // Optional animation type
 }
 
 const ServiceCard = ({ icon, title, description, link, animationType }: ServiceCardProps) => (
-    <div className="col-lg-3 col-md-6 mb-4">
-        <div className={`service-card h-100 text-center p-4 ${animationType ? `service-icon-${animationType}` : ''}`}>
-            <div className={`service-icon ${animationType ? animationType : ''} mb-3`}>
-                <i className={`${icon} fa-3x`}></i>
-            </div>
-            <h4 className="service-title">{title}</h4>
-            <p className="service-description">{description}</p>
-            <div>
-                <a href={link} className="btn btn-secondary">Learn More</a>
-            </div>
-        </div>
+  <div className="col-span-1 bg-white rounded-xl shadow-lg p-6 text-center transform transition-transform hover:scale-105 hover:shadow-2xl">
+    <div className={`text-blue-600 text-4xl mb-4 ${animationType}`}>
+      <i className={icon}></i>
     </div>
+    <h4 className="text-xl font-semibold text-gray-800 mb-2">{title}</h4>
+    <p className="text-gray-600 mb-4">{description}</p>
+    <a
+      href={link}
+      className="inline-block px-6 py-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white font-medium rounded-full hover:from-teal-500 hover:to-blue-500 shadow-md hover:shadow-lg transition-all"
+    >
+      Learn More
+    </a>
+  </div>
 );
 
 export default ServiceCard;

@@ -5,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import "./App.css";
-import { Navbar } from "./layouts/NavbarAndFooter/Navbar";
+
 import { HomePage } from "./layouts/HomePage/HomePage";
 import { Footer } from "./layouts/NavbarAndFooter/Footer";
 import { FullGallery } from "./layouts/GallaryPage.tsx/FullGallery";
@@ -24,6 +24,7 @@ import { S2OLibrary } from "./layouts/S2OAcadmyPage/components/S2OLibrary";
 import Bookshelf from "./layouts/S2OAcadmyPage/components/S2O Library/BookShelf";
 import EventCalendar from "./layouts/EventCalander/EventCalander";
 import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
+import Navbar from "./layouts/NavbarAndFooter/Navbar";
 
 
 

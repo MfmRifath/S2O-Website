@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import './S2OAcademy.css'; // Import the CSS file for custom styles
 
 const s2oAcademiaInfo = {
-    logo: require('./../../../Images/s2o-academy.jpg'), // Adjust the path to your S2O Academia logo
-    description: 'S2O Academy is committed to delivering high-quality education through innovative and engaging learning experiences. Our programs are designed to foster intellectual growth, creativity, and critical thinking. Join us to explore a world of knowledge and opportunities.'
+    logo: require('./../../../Images/s2o-academy.jpg'), // Adjust the path to your S2O Academy logo
+    description:
+        'S2O Academy is committed to delivering high-quality education through innovative and engaging learning experiences. Our programs are designed to foster intellectual growth, creativity, and critical thinking. Join us to explore a world of knowledge and opportunities.',
 };
 
 export const S2OAcademyPage = () => {
@@ -15,11 +15,11 @@ export const S2OAcademyPage = () => {
         const options = {
             root: null,
             rootMargin: '0px',
-            threshold: 0.1 // Trigger animation when 10% of the element is visible
+            threshold: 0.1, // Trigger animation when 10% of the element is visible
         };
 
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+            entries.forEach((entry) => {
                 if (entry.isIntersecting) {
                     // Add animation class
                     if (entry.target === logoRef.current) {
@@ -51,21 +51,33 @@ export const S2OAcademyPage = () => {
     }, []);
 
     return (
-        <section className="text-center py-5">
-            <div className="mb-5">
-                <img 
-                    src={s2oAcademiaInfo.logo} 
-                    alt="S2O Academia Logo" 
-                    className="s2o-logo mb-3" 
-                    ref={logoRef} 
-                />
-                <p 
-                    className="s2o-description" 
+        <section className="text-center py-12 bg-gradient-to-r from-blue-50 via-teal-50 to-blue-100">
+            <div className="container mx-auto px-6 lg:px-20">
+                {/* Logo */}
+                <div className="mb-8">
+                    <img
+                        src={s2oAcademiaInfo.logo}
+                        alt="S2O Academy Logo"
+                        className="mx-auto w-40 lg:w-64 rounded-xl shadow-lg transition-transform transform hover:scale-105"
+                        ref={logoRef}
+                    />
+                </div>
+
+                {/* Description */}
+                <p
+                    className="text-lg lg:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto animate-opacity"
                     ref={descriptionRef}
                 >
                     {s2oAcademiaInfo.description}
                 </p>
-                <a href="#explore" className="btn btn-outline-light explore-btn">Explore S2O Academy</a>
+
+                {/* Button */}
+                <a
+                    href="#explore"
+                    className="inline-block mt-6 px-6 py-3 bg-gradient-to-r from-blue-500 to-teal-500 text-white font-medium rounded-full shadow-md hover:from-teal-500 hover:to-blue-500 hover:shadow-lg transform transition-transform hover:scale-105"
+                >
+                    Explore S2O Academy
+                </a>
             </div>
         </section>
     );
