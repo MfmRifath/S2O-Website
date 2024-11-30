@@ -15,7 +15,7 @@ interface AdministrationModal {
   LinkedIn: string;
   email: string;
   year: number;
-  adminImage: Image;
+  adminImage: Image | null; // Allow for null values
 }
 
 export const Administration = () => {
@@ -126,7 +126,7 @@ export const Administration = () => {
               <div className="relative z-10 flex justify-center">
                 <img
                   src={
-                    admin.adminImage.url || require("./../../../Images/logo.jpg")
+                    admin.adminImage?.url || require("./../../../Images/logo.jpg")
                   }
                   alt={admin.adminName || "Team Member"}
                   onError={(e) =>

@@ -7,13 +7,12 @@ class GalleryImageModel {
   date?: string;
   images: Array<Image>;
 
-
   constructor(
     id: number,
     event: string,
-    images: Array<Image>,
-    description?: string,
-    date?: string
+    images: Array<Image> = [], // Default to an empty array
+    description: string = "", // Default to an empty string
+    date: string = "" // Default to an empty string
   ) {
     this.id = id;
     this.event = event;

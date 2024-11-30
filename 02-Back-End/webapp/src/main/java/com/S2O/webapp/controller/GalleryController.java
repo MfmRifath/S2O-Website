@@ -41,7 +41,7 @@ public class GalleryController {
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<?> createGallery(
             @RequestPart("gallery") String galleryJson,
-            @RequestPart("images") List<MultipartFile> imageFiles) {
+            @RequestPart(value = "images",required = false) List<MultipartFile> imageFiles) {
         try {
             Gallery gallery = galleryService.parseGalleryJson(galleryJson);
             Gallery savedGallery = galleryService.saveGallery(gallery, imageFiles);

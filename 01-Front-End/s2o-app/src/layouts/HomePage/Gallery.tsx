@@ -33,13 +33,14 @@ const Gallery: React.FC = () => {
     fetchGalleries();
   }, []);
 
-  // Generate URLs for image files in each gallery
   const images = galleries.flatMap((gallery) =>
     Array.isArray(gallery.images)
-      ? gallery.images.map((img) => {
-          const imgUrl = img.file ? URL.createObjectURL(img.file) : img.url;
-          return { original: imgUrl, thumbnail: imgUrl };
-        })
+      ? gallery.images
+          .filter((img) => img && (img.file || img.url)) // Filter out invalid images
+          .map((img) => {
+            const imgUrl = img.file ? URL.createObjectURL(img.file) : img.url!;
+            return { original: imgUrl, thumbnail: imgUrl };
+          })
       : []
   );
 

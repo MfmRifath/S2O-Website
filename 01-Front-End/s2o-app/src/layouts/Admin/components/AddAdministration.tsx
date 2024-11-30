@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
@@ -37,6 +37,40 @@ const AddEditAdministration: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [httpError, setHttpError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Fetch administration data for editing
+  useEffect(() => {
+    const fetchAdministration = async () => {
+      if (id) {
+        setIsLoading(true);
+        try {
+          const response = await axios.get<AdministrationModal>(
+            `http://localhost:8080/api/administrations/${id}`
+          );
+          setFormData(response.data);
+  
+          // Check if adminImages exists and handle the image
+          if (response.data.adminImages?.url) {
+            const imageFile = await fetch(response.data.adminImages.url)
+              .then((res) => res.blob())
+              .then(
+                (blob) =>
+                  new File([blob], response.data.adminImages?.keyName || "image", {
+                    type: blob.type,
+                  })
+              );
+            setSelectedImage(imageFile);
+          }
+        } catch (error) {
+          setHttpError("Failed to fetch administration data.");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+  
+    fetchAdministration();
+  }, [id]);
 
   const resetFormFields = () => {
     setFormData({

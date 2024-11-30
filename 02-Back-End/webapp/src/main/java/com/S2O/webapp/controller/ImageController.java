@@ -1,6 +1,5 @@
 package com.S2O.webapp.controller;
 
-import com.S2O.webapp.Entity.Image;
 import com.S2O.webapp.services.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

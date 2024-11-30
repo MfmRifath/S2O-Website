@@ -54,7 +54,7 @@ export const AdministrationTable: React.FC = () => {
   const deleteAdminMember = async (id: number) => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/administrations/delete/admin-member/${id}`
+        `http://localhost:8080/api/administrations/delete/${id}`
       );
       setAdministrations(administrations.filter((admin) => admin.id !== id));
     } catch (error) {

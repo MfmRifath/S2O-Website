@@ -3,3 +3,11 @@
 @tailwind utilities;
 
 
+@font-face {
+    font-family: 'Bamini';
+    src: url('/Font/Bamini.ttf') format('truetype');
+  }
+  
+  .font-bamini {
+    font-family: 'Bamini', serif;
+  }

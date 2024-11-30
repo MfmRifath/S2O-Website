@@ -18,6 +18,7 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
   );
 
   const [error, setError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
@@ -34,6 +35,8 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
           prevItem.date
         );
       });
+    } else {
+      console.error("No file selected");
     }
   };
 
@@ -51,6 +54,28 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
   };
 
   const removeImageField = (index: number) => {
+    const imageToDelete = item.images[index]; // Get the image to be removed
+  
+    if (galleryItem && imageToDelete.url) {
+      // Extract the keyName from the image URL or object
+      const keyName = imageToDelete.keyName;
+  
+      // If the gallery item exists and the image has a keyName, delete it from the database
+      fetch(`http://localhost:8080/api/images/${keyName}`, {
+        method: "DELETE",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to delete the image from the database");
+          }
+          console.log(`Image with keyName ${keyName} deleted successfully.`);
+        })
+        .catch((error) => {
+          console.error("Error deleting image:", error);
+        });
+    }
+  
+    // Remove the image from the state
     setItem((prevItem) => {
       const updatedImages = [...prevItem.images];
       updatedImages.splice(index, 1);
@@ -84,33 +109,48 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
       })
     );
 
-    item.images.forEach((image) => {
+    item.images.forEach((image, index) => {
       if (image.file) {
-        formData.append("imageFiles", image.file);
+        formData.append("images", image.file);
       }
     });
 
     const url = galleryItem
       ? `http://localhost:8080/api/galleries/${galleryItem.id}`
-      : "http://localhost:8080/api/galleries";
+      : `http://localhost:8080/api/galleries`;
 
     const method = galleryItem ? "PUT" : "POST";
 
     try {
-      const response = await fetch(url, {
-        method: method,
-        body: formData,
-      });
+      const xhr = new XMLHttpRequest();
+      xhr.open(method, url);
 
-      if (!response.ok) {
-        throw new Error(`Failed to ${galleryItem ? "edit" : "add"} gallery`);
-      }
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          setUploadProgress(percentComplete);
+        }
+      };
 
-      const updatedGallery = await response.json();
+      xhr.onload = () => {
+        if (xhr.status === 200 || xhr.status === 201) {
+          const updatedGallery = JSON.parse(xhr.responseText);
+          onSave(updatedGallery);
+          onClose();
+        } else {
+          setError(`Failed to ${galleryItem ? "edit" : "add"} gallery`);
+        }
+        setUploadProgress(null);
+      };
 
-      onSave(updatedGallery);
-      onClose();
+      xhr.onerror = () => {
+        setError(`Failed to ${galleryItem ? "edit" : "add"} gallery. Please try again.`);
+        setUploadProgress(null);
+      };
+
+      xhr.send(formData);
     } catch (error) {
+      console.error("Error saving gallery:", error);
       setError(`Failed to ${galleryItem ? "edit" : "add"} gallery. Please try again.`);
     }
   };
@@ -202,6 +242,18 @@ export const AddEditGalleryModal: React.FC<AddEditGalleryModalProps> = ({
             </button>
           </div>
         </div>
+
+        {uploadProgress !== null && (
+          <div className="mt-4">
+            <p>Uploading: {uploadProgress}%</p>
+            <div className="w-full bg-gray-300 h-2 rounded">
+              <div
+                className="bg-blue-500 h-2 rounded"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-end space-x-4 mt-6">
           <button

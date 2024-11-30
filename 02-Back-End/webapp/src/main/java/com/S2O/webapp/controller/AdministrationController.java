@@ -74,19 +74,18 @@ public class AdministrationController {
             return new ResponseEntity<>("Failed to update administration: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    // Delete an administration by ID
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteAdministration(@PathVariable Long id) {
         try {
-            // Check if the administration exists before deletion
             if (!administrationService.existsById(id)) {
                 return new ResponseEntity<>("Administration not found", HttpStatus.NOT_FOUND);
             }
 
-            // Delete the administration
             administrationService.deleteAdministration(id);
             return new ResponseEntity<>("Administration deleted successfully", HttpStatus.OK);
         } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
             return new ResponseEntity<>("Failed to delete administration: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

@@ -1,24 +1,26 @@
 import React, { useState } from "react";
+import axios from "axios";
 
-export const AddEditArticle: React.FC = () => {
-  const [articleId, setArticleId] = useState<number | null>(null);
+export const AddEditArticle: React.FC<{ articleId?: number }> = ({
+  articleId,
+}) => {
   const [author, setAuthor] = useState("");
   const [title, setTitle] = useState("");
   const [authorQualification, setAuthorQualification] = useState("");
-  const [content, setContent] = useState("");
+  const [content, setContent] = useState(""); // This will be in Bamini font
   const [date, setDate] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
-
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [displayWarning, setDisplayWarning] = useState(false);
   const [displaySuccess, setDisplaySuccess] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
-    setSelectedImages(files);
+    setSelectedImages((prev) => [...prev, ...files]);
   };
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDate(e.target.value);
+  const removeImage = (index: number) => {
+    setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const submitArticle = async (e: React.FormEvent) => {
@@ -28,14 +30,7 @@ export const AddEditArticle: React.FC = () => {
       ? `http://localhost:8080/api/articles/edit/article/${articleId}`
       : `http://localhost:8080/api/articles/add/article`;
 
-    if (
-      author &&
-      authorQualification &&
-      title &&
-      content &&
-      date &&
-      selectedImages.length > 0
-    ) {
+    if (author && authorQualification && title && content && date) {
       const articleData = {
         author,
         title,
@@ -45,22 +40,30 @@ export const AddEditArticle: React.FC = () => {
       };
 
       const formData = new FormData();
-      formData.append("article", JSON.stringify(articleData)); // Send article data as JSON
+      formData.append("article", JSON.stringify(articleData));
       selectedImages.forEach((file) => formData.append("images", file));
 
-      const requestOptions: RequestInit = {
-        method: articleId ? "PUT" : "POST",
-        body: formData,
-      };
-
       try {
-        const response = await fetch(url, requestOptions);
-        if (!response.ok) {
-          throw new Error("Failed to add/update article");
+        const response = await axios.post(url, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              setUploadProgress(percentCompleted);
+            }
+          },
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          setDisplaySuccess(true);
+          resetFormFields();
+        } else {
+          throw new Error("Failed to save article.");
         }
-        resetFormFields();
-        setDisplaySuccess(true);
-        setDisplayWarning(false);
       } catch (error) {
         console.error("Error submitting article:", error);
         setDisplaySuccess(false);
@@ -78,7 +81,7 @@ export const AddEditArticle: React.FC = () => {
     setContent("");
     setDate("");
     setSelectedImages([]);
-    setArticleId(null);
+    setUploadProgress(0);
     setDisplayWarning(false);
   };
 
@@ -99,6 +102,7 @@ export const AddEditArticle: React.FC = () => {
       </h1>
       <form onSubmit={submitArticle}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Input Fields */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-2">
               Title
@@ -106,7 +110,6 @@ export const AddEditArticle: React.FC = () => {
             <input
               type="text"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
-              name="title"
               required
               onChange={(e) => setTitle(e.target.value)}
               value={title}
@@ -119,7 +122,6 @@ export const AddEditArticle: React.FC = () => {
             <input
               type="text"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
-              name="author"
               required
               onChange={(e) => setAuthor(e.target.value)}
               value={author}
@@ -132,7 +134,6 @@ export const AddEditArticle: React.FC = () => {
             <input
               type="text"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
-              name="authorQualification"
               required
               onChange={(e) => setAuthorQualification(e.target.value)}
               value={authorQualification}
@@ -145,26 +146,31 @@ export const AddEditArticle: React.FC = () => {
             <input
               type="date"
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
-              name="date"
               required
-              onChange={handleDateChange}
+              onChange={(e) => setDate(e.target.value)}
               value={date}
             />
           </div>
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-600 mb-2">
-              Content
-            </label>
-            <textarea
-              rows={8}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none"
-              name="content"
-              required
-              onChange={(e) => setContent(e.target.value)}
-              value={content}
-            />
-          </div>
-          <div>
+  <label className="block text-sm font-medium text-gray-600 mb-2">
+    Content (Type in Tamil - Bamini)
+  </label>
+  <textarea
+    rows={6}
+    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none font-bamini"
+    required
+    onChange={(e) => setContent(e.target.value)}
+    value={content}
+  />
+  <div className="mt-2 text-sm text-gray-500">
+    Note: Please switch to the <strong>Bamini</strong> Tamil keyboard layout to type in Tamil.
+    <div className="mt-1">
+      Example: <strong>க</strong> = <code>f</code>, <strong>ச</strong> = <code>r</code>, <strong>த</strong> = <code>j</code>.
+    </div>
+  </div>
+</div>
+          {/* File Upload */}
+          <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-600 mb-2">
               Upload Images
             </label>
@@ -174,11 +180,46 @@ export const AddEditArticle: React.FC = () => {
               multiple
               onChange={handleFileChange}
             />
+            <div className="flex flex-wrap mt-4 gap-2">
+              {selectedImages.map((file, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`Preview ${index}`}
+                    className="w-20 h-20 object-cover rounded-lg shadow"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute top-0 right-0 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Upload Progress */}
+        {uploadProgress > 0 && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-600">
+              Upload Progress
+            </label>
+            <div className="w-full bg-gray-200 h-4 rounded-lg mt-2">
+              <div
+                className="bg-green-500 h-4 rounded-lg"
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-gray-600 mt-1">{uploadProgress}%</p>
+          </div>
+        )}
+
         <button
           type="submit"
-          className="mt-6 px-6 py-3 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 focus:ring-2 focus:ring-green-400 transition-all"
+          className="mt-6 px-6 py-3 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 focus:ring-2 focus:ring-green-300 transition-all"
         >
           {articleId ? "Update Article" : "Add Article"}
         </button>
@@ -187,5 +228,4 @@ export const AddEditArticle: React.FC = () => {
   );
 };
 
-// Export component
 export default AddEditArticle;

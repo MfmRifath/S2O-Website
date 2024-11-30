@@ -124,9 +124,18 @@ public class AdministrationService {
         return convertToAdministrationDTO(administration);
     }
     // Delete an administration by ID
+    @Transactional
     public void deleteAdministration(Long id) {
         Administration administration = administrationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Administration not found with id " + id));
+
+        // Delete associated image
+        Image adminImage = administration.getAdminImages();
+        if (adminImage != null) {
+            imageService.deleteImage(adminImage.getKeyName());
+        }
+
+        // Delete the administration
         administrationRepository.delete(administration);
     }
 

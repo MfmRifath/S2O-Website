@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import GalleryImageModel from "../../../Model/GalleryImageModel";
 import AddEditGalleryModal from "./AddGallryModal";
-import { DeleteConfirmationModal } from "./DeleteConfomationsMoadal";
+import DeleteConfirmationModal from "./DeleteConfomationsMoadal";
+
 
 export const ManageGallery: React.FC = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryImageModel[]>([]);
