@@ -1,70 +1,119 @@
-import React, { useEffect, useState } from 'react';
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import { Button, Typography, Grid, TextField, MenuItem, Card, CardContent } from '@mui/material';
-import marksService, { Marks } from '../Service/marksService';
-import studentService, { Student } from '../Service/studentService';
+import React, { useState, useEffect } from "react";
+import {
+  Typography,
+  Button,
+  Modal,
+  TextField,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+} from "@mui/material";
+import axios from "axios";
 
-// Validation Schema
-const MarksSchema = Yup.object().shape({
-  studentId: Yup.string().required('Student ID is required'),
-  subject: Yup.string().required('Subject is required'),
-  marks: Yup.number().min(0).max(100).required('Marks are required'),
-  examType: Yup.mixed<'MID_TERM' | 'FINAL' | 'UNIT_TEST'>()
-    .oneOf(['MID_TERM', 'FINAL', 'UNIT_TEST'], 'Invalid exam type')
-    .required('Exam type is required'),
-});
+interface Marks {
+  id?: string; // Optional for new marks
+  examType: string;
+  marks: number;
+  subject: string;
+  studentId: string;
+}
 
-const MarksManagement = () => {
+const modalStyle = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "background.paper",
+  boxShadow: 24,
+  p: 4,
+  borderRadius: "8px",
+};
+
+const MarksManagement: React.FC = () => {
   const [marksList, setMarksList] = useState<Marks[]>([]);
-  const [students, setStudents] = useState<Student[]>([]);
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [open, setOpen] = useState(false);
+  const [currentMark, setCurrentMark] = useState<Marks | null>(null);
+  const [newMark, setNewMark] = useState<Marks>({
+    examType: "",
+    marks: 0,
+    subject: "",
+    studentId: "",
+  });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Fetch students based on the selected year
-    const fetchStudents = async () => {
-      try {
-        const response = await studentService.getStudentsByYear(selectedYear);
-        setStudents(response.data);
-      } catch (error) {
-        console.error('Error fetching students:', error);
-      }
-    };
-
-    fetchStudents();
-  }, [selectedYear]);
-
-  useEffect(() => {
-    // Fetch marks data on component mount
-    const fetchMarks = async () => {
-      try {
-        const response = await marksService.getMarksByStudent('studentId1'); // Replace with dynamic ID as needed
-        setMarksList(response.data);
-      } catch (error) {
-        console.error('Error fetching marks:', error);
-      }
-    };
-
     fetchMarks();
   }, []);
 
-  const handleAddMarks = async (values: Marks, resetForm: () => void) => {
+  const fetchMarks = async () => {
     try {
-      await marksService.addMarks(values);
-      setMarksList((prev) => [...prev, values]);
-      resetForm();
-    } catch (error) {
-      console.error('Error adding marks:', error);
+      const response = await axios.get<Marks[]>("http://localhost:8080/marks");
+      setMarksList(response.data);
+    } catch (err) {
+      setError("Failed to fetch marks data.");
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleAddMark = () => {
+    setCurrentMark(null);
+    setNewMark({
+      examType: "",
+      marks: 0,
+      subject: "",
+      studentId: "",
+    });
+    setOpen(true);
+  };
+
+  const handleEditMark = (mark: Marks) => {
+    setCurrentMark(mark);
+    setNewMark(mark);
+    setOpen(true);
+  };
+
+  const handleDeleteMark = async (id: string) => {
     try {
-      await marksService.deleteMarks(id);
+      await axios.delete(`http://localhost:8080/marks/${id}`);
       setMarksList((prev) => prev.filter((mark) => mark.id !== id));
-    } catch (error) {
-      console.error('Error deleting marks:', error);
+    } catch (err) {
+      setError("Failed to delete mark.");
     }
+  };
+
+  const handleSaveMark = async () => {
+    try {
+      if (currentMark) {
+        // Update existing mark
+        const response = await axios.put(
+          `http://localhost:8080/marks/${currentMark.id}`,
+          newMark
+        );
+        setMarksList((prev) =>
+          prev.map((mark) =>
+            mark.id === currentMark.id ? response.data : mark
+          )
+        );
+      } else {
+        // Add new mark
+        const response = await axios.post("http://localhost:8080/marks", newMark);
+        setMarksList((prev) => [...prev, response.data]);
+      }
+      setOpen(false);
+    } catch (err) {
+      setError("Failed to save mark.");
+    }
+  };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setError(null);
   };
 
   return (
@@ -73,132 +122,102 @@ const MarksManagement = () => {
         Marks Management
       </Typography>
 
-      {/* Year Selection */}
-      <Grid container spacing={2} style={{ marginBottom: '20px' }}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            select
-            label="Select Year"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-            fullWidth
-          >
-            {[2022, 2023, 2024].map((year) => (
-              <MenuItem key={year} value={year}>
-                {year}
-              </MenuItem>
+      <Button variant="contained" color="primary" onClick={handleAddMark}>
+        Add Mark
+      </Button>
+
+      <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell><strong>Exam Type</strong></TableCell>
+              <TableCell><strong>Subject</strong></TableCell>
+              <TableCell><strong>Marks</strong></TableCell>
+              <TableCell><strong>Student ID</strong></TableCell>
+              <TableCell><strong>Actions</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {marksList.map((mark) => (
+              <TableRow key={mark.id}>
+                <TableCell>{mark.examType}</TableCell>
+                <TableCell>{mark.subject}</TableCell>
+                <TableCell>{mark.marks}</TableCell>
+                <TableCell>{mark.studentId}</TableCell>
+                <TableCell>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => handleEditMark(mark)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    style={{ marginLeft: "10px" }}
+                    onClick={() => handleDeleteMark(mark.id!)}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
             ))}
-          </TextField>
-        </Grid>
-      </Grid>
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-      <Formik
-        initialValues={{
-          studentId: '',
-          subject: '',
-          marks: 0,
-          examType: 'MID_TERM' as 'MID_TERM' | 'FINAL' | 'UNIT_TEST',
-        }}
-        validationSchema={MarksSchema}
-        onSubmit={(values, { resetForm }) => {
-          handleAddMarks(values, resetForm);
-        }}
-      >
-        {({ errors, touched }) => (
-          <Form>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  select
-                  name="studentId"
-                  label="Student"
-                  fullWidth
-                  error={touched.studentId && !!errors.studentId}
-                  helperText={touched.studentId && errors.studentId}
-                >
-                  {students.map((student) => (
-                    <MenuItem key={student.id} value={student.id}>
-                      {student.name}
-                    </MenuItem>
-                  ))}
-                </Field>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="subject"
-                  label="Subject"
-                  fullWidth
-                  error={touched.subject && !!errors.subject}
-                  helperText={touched.subject && errors.subject}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="marks"
-                  label="Marks"
-                  type="number"
-                  fullWidth
-                  error={touched.marks && !!errors.marks}
-                  helperText={touched.marks && errors.marks}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  select
-                  name="examType"
-                  label="Exam Type"
-                  fullWidth
-                  error={touched.examType && !!errors.examType}
-                  helperText={touched.examType && errors.examType}
-                >
-                  <MenuItem value="MID_TERM">Mid Term</MenuItem>
-                  <MenuItem value="FINAL">Final</MenuItem>
-                  <MenuItem value="UNIT_TEST">Unit Test</MenuItem>
-                </Field>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained" color="primary" fullWidth>
-                  Add Marks
-                </Button>
-              </Grid>
-            </Grid>
-          </Form>
-        )}
-      </Formik>
-
-      <Typography variant="h5" gutterBottom style={{ marginTop: '20px' }}>
-        Marks List
-      </Typography>
-
-      <Grid container spacing={2}>
-        {marksList.map((mark) => (
-          <Grid item xs={12} sm={6} md={4} key={mark.id}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6">{mark.subject}</Typography>
-                <Typography>Marks: {mark.marks}</Typography>
-                <Typography>Exam Type: {mark.examType}</Typography>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  onClick={() => handleDelete(mark.id!)}
-                  style={{ marginTop: '10px' }}
-                >
-                  Delete
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      <Modal open={open} onClose={handleCloseModal}>
+        <Box sx={modalStyle}>
+          <Typography variant="h6" gutterBottom>
+            {currentMark ? "Edit Mark" : "Add Mark"}
+          </Typography>
+          {error && (
+            <Typography color="error" style={{ marginBottom: "10px" }}>
+              {error}
+            </Typography>
+          )}
+          <TextField
+            label="Exam Type"
+            fullWidth
+            value={newMark.examType}
+            onChange={(e) => setNewMark({ ...newMark, examType: e.target.value })}
+            style={{ marginBottom: "10px" }}
+          />
+          <TextField
+            label="Subject"
+            fullWidth
+            value={newMark.subject}
+            onChange={(e) => setNewMark({ ...newMark, subject: e.target.value })}
+            style={{ marginBottom: "10px" }}
+          />
+          <TextField
+            label="Marks"
+            type="number"
+            fullWidth
+            value={newMark.marks}
+            onChange={(e) => setNewMark({ ...newMark, marks: parseInt(e.target.value) })}
+            style={{ marginBottom: "10px" }}
+          />
+          <TextField
+            label="Student ID"
+            fullWidth
+            value={newMark.studentId}
+            onChange={(e) => setNewMark({ ...newMark, studentId: e.target.value })}
+            style={{ marginBottom: "10px" }}
+          />
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button onClick={handleCloseModal} style={{ marginRight: "10px" }}>
+              Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={handleSaveMark}>
+              Save
+            </Button>
+          </div>
+        </Box>
+      </Modal>
     </div>
   );
 };

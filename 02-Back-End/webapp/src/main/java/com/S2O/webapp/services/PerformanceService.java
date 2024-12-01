@@ -1,6 +1,7 @@
 package com.S2O.webapp.services;
 
 import com.S2O.webapp.Entity.Performance;
+import com.S2O.webapp.Entity.Stream;
 import com.S2O.webapp.Entity.Student;
 import com.S2O.webapp.dao.PerformanceRepository;
 import com.S2O.webapp.services.StudentService;
@@ -33,7 +34,7 @@ public class PerformanceService {
         performance.setStudent(student);
         performance.setAverageMarks(averageMarks);
         performance.setExamCount(examCount);
-        performance.setStream(student.getStream());
+        performance.setStream(Stream.valueOf(student.getStream()));
 
         return performanceRepository.save(performance);
     }

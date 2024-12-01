@@ -1,5 +1,6 @@
-package Factory;
+package com.S2O.webapp.Factory;
 
+import com.S2O.webapp.Entity.Stream;
 import com.S2O.webapp.Entity.Student;
 import com.S2O.webapp.dto.StudentInfoDto;
 import com.S2O.webapp.services.StudentService;
@@ -33,6 +34,36 @@ public class StudentDataFactoryImpl implements StudentDataFactory {
         return studentService.getStudentById(studentId)
                 .map(this::convertToDto)
                 .orElseThrow(() -> new RuntimeException("Student not found with ID: " + studentId));
+    }
+
+    public StudentInfoDto addStudent(StudentInfoDto studentInfoDto) {
+        Student student = new Student();
+        student.setName(studentInfoDto.getStudentName());
+        student.setStream(String.valueOf(Stream.valueOf(studentInfoDto.getStream()))); // Ensure this matches your Enum
+        student.setYear(studentInfoDto.getYear());
+
+        Student savedStudent = studentService.addStudent(student);
+        return convertToDto(savedStudent);
+    }
+
+    public StudentInfoDto updateStudent(UUID studentId, StudentInfoDto studentInfoDto) {
+        // Log the incoming studentId
+        System.out.println("Updating Student with ID: " + studentId);
+
+        // Fetch the existing student from the database
+        Student student = studentService.getStudentById(studentId)
+                .orElseThrow(() -> new IllegalArgumentException("Student not found with ID: " + studentId));
+
+        // Update the student entity
+        student.setName(studentInfoDto.getStudentName());
+        student.setStream(studentInfoDto.getStream()); // Assuming stream validation is handled elsewhere
+        student.setYear(studentInfoDto.getYear());
+
+        // Save the updated student
+        Student updatedStudent = studentService.updateStudent(studentId, student);
+
+        // Convert the updated entity back to DTO and return
+        return convertToDto(updatedStudent);
     }
 
     private StudentInfoDto convertToDto(Student student) {

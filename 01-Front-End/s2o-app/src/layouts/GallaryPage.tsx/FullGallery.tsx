@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import GalleryImageModel from "../../Model/GalleryImageModel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSearchPlus,
-  faSearchMinus,
-  faTimes,
-  faExpand,
-} from "@fortawesome/free-solid-svg-icons";
+import { faSearchPlus, faSearchMinus, faTimes, faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 
@@ -16,8 +11,9 @@ export const FullGallery: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [httpError, setHttpError] = useState<string | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [currentImage, setCurrentImage] = useState<string | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [currentGalleryImages, setCurrentGalleryImages] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGalleries = async () => {
@@ -37,21 +33,35 @@ export const FullGallery: React.FC = () => {
     fetchGalleries();
   }, []);
 
-  const openModal = (imgSrc: string) => {
-    setCurrentImage(imgSrc);
+  const openModal = (images: string[], index: number) => {
+    setCurrentGalleryImages(images);
+    setCurrentImageIndex(index);
     setModalIsOpen(true);
     setZoomLevel(1);
   };
 
   const closeModal = () => {
     setModalIsOpen(false);
-    setCurrentImage(null);
+    setCurrentGalleryImages([]);
+    setCurrentImageIndex(0);
   };
 
   const zoomIn = () =>
     setZoomLevel((prevZoomLevel) => Math.min(prevZoomLevel + 0.1, 3));
   const zoomOut = () =>
     setZoomLevel((prevZoomLevel) => Math.max(prevZoomLevel - 0.1, 1));
+
+  const goToNextImage = () => {
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % currentGalleryImages.length);
+    setZoomLevel(1);
+  };
+
+  const goToPrevImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      (prevIndex - 1 + currentGalleryImages.length) % currentGalleryImages.length
+    );
+    setZoomLevel(1);
+  };
 
   return (
     <div className="py-12 bg-gradient-to-br from-blue-50 to-teal-50">
@@ -107,19 +117,20 @@ export const FullGallery: React.FC = () => {
                       <div
                         key={index}
                         className="relative cursor-pointer"
-                        onClick={() => openModal(imgSrc)}
+                        onClick={() =>
+                          openModal(
+                            gallery.images.map((img) =>
+                              img.file ? URL.createObjectURL(img.file) : img.url
+                            ),
+                            index
+                          )
+                        }
                       >
                         <img
                           src={imgSrc}
                           alt={`Gallery image ${index + 1}`}
-                          className="w-full h-48 object-cover"
+                          className="w-full h-48 object-cover rounded-lg"
                         />
-                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity">
-                          <FontAwesomeIcon
-                            icon={faExpand}
-                            className="text-white text-2xl"
-                          />
-                        </div>
                       </div>
                     );
                   })}
@@ -134,35 +145,46 @@ export const FullGallery: React.FC = () => {
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
           contentLabel="Image Modal"
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75"
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
           overlayClassName="modal-overlay"
         >
-          {currentImage && (
-            <div className="relative bg-white rounded-lg p-6 shadow-lg">
-              {/* Modal Controls */}
-              <div className="absolute top-4 right-4 space-x-2">
+          {currentGalleryImages.length > 0 && (
+            <div className="relative bg-black flex items-center justify-center w-full h-full">
+              <div className="absolute top-4 right-4 flex space-x-4 text-white">
                 <FontAwesomeIcon
                   icon={faSearchPlus}
-                  className="cursor-pointer text-gray-700 hover:text-blue-500 transition"
+                  className="cursor-pointer hover:text-blue-500"
                   onClick={zoomIn}
                 />
                 <FontAwesomeIcon
                   icon={faSearchMinus}
-                  className="cursor-pointer text-gray-700 hover:text-blue-500 transition"
+                  className="cursor-pointer hover:text-blue-500"
                   onClick={zoomOut}
                 />
                 <FontAwesomeIcon
                   icon={faTimes}
-                  className="cursor-pointer text-red-500 hover:text-red-600 transition"
+                  className="cursor-pointer hover:text-red-500"
                   onClick={closeModal}
                 />
               </div>
+              <button
+                className="absolute left-4 text-white text-3xl hover:text-gray-400"
+                onClick={goToPrevImage}
+              >
+                <FontAwesomeIcon icon={faChevronLeft} />
+              </button>
               <img
-                src={currentImage}
+                src={currentGalleryImages[currentImageIndex]}
                 alt="Current View"
-                className="w-full h-auto"
+                className="w-auto max-h-full transform transition-transform"
                 style={{ transform: `scale(${zoomLevel})` }}
               />
+              <button
+                className="absolute right-4 text-white text-3xl hover:text-gray-400"
+                onClick={goToNextImage}
+              >
+                <FontAwesomeIcon icon={faChevronRight} />
+              </button>
             </div>
           )}
         </Modal>

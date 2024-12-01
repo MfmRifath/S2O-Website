@@ -15,7 +15,6 @@ import { S2OAcadamy } from "./layouts/S2OAcadmyPage/S2OAcadamyPage";
 import { ResultPortal } from "./layouts/S2OAcadmyPage/components/ExamPortal/ResultPortal";
 import Dashboard from "./layouts/Admin/components/Dashboard";
 import TeacherHome from "./layouts/Teacher/TeacherDashBoard";
-import StudentManagement from "./layouts/Teacher/Pages/StudentManagment";
 import MarksManagement from "./layouts/Teacher/Pages/MarksManagement";
 import PerformanceTracking from "./layouts/Teacher/Pages/PerformanceTracking";
 import { ContentManagement } from "./layouts/Admin/Pages/ContentMangement.tsx";
@@ -25,6 +24,7 @@ import Bookshelf from "./layouts/S2OAcadmyPage/components/S2O Library/BookShelf"
 import EventCalendar from "./layouts/EventCalander/EventCalander";
 import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
 import Navbar from "./layouts/NavbarAndFooter/Navbar";
+import StudentDataComponent from "./layouts/Teacher/Pages/StudentManagment";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -127,7 +127,7 @@ function App() {
           path="/students"
           element={
             <Layout>
-              <StudentManagement />
+              <StudentDataComponent/>
             </Layout>
           }
         />

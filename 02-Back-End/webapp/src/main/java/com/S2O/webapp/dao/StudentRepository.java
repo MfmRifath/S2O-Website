@@ -10,8 +10,8 @@ import java.util.UUID;
 public interface StudentRepository extends JpaRepository<Student, UUID> {
 
     // Custom query to find students by stream
-    List<Student> findByStream(String stream);
+    List<Student> findByYear(int year);
 
     // Custom query to find students by year
-    List<Student> findByYear(Integer year);
+
 }
