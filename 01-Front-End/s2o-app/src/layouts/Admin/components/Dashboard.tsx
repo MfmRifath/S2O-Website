@@ -8,7 +8,7 @@ import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import Header from './Header';
 import Sidebar from './Sidebar';
 
-const Dashboard: React.FC = () => {
+const AdminDashboard: React.FC = () => {
   return (
     <Box sx={{ display: 'flex', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       <Sidebar />
@@ -72,4 +72,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default AdminDashboard;
