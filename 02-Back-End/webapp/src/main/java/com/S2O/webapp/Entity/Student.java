@@ -2,6 +2,7 @@ package com.S2O.webapp.Entity;
 
 import lombok.Data;
 
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
@@ -12,22 +13,14 @@ import java.util.UUID;
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(name = "name", nullable = false)
     private String name;
-
-    @Column(name = "stream", nullable = false) // Ensure this is a string
     private String stream;
-
-    @Column(name = "year", nullable = false)
-    private int year;
-
-    @Version
-    private Long version;
+    private String year;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Marks> marks;
+    private List<Mark> marks;
+
 }

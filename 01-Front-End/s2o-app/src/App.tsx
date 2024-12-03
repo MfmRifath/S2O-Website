@@ -13,10 +13,7 @@ import LoginPage from "./layouts/LoginPage/LoginPage";
 import RegistrationForm from "./layouts/RegitrationPage/RegistrationForm";
 import { S2OAcadamy } from "./layouts/S2OAcadmyPage/S2OAcadamyPage";
 import { ResultPortal } from "./layouts/S2OAcadmyPage/components/ExamPortal/ResultPortal";
-import Dashboard from "./layouts/Admin/components/Dashboard";
-import TeacherHome from "./layouts/Teacher/TeacherDashBoard";
-import MarksManagement from "./layouts/Teacher/Pages/MarksManagement";
-import PerformanceTracking from "./layouts/Teacher/Pages/PerformanceTracking";
+
 import { ContentManagement } from "./layouts/Admin/Pages/ContentMangement.tsx";
 import Article from "./layouts/Article/Article";
 import { S2OLibrary } from "./layouts/S2OAcadmyPage/components/S2OLibrary";
@@ -24,7 +21,8 @@ import Bookshelf from "./layouts/S2OAcadmyPage/components/S2O Library/BookShelf"
 import EventCalendar from "./layouts/EventCalander/EventCalander";
 import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
 import Navbar from "./layouts/NavbarAndFooter/Navbar";
-import StudentDataComponent from "./layouts/Teacher/Pages/StudentManagment";
+import AdminDashboard from "./layouts/Admin/components/Dashboard";
+import TeacherDashboard from "./layouts/Teacher/Pages/Dashboard";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -103,7 +101,7 @@ function App() {
           path="/admin"
           element={
             <Layout>
-              <Dashboard />
+              <AdminDashboard />
             </Layout>
           }
         />
@@ -119,34 +117,12 @@ function App() {
           path="/Teacher"
           element={
             <Layout>
-              <TeacherHome />
+              <TeacherDashboard />
             </Layout>
           }
         />
-        <Route
-          path="/students"
-          element={
-            <Layout>
-              <StudentDataComponent/>
-            </Layout>
-          }
-        />
-        <Route
-          path="/marks"
-          element={
-            <Layout>
-              <MarksManagement />
-            </Layout>
-          }
-        />
-        <Route
-          path="/performance"
-          element={
-            <Layout>
-              <PerformanceTracking />
-            </Layout>
-          }
-        />
+        
+      
         <Route
           path="/content"
           element={
