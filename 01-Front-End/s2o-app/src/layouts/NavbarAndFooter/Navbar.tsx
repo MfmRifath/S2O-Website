@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
           {[
             { to: "/home", label: "Home" },
             { to: "/s2oAcademy", label: "S2O Academy" },
-            { to: "/eventCalendar", label: "Event Calendar" },
+            { to: "/eventCalender", label: "Event Calender" },
             { to: "/register", label: "Registration" },
             { to: "/article", label: "Article" },
             { to: "/admin", label: "Admin" },
@@ -133,7 +133,7 @@ const Navbar: React.FC = () => {
           {[
             { to: "/home", label: "Home" },
             { to: "/s2oAcademy", label: "S2O Academy" },
-            { to: "/eventCalendar", label: "Event Calendar" },
+            { to: "/eventCalender", label: "Event Calendar" },
             { to: "/register", label: "Registration" },
             { to: "/article", label: "Article" },
             { to: "/admin", label: "Admin" },

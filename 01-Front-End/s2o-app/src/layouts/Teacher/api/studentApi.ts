@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { StudentDTO } from '../types/StudentDTO';
- // Adjust based on where you defined StudentDTO
+import { MarkDTO } from '../types/MarkDTOs';
 
 const BASE_URL = 'http://localhost:8080/api/students';
 
@@ -21,4 +21,10 @@ export const createStudent = async (student: StudentDTO): Promise<StudentDTO> =>
 
 export const deleteStudent = async (id: number): Promise<void> => {
   await axios.delete(`${BASE_URL}/${id}`);
+};
+
+// New method to fetch student's marks
+export const getStudentMarks = async (id: number): Promise<MarkDTO[]> => {
+  const response = await axios.get(`${BASE_URL}/${id}/marks`);
+  return response.data;
 };

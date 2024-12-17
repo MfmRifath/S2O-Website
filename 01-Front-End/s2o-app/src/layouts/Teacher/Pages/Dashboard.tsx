@@ -15,6 +15,8 @@ const TeacherDashBoard: React.FC = () => {
         return <MarksList />;
       case 'PerformanceByStream':
         return <PerformanceByStream />;
+      case 'studentManagement':
+        return <StudentManagement />;
       case 'PerformanceBySubject':
         return <PerformanceBySubject />;
       case 'StudentManagement':
@@ -40,6 +42,14 @@ const TeacherDashBoard: React.FC = () => {
             onClick={() => setActivePage('MarksList')}
           >
             Marks List
+          </li>
+          <li
+            className={`cursor-pointer p-2 rounded-lg ${
+              activePage === 'StudentManagement' ? 'bg-blue-600' : 'hover:bg-blue-700'
+            }`}
+            onClick={() => setActivePage('StudentManagement')}
+          >
+            Student Management
           </li>
           <li
             className={`cursor-pointer p-2 rounded-lg ${

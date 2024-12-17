@@ -1,12 +1,13 @@
+import { ExamDTO } from "./ExamDTO";
+import { StudentDTO } from "./StudentDTO";
+import { SubjectDTO } from "./SubjectDTO";
+
 // src/types/markTypes.ts
 export interface MarkDTO {
   id: number;
-  studentId: number; // ID for the student
-  studentName?: string; // Optional name for display
-  subjectId: number; // ID for the subject
-  subjectName?: string; // Optional name for display
-  examId: number; // ID for the exam
-  examName?: string; // Optional name for display
+  studentDTO: StudentDTO; // Optional name for display
+  subjectDTO: SubjectDTO; // ID for the subject
+  examDTO: ExamDTO; // ID for the exam
   marks: number; // Marks scored
   maxMarks: number; // Maximum possible marks
 }

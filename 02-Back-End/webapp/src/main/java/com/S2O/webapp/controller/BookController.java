@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,6 +58,22 @@ public class BookController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + book.getTitle() + ".pdf\"")
                     .contentType(MediaType.APPLICATION_PDF)
                     .body(new ByteArrayResource(book.getPdfFile()));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/cover/book/{id}")
+    public ResponseEntity<ByteArrayResource> getBookCover(@PathVariable Long id) {
+        Optional<Book> bookOptional = bookService.getBookById(id);
+        if (bookOptional.isPresent()) {
+            try {
+                byte[] imageData = bookService.getFirstPageAsImage(bookOptional.get().getPdfFile());
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_PNG)
+                        .body(new ByteArrayResource(imageData));
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            }
         } else {
             return ResponseEntity.notFound().build();
         }

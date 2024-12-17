@@ -1,5 +1,8 @@
 package com.S2O.webapp.RequesModal;
 
+import com.S2O.webapp.Entity.Exam;
+import com.S2O.webapp.Entity.Student;
+import com.S2O.webapp.Entity.Subject;
 import lombok.Data;
 
 @Data
@@ -9,12 +12,8 @@ public class MarkDTO {
     private double maxMarks;
 
     // IDs for related entities
-    private Long studentId;
-    private Long subjectId;
-    private Long examId;
+    private StudentDTO studentDTO;
+    private SubjectDTO subjectDTO;
+    private ExamDTO examDTO;
 
-    // Optional: Names for display purposes
-    private String studentName;
-    private String subjectName;
-    private String examName;
 }

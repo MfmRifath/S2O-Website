@@ -1,13 +1,12 @@
 package com.S2O.webapp.services;
 
 import com.S2O.webapp.Entity.Mark;
-import com.S2O.webapp.RequesModal.MarkDTO;
-import com.S2O.webapp.RequesModal.PerformanceDTO;
-import com.S2O.webapp.RequesModal.SubjectPerformanceDTO;
+import com.S2O.webapp.RequesModal.*;
 import com.S2O.webapp.dao.ExamRepository;
 import com.S2O.webapp.dao.MarkRepository;
 import com.S2O.webapp.dao.StudentRepository;
 import com.S2O.webapp.dao.SubjectRepository;
+import com.amazonaws.services.accessanalyzer.model.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +31,16 @@ public class MarkServiceImpl implements MarkService {
 
     @Override
     public List<MarkDTO> getAllMarks() {
-        return markRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+        return markRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public MarkDTO getMarkById(Long id) {
-        return markRepository.findById(id).map(this::convertToDTO).orElse(null);
+        return markRepository.findById(id)
+                .map(this::convertToDTO)
+                .orElse(null);
     }
 
     @Override
@@ -45,9 +48,12 @@ public class MarkServiceImpl implements MarkService {
         Mark mark = new Mark();
         mark.setMarks(markDTO.getMarks());
         mark.setMaxMarks(markDTO.getMaxMarks());
-        mark.setStudent(studentRepository.findById(markDTO.getStudentId()).orElseThrow());
-        mark.setSubject(subjectRepository.findById(markDTO.getSubjectId()).orElseThrow());
-        mark.setExam(examRepository.findById(markDTO.getExamId()).orElseThrow());
+        mark.setStudent(studentRepository.findById(markDTO.getStudentDTO().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found")));
+        mark.setSubject(subjectRepository.findById(markDTO.getSubjectDTO().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Subject not found")));
+        mark.setExam(examRepository.findById(markDTO.getExamDTO().getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Exam not found")));
 
         Mark saved = markRepository.save(mark);
         return convertToDTO(saved);
@@ -63,72 +69,83 @@ public class MarkServiceImpl implements MarkService {
         dto.setId(mark.getId());
         dto.setMarks(mark.getMarks());
         dto.setMaxMarks(mark.getMaxMarks());
-        dto.setStudentName(mark.getStudent().getName());
-        dto.setSubjectName(mark.getSubject().getName());
-        dto.setExamName(mark.getExam().getName());
+
+        // Map Student entity to StudentDTO
+        StudentDTO studentDTO = new StudentDTO();
+        studentDTO.setId(mark.getStudent().getId());
+        studentDTO.setName(mark.getStudent().getName());
+        studentDTO.setStream(mark.getStudent().getStream());
+        studentDTO.setYear(mark.getStudent().getYear());
+        dto.setStudentDTO(studentDTO);
+
+        // Map Subject entity to SubjectDTO
+        SubjectDTO subjectDTO = new SubjectDTO();
+        subjectDTO.setId(mark.getSubject().getId());
+        subjectDTO.setName(mark.getSubject().getName());
+        dto.setSubjectDTO(subjectDTO);
+
+        // Map Exam entity to ExamDTO
+        ExamDTO examDTO = new ExamDTO();
+        examDTO.setId(mark.getExam().getId());
+        examDTO.setName(mark.getExam().getName());
+        dto.setExamDTO(examDTO);
+
         return dto;
     }
+
+    private PerformanceDTO mapToPerformanceDTO(Mark mark) {
+        PerformanceDTO performance = new PerformanceDTO();
+        performance.setStudentId(mark.getStudent().getId());
+        performance.setStudentName(mark.getStudent().getName());
+        performance.setStream(mark.getStudent().getStream());
+        performance.setSubjectId(mark.getSubject().getId());
+        performance.setSubjectName(mark.getSubject().getName());
+        performance.setExamId(mark.getExam().getId());
+        performance.setExamName(mark.getExam().getName());
+        performance.setMarks(mark.getMarks());
+        performance.setMaxMarks(mark.getMaxMarks());
+        performance.setPercentage((mark.getMarks() / mark.getMaxMarks()) * 100);
+        return performance;
+    }
+
     @Override
     public List<PerformanceDTO> calculatePerformance() {
-        List<Mark> marks = markRepository.findAll(); // Fetch all marks
-
-        return marks.stream().map(mark -> {
-            PerformanceDTO performance = new PerformanceDTO();
-            performance.setStudentId(mark.getStudent().getId());
-            performance.setStudentName(mark.getStudent().getName());
-            performance.setSubjectId(mark.getSubject().getId());
-            performance.setSubjectName(mark.getSubject().getName());
-            performance.setExamId(mark.getExam().getId());
-            performance.setExamName(mark.getExam().getName());
-            performance.setMarks(mark.getMarks());
-            performance.setMaxMarks(mark.getMaxMarks());
-            performance.setPercentage((mark.getMarks() / mark.getMaxMarks()) * 100);
-            return performance;
-        }).collect(Collectors.toList());
+        return markRepository.findAll().stream()
+                .map(this::mapToPerformanceDTO)
+                .collect(Collectors.toList());
     }
+
     @Override
     public Map<String, List<PerformanceDTO>> calculatePerformanceByStream() {
-        List<Mark> marks = markRepository.findAll(); // Fetch all marks
-
-        return marks.stream().map(mark -> {
-            PerformanceDTO performance = new PerformanceDTO();
-            performance.setStudentId(mark.getStudent().getId());
-            performance.setStudentName(mark.getStudent().getName());
-            performance.setStream(mark.getStudent().getStream()); // Set the stream
-            performance.setSubjectId(mark.getSubject().getId());
-            performance.setSubjectName(mark.getSubject().getName());
-            performance.setExamId(mark.getExam().getId());
-            performance.setExamName(mark.getExam().getName());
-            performance.setMarks(mark.getMarks());
-            performance.setMaxMarks(mark.getMaxMarks());
-            performance.setPercentage((mark.getMarks() / mark.getMaxMarks()) * 100);
-            return performance;
-        }).collect(Collectors.groupingBy(PerformanceDTO::getStream));
+        return markRepository.findAll().stream()
+                .map(this::mapToPerformanceDTO)
+                .collect(Collectors.groupingBy(PerformanceDTO::getStream));
     }
+
     @Override
     public List<SubjectPerformanceDTO> calculateOverallPerformanceBySubject() {
         List<Mark> marks = markRepository.findAll();
 
-        // Group marks by subject and calculate the performance
         Map<Long, List<Mark>> marksBySubject = marks.stream()
                 .collect(Collectors.groupingBy(mark -> mark.getSubject().getId()));
 
-        return marksBySubject.entrySet().stream().map(entry -> {
-            Long subjectId = entry.getKey();
-            List<Mark> subjectMarks = entry.getValue();
+        return marksBySubject.entrySet().stream()
+                .map(entry -> {
+                    Long subjectId = entry.getKey();
+                    List<Mark> subjectMarks = entry.getValue();
 
-            double totalMarksObtained = subjectMarks.stream().mapToDouble(Mark::getMarks).sum();
-            double totalMaxMarks = subjectMarks.stream().mapToDouble(Mark::getMaxMarks).sum();
-            double averagePercentage = (totalMarksObtained / totalMaxMarks) * 100;
+                    double totalMarksObtained = subjectMarks.stream().mapToDouble(Mark::getMarks).sum();
+                    double totalMaxMarks = subjectMarks.stream().mapToDouble(Mark::getMaxMarks).sum();
+                    double averagePercentage = (totalMarksObtained / totalMaxMarks) * 100;
 
-            SubjectPerformanceDTO performance = new SubjectPerformanceDTO();
-            performance.setSubjectId(subjectId);
-            performance.setSubjectName(subjectMarks.get(0).getSubject().getName()); // Assumes all marks belong to the same subject
-            performance.setTotalMarksObtained(totalMarksObtained);
-            performance.setTotalMaxMarks(totalMaxMarks);
-            performance.setAveragePercentage(averagePercentage);
+                    SubjectPerformanceDTO performance = new SubjectPerformanceDTO();
+                    performance.setSubjectId(subjectId);
+                    performance.setSubjectName(subjectMarks.isEmpty() ? "Unknown" : subjectMarks.get(0).getSubject().getName());
+                    performance.setTotalMarksObtained(totalMarksObtained);
+                    performance.setTotalMaxMarks(totalMaxMarks);
+                    performance.setAveragePercentage(averagePercentage);
 
-            return performance;
-        }).collect(Collectors.toList());
+                    return performance;
+                }).collect(Collectors.toList());
     }
 }

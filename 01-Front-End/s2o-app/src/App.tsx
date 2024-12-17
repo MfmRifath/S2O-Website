@@ -18,11 +18,11 @@ import { ContentManagement } from "./layouts/Admin/Pages/ContentMangement.tsx";
 import Article from "./layouts/Article/Article";
 import { S2OLibrary } from "./layouts/S2OAcadmyPage/components/S2OLibrary";
 import Bookshelf from "./layouts/S2OAcadmyPage/components/S2O Library/BookShelf";
-import EventCalendar from "./layouts/EventCalander/EventCalander";
 import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
 import Navbar from "./layouts/NavbarAndFooter/Navbar";
 import AdminDashboard from "./layouts/Admin/components/Dashboard";
 import TeacherDashboard from "./layouts/Teacher/Pages/Dashboard";
+import EventCalendar from "./layouts/EventCalander/EventCalender";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -156,7 +156,7 @@ function App() {
           }
         />
         <Route
-          path="/eventCalaender"
+          path="/eventCalender"
           element={
             <Layout>
               <EventCalendar />

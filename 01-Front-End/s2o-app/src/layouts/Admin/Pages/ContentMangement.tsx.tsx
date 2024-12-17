@@ -6,6 +6,7 @@ import ChatList from "../components/ChatTable";
 import { AdministrationTable } from "../components/AdminitarionTable";
 import { ManageGallery } from "../components/ManageGallary";
 import AddEditAdministration from "../components/AddAdministration";
+import { LibraryManagement } from "./LibraryManager";
 
 export const ContentManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("admin-table");
@@ -15,7 +16,7 @@ export const ContentManagement: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 p-8">
+    <div className="min-h-screen bg-gradient-to-br mt-8 from-blue-100 via-purple-100 to-pink-100 p-8">
       <div className="container mx-auto max-w-7xl p-6 bg-white shadow-lg rounded-xl">
         <h3 className="text-4xl font-extrabold text-gray-800 mb-8 text-center">
           Content Management
@@ -29,6 +30,7 @@ export const ContentManagement: React.FC = () => {
               { id: "article-table", label: "Article Table" },
               { id: "chat-list", label: "Chat Table" },
               { id: "manage-gallery", label: "Manage Gallery" },
+              { id: "manage-Library", label: "Manage Library" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -51,6 +53,7 @@ export const ContentManagement: React.FC = () => {
           {activeTab === "article-table" && <ArticleTable />}
           {activeTab === "chat-list" && <ChatList />}
           {activeTab === "manage-gallery" && <ManageGallery />}
+          {activeTab === "manage-Library" && <LibraryManagement />}
         </div>
       </div>
     </div>

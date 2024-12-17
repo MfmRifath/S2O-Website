@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { StudentDTO } from '../types/StudentDTO';
-import { createStudent, deleteStudent, getAllStudents } from '../api/studentApi';
 
+import { createStudent, deleteStudent, getAllStudents, getStudentMarks } from '../api/studentApi';
+import { StudentDTO } from '../types/StudentDTO';
+import { MarkDTO } from '../types/MarkDTOs';
 
 const StudentManagement: React.FC = () => {
   const [students, setStudents] = useState<StudentDTO[]>([]);
+  const [selectedStudent, setSelectedStudent] = useState<StudentDTO | null>(null);
+  const [studentMarks, setStudentMarks] = useState<MarkDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [newStudent, setNewStudent] = useState<StudentDTO>({
     id: 0,
     name: '',
     stream: '',
     year: '',
+    marks: [],
   });
 
   useEffect(() => {
@@ -31,12 +35,18 @@ const StudentManagement: React.FC = () => {
 
     const created = await createStudent(newStudent);
     setStudents([...students, created]);
-    setNewStudent({ id: 0, name: '', stream: '', year: '' });
+    setNewStudent({ id: 0, name: '', stream: '', year: '', marks: [] });
   };
 
   const handleDeleteStudent = async (id: number) => {
     await deleteStudent(id);
     setStudents(students.filter((student) => student.id !== id));
+  };
+
+  const handleSelectStudent = async (student: StudentDTO) => {
+    setSelectedStudent(student);
+    const marks = await getStudentMarks(student.id); // Fetch only marks
+    setStudentMarks(marks);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -93,7 +103,11 @@ const StudentManagement: React.FC = () => {
         </thead>
         <tbody>
           {students.map((student) => (
-            <tr key={student.id} className="odd:bg-white even:bg-gray-50">
+            <tr
+              key={student.id}
+              className="odd:bg-white even:bg-gray-50 cursor-pointer"
+              onClick={() => handleSelectStudent(student)}
+            >
               <td className="border border-gray-300 px-4 py-2 text-center">{student.id}</td>
               <td className="border border-gray-300 px-4 py-2">{student.name}</td>
               <td className="border border-gray-300 px-4 py-2">{student.stream}</td>
@@ -110,6 +124,33 @@ const StudentManagement: React.FC = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Selected Student Marks */}
+      {selectedStudent && (
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold">Marks for {selectedStudent.name}</h2>
+          <table className="table-auto w-full border-collapse border border-gray-200 mt-4">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="border border-gray-300 px-4 py-2">Subject</th>
+                <th className="border border-gray-300 px-4 py-2">Exam</th>
+                <th className="border border-gray-300 px-4 py-2">Marks</th>
+                <th className="border border-gray-300 px-4 py-2">Max Marks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {studentMarks.map((mark) => (
+                <tr key={mark.id} className="odd:bg-white even:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">{mark.subjectDTO?.name}</td>
+                  <td className="border border-gray-300 px-4 py-2">{mark.examDTO?.name}</td>
+                  <td className="border border-gray-300 px-4 py-2">{mark.marks}</td>
+                  <td className="border border-gray-300 px-4 py-2">{mark.maxMarks}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 };
