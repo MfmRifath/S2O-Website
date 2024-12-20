@@ -1,3 +1,5 @@
+package com.S2O.webapp.utility;
+
 import com.S2O.webapp.Entity.Role;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

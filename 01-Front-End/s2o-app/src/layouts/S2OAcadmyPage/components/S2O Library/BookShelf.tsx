@@ -39,7 +39,7 @@ const Bookshelf: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto mt-10 p-6 font-sans">
+    <div className="container mx-auto mt-20 p-6 font-sans">
       <h1 className="text-3xl font-bold text-center mb-6 text-blue-600">
         📚 Bookshelf
       </h1>

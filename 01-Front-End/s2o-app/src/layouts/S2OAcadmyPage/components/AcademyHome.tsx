@@ -36,7 +36,7 @@ const AcademyHome = () => {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col mt-20 min-h-screen bg-gray-50">
       {/* Sidebar */}
       <div className="flex">
         {isSidebarVisible && <Sidebar />}

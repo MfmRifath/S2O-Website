@@ -12,7 +12,6 @@ import { ContentManagement } from "./layouts/Admin/Pages/ContentMangement.tsx";
 import Article from "./layouts/Article/Article";
 import { S2OLibrary } from "./layouts/S2OAcadmyPage/components/S2OLibrary";
 import Bookshelf from "./layouts/S2OAcadmyPage/components/S2O Library/BookShelf";
-import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
 import Navbar from "./layouts/NavbarAndFooter/Navbar";
 import AdminDashboard from "./layouts/Admin/components/Dashboard";
 import TeacherDashboard from "./layouts/Teacher/Pages/Dashboard";
@@ -22,10 +21,13 @@ import SignUpPage from "./layouts/LoginPage/SignUpPage";
 import { S2OAcadamy } from "./layouts/S2OAcadmyPage/S2OAcadamyPage";
 import SiteSettings from "./layouts/Admin/Pages/SiteSettings";
 import DonationManagement from "./layouts/Admin/Pages/DonationManagement";
-import Users from "./layouts/Admin/Pages/Users";
+
 import SecuritySettings from "./layouts/Admin/Pages/SecuritySettings";
 import Analytics from "./layouts/Admin/Pages/Analytics";
 import Reports from "./layouts/Admin/Pages/Reports";
+import UserManagement from "./layouts/Admin/Pages/Users";
+import ProfilePage from "./layouts/Profile";
+import { useState } from "react";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -41,6 +43,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  const [isDialogOpen, setDialogOpen] = useState(false);
   return (
     <Router>
       <Routes>
@@ -141,7 +144,7 @@ function App() {
           path="/adminUsers"
           element={
             <PrivateRoute
-              element={< Users/>}
+              element={< UserManagement/>}
               requiredRole={"ROLE_ADMIN"}
             />
           }
@@ -161,6 +164,15 @@ function App() {
             <PrivateRoute
               element={< Analytics/>}
               requiredRole={"ROLE_ADMIN"}
+            />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute
+              element={< ProfilePage/>}
+              requiredRole={"ROLE_USER"}
             />
           }
         />

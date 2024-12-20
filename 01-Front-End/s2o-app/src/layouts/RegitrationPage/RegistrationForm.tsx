@@ -1,6 +1,4 @@
-// src/components/RegistrationForm.tsx
 import React, { useState } from "react";
-import "./RegistrationForm.css";
 
 const RegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -34,126 +32,140 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className="form-container mt-5 p-4 shadow-lg rounded bg-form-background">
-      <header className="form-header text-center mb-4">
+    <div className="max-w-4xl mx-auto mt-20 p-8 bg-white shadow-lg rounded-lg">
+      <header className="text-center mb-6">
         <img
           src={require("./../../Images/logo.png")}
           alt="Club Logo"
-          className="form-logo mx-auto"
+          className="mx-auto mb-4 h-16"
         />
-        <h1 className="form-title my-3">Join Our Club</h1>
+        <h1 className="text-3xl font-extrabold text-gray-800">Join Our Club</h1>
       </header>
+
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="fullName" className="form-label">
-            Full Name:
-          </label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            className="form-input rounded-pill shadow-sm"
-            placeholder="Enter your full name"
-            onChange={handleInputChange}
-            value={formData.fullName}
-          />
-        </div>
+        <div className="space-y-6">
+          {/* Full Name */}
+          <div className="form-group">
+            <label htmlFor="fullName" className="block text-lg font-medium text-gray-700">
+              Full Name:
+            </label>
+            <input
+              type="text"
+              id="fullName"
+              name="fullName"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your full name"
+              onChange={handleInputChange}
+              value={formData.fullName}
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email:
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            className="form-input rounded-pill shadow-sm"
-            placeholder="Enter your email"
-            onChange={handleInputChange}
-            value={formData.email}
-          />
-        </div>
+          {/* Email */}
+          <div className="form-group">
+            <label htmlFor="email" className="block text-lg font-medium text-gray-700">
+              Email:
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your email"
+              onChange={handleInputChange}
+              value={formData.email}
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="phone" className="form-label">
-            Phone Number:
-          </label>
-          <input
-            type="tel"
-            id="phone"
-            name="phone"
-            className="form-input rounded-pill shadow-sm"
-            placeholder="Enter your phone number"
-            onChange={handleInputChange}
-            value={formData.phone}
-          />
-        </div>
+          {/* Phone Number */}
+          <div className="form-group">
+            <label htmlFor="phone" className="block text-lg font-medium text-gray-700">
+              Phone Number:
+            </label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter your phone number"
+              onChange={handleInputChange}
+              value={formData.phone}
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="dob" className="form-label">
-            Date of Birth:
-          </label>
-          <input
-            type="date"
-            id="dob"
-            name="dob"
-            className="form-input rounded-pill shadow-sm"
-            onChange={handleInputChange}
-            value={formData.dob}
-          />
-        </div>
+          {/* Date of Birth */}
+          <div className="form-group">
+            <label htmlFor="dob" className="block text-lg font-medium text-gray-700">
+              Date of Birth:
+            </label>
+            <input
+              type="date"
+              id="dob"
+              name="dob"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+              onChange={handleInputChange}
+              value={formData.dob}
+            />
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="membershipType" className="form-label">
-            Membership Type:
-          </label>
-          <select
-            id="membershipType"
-            name="membershipType"
-            className="form-input rounded-pill shadow-sm"
-            onChange={handleInputChange}
-            value={formData.membershipType}
-          >
-            <option value="basic">Basic</option>
-            <option value="premium">Premium</option>
-            <option value="family">Family</option>
-          </select>
-        </div>
+          {/* Membership Type */}
+          <div className="form-group">
+            <label htmlFor="membershipType" className="block text-lg font-medium text-gray-700">
+              Membership Type:
+            </label>
+            <select
+              id="membershipType"
+              name="membershipType"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+              onChange={handleInputChange}
+              value={formData.membershipType}
+            >
+              <option value="basic">Basic</option>
+              <option value="premium">Premium</option>
+              <option value="family">Family</option>
+            </select>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="interests" className="form-label">
-            Interests:
-          </label>
-          <textarea
-            id="interests"
-            name="interests"
-            rows={4}
-            className="form-textarea shadow-sm"
-            placeholder="Tell us about your interests"
-            onChange={handleInputChange}
-            value={formData.interests}
-          ></textarea>
-        </div>
+          {/* Interests */}
+          <div className="form-group">
+            <label htmlFor="interests" className="block text-lg font-medium text-gray-700">
+              Interests:
+            </label>
+            <textarea
+              id="interests"
+              name="interests"
+              rows={4}
+              className="w-full p-3 mt-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500"
+              placeholder="Tell us about your interests"
+              onChange={handleInputChange}
+              value={formData.interests}
+            ></textarea>
+          </div>
 
-        <div className="form-group">
-          <div className="form-check">
+          {/* Terms & Conditions */}
+          <div className="form-group flex items-center">
             <input
               type="checkbox"
               id="agree"
               name="agree"
-              className="form-check-input"
+              className="mr-2"
               onChange={handleInputChange}
               checked={formData.agree}
             />
-            <label htmlFor="agree" className="form-check-label">
+            <label htmlFor="agree" className="text-lg text-gray-700">
               I agree to the club's policies.
             </label>
           </div>
-        </div>
 
-        <button type="submit" className="form-submit-btn rounded-pill shadow">
-          Register
-        </button>
+          {/* Submit Button */}
+          <div className="form-group">
+            <button
+              type="submit"
+              className="w-full py-3 bg-blue-500 text-white font-semibold rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Register
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );

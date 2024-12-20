@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import {jwtDecode }from "jwt-decode"; // Import jwt-decode
+import{ jwtDecode }from "jwt-decode";
 
 const Navbar: React.FC = () => {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState<string | null>(null); // Track user role
+  const [userRole, setUserRole] = useState<string | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -28,40 +28,35 @@ const Navbar: React.FC = () => {
     if (token) {
       setIsLoggedIn(true);
       try {
-        // Decode the token to get user roles
         const decodedToken: any = jwtDecode(token);
-
-        // Check if the roles array contains specific roles
         const roles = decodedToken.roles || [];
         if (roles.includes("ROLE_ADMIN")) {
           setUserRole("ROLE_ADMIN");
         } else if (roles.includes("ROLE_TEACHER")) {
           setUserRole("ROLE_TEACHER");
         } else {
-          setUserRole(null); // Default if no role found
+          setUserRole(null);
         }
       } catch (error) {
         console.error("Error decoding token", error);
       }
     } else {
       setIsLoggedIn(false);
-      setUserRole(null); // Clear role if no token is found
+      setUserRole(null);
     }
   };
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    setUserRole(null); // Clear role state
+    setUserRole(null);
     navigate("/login");
   };
 
   useEffect(() => {
     window.addEventListener("scroll", controlNavbar);
     checkLoginStatus();
-    return () => {
-      window.removeEventListener("scroll", controlNavbar);
-    };
+    return () => window.removeEventListener("scroll", controlNavbar);
   }, [lastScrollY]);
 
   return (
@@ -69,36 +64,43 @@ const Navbar: React.FC = () => {
       initial={{ y: -100 }}
       animate={{ y: showNavbar ? 0 : -100 }}
       transition={{ type: "spring", stiffness: 80, damping: 15 }}
-      className="fixed top-0 left-0 w-full z-40 bg-gradient-to-r from-white/70 to-blue-50 backdrop-blur-md border-b border-gray-200 shadow-lg rounded-b-2xl"
+      className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 backdrop-blur-md shadow-lg rounded-b-3xl"
     >
       <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center bg-black p-2 rounded-full"> {/* Dark background added here */}
-          <Link to="/" className="flex items-center">
-            <motion.img
-              src={require("./../../Images/logo.png")}
-              alt="Logo"
-              className="h-12 w-auto rounded-full"
-              whileHover={{ scale: 1.2, rotate: 10 }}
-              transition={{ duration: 0.3 }}
-            />
+        {/* Logo */}
+        <div>
+          <Link to="/" className="flex items-center space-x-3">
+            <motion.div
+              className="bg-blue p-3 rounded-full shadow-md hover:shadow-lg"
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 120 }}
+            >
+              <motion.img
+                src={require("./../../Images/logo.png")}
+                alt="Logo"
+                className="h-15 w-20 rounded-full"
+                whileHover={{ scale: 1.2 }}
+                transition={{ duration: 0.3 }}
+              />
+            </motion.div>
           </Link>
         </div>
 
-        <div className="hidden lg:flex space-x-6">
+        {/* Desktop Menu */}
+        <div className="hidden lg:flex space-x-6 items-center">
           {[
             { to: "/home", label: "Home" },
             { to: "/s2oAcademy", label: "S2O Academy" },
             { to: "/eventCalender", label: "Event Calendar" },
             { to: "/register", label: "Registration" },
             { to: "/article", label: "Article" },
-            // Conditionally render Admin and Teacher based on user role
             userRole === "ROLE_ADMIN" && { to: "/admin", label: "Admin" },
             userRole === "ROLE_TEACHER" && { to: "/teacher", label: "Teacher" },
             { to: "/chat", label: "Chat" },
           ]
-            .filter(Boolean) // Filter out undefined values (Admin, Teacher)
-            .map((link) => 
-              link && (
+            .filter(Boolean)
+            .map((link) =>
+              link ? (
                 <motion.div
                   key={link.to}
                   whileHover={{ scale: 1.1 }}
@@ -107,19 +109,20 @@ const Navbar: React.FC = () => {
                 >
                   <Link
                     to={link.to}
-                    className={`no-underline text-sm font-medium px-6 py-3 rounded-lg transition-all block ${
+                    className={`text-sm font-medium px-6 py-3 rounded-lg transition ${
                       location.pathname === link.to
-                        ? "bg-blue-600 text-white shadow-lg"
-                        : "text-gray-700 hover:text-blue-600 hover:shadow-md"
-                    }`}
+                        ? "bg-white text-blue-700 shadow-lg"
+                        : "text-white hover:bg-blue-700 hover:shadow-md"
+                    } no-underline`}
                   >
                     {link.label}
                   </Link>
                 </motion.div>
-              )
+              ) : null
             )}
         </div>
 
+        {/* Desktop Profile/Sign Buttons */}
         <div className="hidden lg:flex items-center space-x-4">
           {isLoggedIn && (
             <motion.div
@@ -128,7 +131,7 @@ const Navbar: React.FC = () => {
             >
               <Link
                 to="/profile"
-                className="flex items-center px-6 py-3 border rounded-lg shadow-md transition-all block text-gray-800 border-gray-300 hover:bg-blue-600 hover:text-white"
+                className="px-4 py-2 border rounded-lg shadow-md bg-white text-blue-700 hover:bg-blue-600 hover:text-blue-400 transition no-underline"
               >
                 <i className="fas fa-user mr-2"></i> Profile
               </Link>
@@ -141,14 +144,14 @@ const Navbar: React.FC = () => {
             {isLoggedIn ? (
               <button
                 onClick={handleSignOut}
-                className="px-6 py-3 rounded-lg font-medium bg-gray-100 text-gray-800 hover:bg-blue-600 hover:text-white"
+                className="px-4 py-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-800 transition no-underline"
               >
                 Sign Out
               </button>
             ) : (
               <Link
                 to="/login"
-                className="px-6 py-3 rounded-lg font-medium bg-gray-100 text-gray-800 hover:bg-blue-600 hover:text-white"
+                className="px-4 py-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-800 transition no-underline"
               >
                 Sign In
               </Link>
@@ -156,22 +159,24 @@ const Navbar: React.FC = () => {
           </motion.div>
         </div>
 
-        <motion.button
+        {/* Mobile Menu Toggle */}
+        <button
           onClick={toggleMobileMenu}
-          className="lg:hidden text-gray-800 text-2xl focus:outline-none"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          aria-label="Toggle Mobile Menu"
+          className="lg:hidden text-white text-2xl focus:outline-none"
         >
           <i className={`fas ${isMobileMenuOpen ? "fa-times" : "fa-bars"}`}></i>
-        </motion.button>
+        </button>
       </div>
 
+      {/* Mobile Menu */}
       <motion.div
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: isMobileMenuOpen ? 1 : 0, y: isMobileMenuOpen ? 0 : -50 }}
+        initial={{ opacity: 0, height: 0 }}
+        animate={{
+          opacity: isMobileMenuOpen ? 1 : 0,
+          height: isMobileMenuOpen ? "auto" : 0,
+        }}
         transition={{ duration: 0.4 }}
-        className={`lg:hidden ${isMobileMenuOpen ? "h-auto" : "h-0"} overflow-hidden bg-gradient-to-r from-white/70 to-blue-100 backdrop-blur-md rounded-b-2xl shadow-md`}
+        className={`lg:hidden overflow-hidden bg-white rounded-b-2xl shadow-md`}
       >
         <div className="flex flex-col px-6 py-4 space-y-3">
           {[
@@ -184,9 +189,9 @@ const Navbar: React.FC = () => {
             userRole === "ROLE_TEACHER" && { to: "/teacher", label: "Teacher" },
             { to: "/chat", label: "Chat" },
           ]
-            .filter(Boolean) // Filter out undefined values (Admin, Teacher)
-            .map((link) => 
-              link && (
+            .filter(Boolean)
+            .map((link) =>
+              link ? (
                 <motion.div
                   key={link.to}
                   whileHover={{ scale: 1.05 }}
@@ -194,16 +199,16 @@ const Navbar: React.FC = () => {
                 >
                   <Link
                     to={link.to}
-                    className={`no-underline text-base font-medium px-6 py-4 rounded-lg transition-all block ${
+                    className={`text-base font-medium px-4 py-2 rounded-lg transition ${
                       location.pathname === link.to
-                        ? "bg-blue-600 text-white shadow-lg"
-                        : "text-gray-700 hover:text-blue-600 hover:shadow-md"
-                    }`}
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-700 hover:bg-blue-500 hover:text-white"
+                    } no-underline`}
                   >
                     {link.label}
                   </Link>
                 </motion.div>
-              )
+              ) : null
             )}
         </div>
       </motion.div>

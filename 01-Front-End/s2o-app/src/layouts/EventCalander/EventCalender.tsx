@@ -3,7 +3,7 @@ import axios from "axios";
 import Calendar from "react-calendar";
 import { Value } from "react-calendar/dist/cjs/shared/types";
 import "react-calendar/dist/Calendar.css";
-
+import { jwtDecode } from "jwt-decode";
 const EventCalendar = () => {
   interface Event {
     id: number;
@@ -24,9 +24,20 @@ const EventCalendar = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null); // Role state for user
 
   useEffect(() => {
     fetchEvents();
+    // Fetch user role or decode token if already in the localStorage
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken: any = jwtDecode(token);
+        setUserRole(decodedToken.roles?.[0] || null);
+      } catch (err) {
+        console.error("Error decoding token", err);
+      }
+    }
   }, []);
 
   const fetchEvents = async () => {
@@ -87,7 +98,7 @@ const EventCalendar = () => {
   };
 
   return (
-    <div className="container mx-auto mt-10 max-w-6xl p-6 max-w-7xl">
+    <div className="container mx-auto mt-20 max-w-6xl p-6 max-w-7xl">
       {/* Header */}
       <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-8">
         🎉 Event Calendar
@@ -151,61 +162,63 @@ const EventCalendar = () => {
       {/* Divider */}
       <div className="my-8 border-t border-gray-300"></div>
 
-      {/* Add Event Form */}
-      <div className="bg-gray-100 p-8 rounded-lg shadow-lg">
-        <h2 className="text-3xl font-semibold text-gray-700 mb-4">
-          📝 Add New Event
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-600 mb-1">Event Title</label>
-            <input
-              type="text"
-              name="title"
-              value={newEvent.title}
-              onChange={handleInputChange}
-              placeholder="Enter event title"
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-600 mb-1">Start Date & Time</label>
-            <input
-              type="datetime-local"
-              name="start"
-              value={newEvent.start}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-600 mb-1">End Date & Time</label>
-            <input
-              type="datetime-local"
-              name="end"
-              value={newEvent.end}
-              onChange={handleInputChange}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-600 mb-1">Description</label>
-            <textarea
-              name="description"
-              value={newEvent.description}
-              onChange={handleInputChange}
-              placeholder="Enter event description"
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-5 py-3 rounded-lg hover:bg-blue-600 transition"
-          >
-            Add Event
-          </button>
-        </form>
-      </div>
+      {/* Add Event Form - Only visible to ROLE_ADMIN */}
+      {userRole === "ROLE_ADMIN" && (
+        <div className="bg-gray-100 p-8 rounded-lg shadow-lg">
+          <h2 className="text-3xl font-semibold text-gray-700 mb-4">
+            📝 Add New Event
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-gray-600 mb-1">Event Title</label>
+              <input
+                type="text"
+                name="title"
+                value={newEvent.title}
+                onChange={handleInputChange}
+                placeholder="Enter event title"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-600 mb-1">Start Date & Time</label>
+              <input
+                type="datetime-local"
+                name="start"
+                value={newEvent.start}
+                onChange={handleInputChange}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-600 mb-1">End Date & Time</label>
+              <input
+                type="datetime-local"
+                name="end"
+                value={newEvent.end}
+                onChange={handleInputChange}
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-gray-600 mb-1">Description</label>
+              <textarea
+                name="description"
+                value={newEvent.description}
+                onChange={handleInputChange}
+                placeholder="Enter event description"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+              />
+            </div>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-5 py-3 rounded-lg hover:bg-blue-600 transition"
+            >
+              Add Event
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };

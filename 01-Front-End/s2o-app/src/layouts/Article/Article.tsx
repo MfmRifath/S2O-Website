@@ -51,7 +51,7 @@ export const Article: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-gray-100 min-h-screen pb-8">
+    <div className="bg-gray-100 mt-20 min-h-screen pb-8">
       <HeadofArticlePage />
 
       {/* Loading State */}

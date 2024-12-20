@@ -79,8 +79,7 @@ public class AuthController {
         newUser.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
         // Assign default role (fetch from database if possible)
-        Role defaultRole = roleRepository.findByAuthority("ROLE_ADMIN")
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+        Role defaultRole = roleRepository.findByAuthority("ROLE_USER");
         newUser.setRoles(Collections.singleton(defaultRole));  // Assign the default role
 
         // Save the user to the database

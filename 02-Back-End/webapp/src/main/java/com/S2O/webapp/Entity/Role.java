@@ -1,5 +1,7 @@
 package com.S2O.webapp.Entity;
 
+import com.S2O.webapp.utility.RoleDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -7,6 +9,7 @@ import javax.persistence.*;
 import java.util.Objects;
 import java.util.Set;
 
+@JsonDeserialize(using = RoleDeserializer.class)
 @Data
 @Entity
 public class Role implements GrantedAuthority {
