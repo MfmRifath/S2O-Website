@@ -28,6 +28,8 @@ import Reports from "./layouts/Admin/Pages/Reports";
 import UserManagement from "./layouts/Admin/Pages/Users";
 import ProfilePage from "./layouts/Profile";
 import { useState } from "react";
+import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
+import AddEditArticle from "./layouts/Admin/components/AddArticle";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -127,6 +129,24 @@ function App() {
           element={
             <PrivateRoute
               element={< SiteSettings/>}
+              requiredRole={"ROLE_ADMIN"}
+            />
+          }
+        />
+        <Route
+          path="/edit-admin/:id"
+          element={
+            <PrivateRoute
+              element={< AddEditAdministration/>}
+              requiredRole={"ROLE_ADMIN"}
+            />
+          }
+        />
+        <Route
+          path="/edit-article/:articleId"
+          element={
+            <PrivateRoute
+              element={< AddEditArticle/>}
               requiredRole={"ROLE_ADMIN"}
             />
           }

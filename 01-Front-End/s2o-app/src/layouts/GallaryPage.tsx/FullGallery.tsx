@@ -64,7 +64,7 @@ export const FullGallery: React.FC = () => {
   };
 
   return (
-    <div className="py-12 bg-gradient-to-br from-blue-50 to-teal-50">
+    <div className="py-12 bg-gradient-to-br from-blue-50 to-teal-50 mt-20">
       <div className="container mx-auto px-6 lg:px-20">
         {/* Title */}
         <div className="text-center mb-8">

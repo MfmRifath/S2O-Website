@@ -47,9 +47,9 @@ const AddEditAdministration: React.FC = () => {
           const response = await axios.get<AdministrationModal>(
             `http://localhost:8080/api/administrations/${id}`
           );
+          console.log("API Response:", response.data);
           setFormData(response.data);
-  
-          // Check if adminImages exists and handle the image
+
           if (response.data.adminImages?.url) {
             const imageFile = await fetch(response.data.adminImages.url)
               .then((res) => res.blob())
@@ -62,13 +62,14 @@ const AddEditAdministration: React.FC = () => {
             setSelectedImage(imageFile);
           }
         } catch (error) {
+          console.error("Error fetching data:", error);
           setHttpError("Failed to fetch administration data.");
         } finally {
           setIsLoading(false);
         }
       }
     };
-  
+
     fetchAdministration();
   }, [id]);
 
@@ -124,6 +125,7 @@ const AddEditAdministration: React.FC = () => {
         throw new Error("Failed to save administration member.");
       }
     } catch (error) {
+      console.error("Error submitting data:", error);
       setHttpError("An error occurred while saving admin data.");
     } finally {
       setIsLoading(false);

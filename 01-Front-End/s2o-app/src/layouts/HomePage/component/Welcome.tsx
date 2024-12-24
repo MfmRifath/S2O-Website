@@ -1,7 +1,20 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Welcome.css";
 
 export const Welcome = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check for JWT token on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // Replace with your storage strategy
+    if (token) {
+      // Optionally validate the token here
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
+
   return (
     <header className="relative h-screen flex items-center justify-center text-white overflow-hidden">
       {/* Background Elements */}
@@ -31,10 +44,10 @@ export const Welcome = () => {
 
         {/* Styled Button */}
         <a
-          href="#"
+          href={isLoggedIn ? "/s2oacademy" : "/login"} // Link changes based on login status
           className="mt-10 inline-block bg-gradient-to-r from-indigo-500 via-blue-600 to-indigo-700 text-white text-lg md:text-xl font-medium px-8 py-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition-transform duration-300 relative focus:outline-none focus:ring-4 focus:ring-teal-300"
         >
-          Explore S2O Academy
+          {isLoggedIn ? "Explore S2O Academy" : "Sign In"} {/* Conditional Text */}
           <span className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400 via-indigo-500 to-blue-600 opacity-20 blur-lg"></span>
         </a>
       </div>

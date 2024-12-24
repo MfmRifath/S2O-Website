@@ -35,14 +35,14 @@ const ArticleList: React.FC<{ article: Article }> = ({ article }) => {
         <div className="bg-white shadow-lg rounded-lg p-6 mb-8 border border-gray-200 hover:shadow-xl transition-shadow">
           {/* Article Header */}
           <header className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-gray-800 font-bamini">
+            <h1 className="text-3xl font-bold text-gray-800">
               {article.title}
             </h1>
             <div className="mt-4">
-              <h3 className="text-lg text-blue-600 font-semibold font-bamini">
+              <h3 className="text-lg text-blue-600 font-semibold">
                 {article.author}
               </h3>
-              <p className="text-sm text-gray-500 italic font-bamini">
+              <p className="text-sm text-gray-500 italic">
                 {article.authorQualification}
               </p>
               <p className="text-sm text-gray-400">

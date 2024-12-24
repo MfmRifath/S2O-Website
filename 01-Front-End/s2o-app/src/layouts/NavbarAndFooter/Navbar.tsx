@@ -34,7 +34,11 @@ const Navbar: React.FC = () => {
           setUserRole("ROLE_ADMIN");
         } else if (roles.includes("ROLE_TEACHER")) {
           setUserRole("ROLE_TEACHER");
-        } else {
+        }
+        else if (roles.includes("ROLE_USER")) {
+          setUserRole("ROLE_USER");
+        }
+         else {
           setUserRole(null);
         }
       } catch (error) {
@@ -90,13 +94,13 @@ const Navbar: React.FC = () => {
         <div className="hidden lg:flex space-x-6 items-center">
           {[
             { to: "/home", label: "Home" },
-            { to: "/s2oAcademy", label: "S2O Academy" },
-            { to: "/eventCalender", label: "Event Calendar" },
-            { to: "/register", label: "Registration" },
-            { to: "/article", label: "Article" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/s2oAcademy", label: "S2O Academy" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/eventCalender", label: "Event Calendar" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/register", label: "Registration" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") &&{ to: "/article", label: "Article" },
             userRole === "ROLE_ADMIN" && { to: "/admin", label: "Admin" },
             userRole === "ROLE_TEACHER" && { to: "/teacher", label: "Teacher" },
-            { to: "/chat", label: "Chat" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/chat", label: "Chat" },
           ]
             .filter(Boolean)
             .map((link) =>
@@ -181,13 +185,13 @@ const Navbar: React.FC = () => {
         <div className="flex flex-col px-6 py-4 space-y-3">
           {[
             { to: "/home", label: "Home" },
-            { to: "/s2oAcademy", label: "S2O Academy" },
-            { to: "/eventCalender", label: "Event Calendar" },
-            { to: "/register", label: "Registration" },
-            { to: "/article", label: "Article" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/s2oAcademy", label: "S2O Academy" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") &&  { to: "/eventCalender", label: "Event Calendar" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/register", label: "Registration" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/article", label: "Article" },
             userRole === "ROLE_ADMIN" && { to: "/admin", label: "Admin" },
             userRole === "ROLE_TEACHER" && { to: "/teacher", label: "Teacher" },
-            { to: "/chat", label: "Chat" },
+            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/chat", label: "Chat" },
           ]
             .filter(Boolean)
             .map((link) =>

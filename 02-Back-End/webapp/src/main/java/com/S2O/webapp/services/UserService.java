@@ -91,4 +91,7 @@ public class UserService implements UserDetailsService {
     public void deleteUserById(Long id) {
         userRepository.deleteById(id);
     }
+    public void updatePassword(com.S2O.webapp.Entity.User user) {
+        userRepository.save(user); // Save the updated user entity
+    }
 }

@@ -1,18 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
 
-export const AddEditArticle: React.FC<{ articleId?: number }> = ({
-  articleId,
-}) => {
+export const AddEditArticle: React.FC = () => {
+  const { articleId } = useParams<{ articleId: string }>(); // Retrieve articleId from the route
   const [author, setAuthor] = useState("");
   const [title, setTitle] = useState("");
   const [authorQualification, setAuthorQualification] = useState("");
-  const [content, setContent] = useState(""); // This will be in Bamini font
+  const [content, setContent] = useState(""); // Content in Bamini font
   const [date, setDate] = useState<string>("");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [displayWarning, setDisplayWarning] = useState(false);
   const [displaySuccess, setDisplaySuccess] = useState(false);
+
+  // Fetch article details if editing
+  useEffect(() => {
+    if (articleId) {
+      const fetchArticleDetails = async () => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8080/api/articles/${articleId}`
+          );
+          const article = response.data;
+
+          // Populate fields with existing article data
+          setAuthor(article.author);
+          setTitle(article.title);
+          setAuthorQualification(article.authorQualification);
+          setContent(article.content);
+          setDate(article.date);
+        } catch (error) {
+          console.error("Error fetching article details:", error);
+        }
+      };
+
+      fetchArticleDetails();
+    }
+  }, [articleId]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
@@ -23,12 +48,11 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
     setSelectedImages((prev) => prev.filter((_, i) => i !== index));
   };
 
+  // Submit new article (POST)
   const submitArticle = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const url = articleId
-      ? `http://localhost:8080/api/articles/edit/article/${articleId}`
-      : `http://localhost:8080/api/articles/add/article`;
+    const url = `http://localhost:8080/api/articles/add/article`;
 
     if (author && authorQualification && title && content && date) {
       const articleData = {
@@ -45,6 +69,56 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
 
       try {
         const response = await axios.post(url, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          onUploadProgress: (progressEvent) => {
+            if (progressEvent.total) {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total
+              );
+              setUploadProgress(percentCompleted);
+            }
+          },
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          setDisplaySuccess(true);
+          resetFormFields();
+        } else {
+          throw new Error("Failed to save article.");
+        }
+      } catch (error) {
+        console.error("Error submitting article:", error);
+        setDisplaySuccess(false);
+        setDisplayWarning(true);
+      }
+    } else {
+      setDisplayWarning(true);
+    }
+  };
+
+  // Submit edited article (PUT)
+  const submitEditArticle = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const url = `http://localhost:8080/api/articles/edit/article/${articleId}`;
+
+    if (author && authorQualification && title && content && date) {
+      const articleData = {
+        author,
+        title,
+        authorQualification,
+        content,
+        date,
+      };
+
+      const formData = new FormData();
+      formData.append("article", JSON.stringify(articleData));
+      selectedImages.forEach((file) => formData.append("images", file));
+
+      try {
+        const response = await axios.put(url, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -100,9 +174,9 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
       <h1 className="text-3xl font-bold mb-6 text-gray-700 text-center">
         {articleId ? "Edit Article" : "Add Article"}
       </h1>
-      <form onSubmit={submitArticle}>
+      <form onSubmit={articleId ? submitEditArticle : submitArticle}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Input Fields */}
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-2">
               Title
@@ -115,6 +189,7 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
               value={title}
             />
           </div>
+          {/* Author */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-2">
               Author
@@ -127,6 +202,7 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
               value={author}
             />
           </div>
+          {/* Author Qualification */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-2">
               Author Qualification
@@ -139,6 +215,7 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
               value={authorQualification}
             />
           </div>
+          {/* Published Date */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-2">
               Published Date
@@ -151,25 +228,20 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
               value={date}
             />
           </div>
+          {/* Content */}
           <div className="col-span-2">
-  <label className="block text-sm font-medium text-gray-600 mb-2">
-    Content (Type in Tamil - Bamini)
-  </label>
-  <textarea
-    rows={6}
-    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none font-bamini"
-    required
-    onChange={(e) => setContent(e.target.value)}
-    value={content}
-  />
-  <div className="mt-2 text-sm text-gray-500">
-    Note: Please switch to the <strong>Bamini</strong> Tamil keyboard layout to type in Tamil.
-    <div className="mt-1">
-      Example: <strong>க</strong> = <code>f</code>, <strong>ச</strong> = <code>r</code>, <strong>த</strong> = <code>j</code>.
-    </div>
-  </div>
-</div>
-          {/* File Upload */}
+            <label className="block text-sm font-medium text-gray-600 mb-2">
+              Content (Type in Tamil - Bamini)
+            </label>
+            <textarea
+              rows={6}
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none font-bamini"
+              required
+              onChange={(e) => setContent(e.target.value)}
+              value={content}
+            />
+          </div>
+          {/* Upload Images */}
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-600 mb-2">
               Upload Images
@@ -200,7 +272,6 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
             </div>
           </div>
         </div>
-
         {/* Upload Progress */}
         {uploadProgress > 0 && (
           <div className="mt-4">
@@ -216,7 +287,7 @@ export const AddEditArticle: React.FC<{ articleId?: number }> = ({
             <p className="text-sm text-gray-600 mt-1">{uploadProgress}%</p>
           </div>
         )}
-
+        {/* Submit Button */}
         <button
           type="submit"
           className="mt-6 px-6 py-3 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 focus:ring-2 focus:ring-green-300 transition-all"

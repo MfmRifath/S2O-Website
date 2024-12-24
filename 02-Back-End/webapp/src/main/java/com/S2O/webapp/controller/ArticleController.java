@@ -71,4 +71,12 @@ public class ArticleController {
             return new ResponseEntity<>("Failed to delete article: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<ArticleDTO> getArticleById(@PathVariable Long id) {
+        ArticleDTO article = articleServices.getArticleById(id); // Add a method to fetch the article by ID
+        if (article == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(article, HttpStatus.OK);
+    }
 }

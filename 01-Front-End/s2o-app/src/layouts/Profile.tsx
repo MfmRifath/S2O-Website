@@ -1,67 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
 import axios from "axios";
-
-// JWT and User Interfaces
-interface JwtPayload {
-  sub: string;
-  userId: number;
-  roles: string[];
-}
-
-interface User {
-  userId: number;
-  username: string;
-  email: string;
-  roles: Role[];
-}
-
-interface Role {
-  id: number;
-  authority: string;
-}
-
-const getUserDetailsFromToken = (token: string): JwtPayload | null => {
-  try {
-    return jwtDecode<JwtPayload>(token);
-  } catch {
-    return null;
-  }
-};
+import { AiOutlineLogout } from "react-icons/ai";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProfilePage: React.FC = () => {
-  const [userDetails, setUserDetails] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  interface UserDetails {
+    userId: string;
+    username: string;
+    email: string;
+    bio?: string;
+    profilePicture?: string;
+  }
+
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "settings">("overview");
+  const [activeTab, setActiveTab] = useState("overview");
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
+  const [updatedEmail, setUpdatedEmail] = useState("");
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
 
   useEffect(() => {
+    interface DecodedToken {
+      userId: string;
+    }
+
     const token = localStorage.getItem("token");
     if (token) {
-      const decodedUser = getUserDetailsFromToken(token);
-      if (decodedUser) {
+      try {
+        const decodedUser = jwtDecode<DecodedToken>(token);
         axios
           .get(`http://localhost:8080/api/user/${decodedUser.userId}`)
-          .then((response) => {
-            setUserDetails(response.data);
+          .then((res) => {
+            setUserDetails(res.data);
+            setUpdatedEmail(res.data.email);
             setLoading(false);
           })
-          .catch(() => {
-            setError("Failed to load user details.");
-            setLoading(false);
-          });
-      } else {
+          .catch(() => setError("Failed to load user details."));
+      } catch {
         setError("Invalid token.");
-        setLoading(false);
       }
     } else {
       setError("No token found.");
-      setLoading(false);
     }
   }, []);
 
@@ -70,11 +56,45 @@ const ProfilePage: React.FC = () => {
     setPasswords({ ...passwords, [name]: value });
   };
 
-  const handleChangePassword = (e: React.FormEvent) => {
+  const handleEmailUpdate = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    axios
+      .put(`http://localhost:8080/api/user/${userDetails?.userId}`, {
+        email: updatedEmail,
+      })
+      .then(() => {
+        toast.success("Email updated successfully!");
+        setUserDetails((prev) => (prev ? { ...prev, email: updatedEmail } : prev));
+      })
+      .catch(() => toast.error("Failed to update email."));
+  };
 
+  const handleProfilePictureUpload = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!profilePicture) {
+      toast.error("Please select a profile picture.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("profilePicture", profilePicture);
+    formData.append("userId", userDetails?.userId || "");
+
+    axios
+      .post(`http://localhost:8080/api/user/upload-profile-picture`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+      .then((res) => {
+        toast.success("Profile picture updated successfully!");
+        setUserDetails((prev) => (prev ? { ...prev, profilePicture: res.data.url } : prev));
+      })
+      .catch(() => toast.error("Failed to upload profile picture."));
+  };
+
+  const handleChangePassword = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (passwords.newPassword !== passwords.confirmPassword) {
-      alert("New passwords do not match.");
+      toast.error("New passwords do not match.");
       return;
     }
 
@@ -84,173 +104,143 @@ const ProfilePage: React.FC = () => {
         currentPassword: passwords.currentPassword,
         newPassword: passwords.newPassword,
       })
-      .then(() => {
-        alert("Password changed successfully!");
-        setPasswords({
-          currentPassword: "",
-          newPassword: "",
-          confirmPassword: "",
-        });
-      })
-      .catch(() => {
-        alert("Failed to change password.");
-      });
+      .then(() => toast.success("Password changed successfully!"))
+      .catch(() => toast.error("Failed to change password."));
   };
 
-  if (loading) {
-    return <p className="text-center text-gray-500">Loading...</p>;
-  }
-
-  if (error) {
-    return <p className="text-center text-red-500">{error}</p>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-md py-4 px-6">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-800">My Profile</h1>
-          <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
-            Logout
+    <div className="min-h-screen bg-gray-100">
+      <header className="bg-white shadow">
+        <div className="container mx-auto p-4 flex justify-between items-center">
+          <h1 className="text-xl font-bold text-gray-800">My Profile</h1>
+          <button className="flex items-center text-red-500">
+            <AiOutlineLogout className="mr-2" /> Logout
           </button>
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="container mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-        {/* Tabs */}
-        <div className="flex border-b mb-6">
-          <button
-            className={`px-6 py-2 text-lg font-medium ${
-              activeTab === "overview"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-500 hover:text-gray-800"
-            }`}
-            onClick={() => setActiveTab("overview")}
-          >
-            Overview
-          </button>
-          <button
-            className={`px-6 py-2 text-lg font-medium ${
-              activeTab === "settings"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-500 hover:text-gray-800"
-            }`}
-            onClick={() => setActiveTab("settings")}
-          >
-            Settings
-          </button>
+      <main className="container mx-auto mt-8 p-6 bg-white shadow rounded">
+        <div className="flex border-b mb-4">
+          {["overview", "settings"].map((tab) => (
+            <button
+              key={tab}
+              className={`px-4 py-2 ${
+                activeTab === tab
+                  ? "text-blue-600 border-b-2 border-blue-600"
+                  : "text-gray-500"
+              }`}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab === "overview" ? "Overview" : "Settings"}
+            </button>
+          ))}
         </div>
 
-        {/* Tab Content */}
         {activeTab === "overview" && (
-          <div>
-            {/* Overview Section */}
-            <div className="text-center">
-              <div className="w-28 h-28 mx-auto rounded-full border-4 border-blue-500 overflow-hidden shadow-md">
-                <img
-                  src={`https://ui-avatars.com/api/?name=${userDetails?.username}&background=random`}
-                  alt="Avatar"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <h2 className="mt-4 text-2xl font-semibold text-gray-800">
-                {userDetails?.username}
-              </h2>
-              <p className="text-gray-500">{userDetails?.email}</p>
-            </div>
-            <div className="mt-6">
-              <h3 className="text-lg font-medium text-gray-700">Roles</h3>
-              <div className="flex flex-wrap gap-3 mt-3">
-                {userDetails?.roles.map((role) => (
-                  <span
-                    key={role.id}
-                    className="text-sm font-medium px-4 py-1 rounded-full bg-blue-100 text-blue-600 shadow"
-                  >
-                    {role.authority}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+          <section className="mt-4 text-center">
+            <img
+              src={userDetails?.profilePicture || `https://ui-avatars.com/api/?name=${userDetails?.username}&background=random`}
+              alt="Avatar"
+              className="w-24 h-24 rounded-full mx-auto border-2 border-blue-500"
+            />
+            <h2 className="mt-4 text-2xl font-semibold text-gray-800">
+              {userDetails?.username}
+            </h2>
+            <p className="text-gray-500">{userDetails?.email}</p>
+          </section>
         )}
 
         {activeTab === "settings" && (
-          <div>
-            {/* Settings Section */}
-            <h3 className="text-lg font-semibold text-gray-700">Profile Settings</h3>
-            <form className="mt-4 space-y-4">
+          <section className="mt-4 space-y-8">
+            {/* Update Email */}
+            <form onSubmit={handleEmailUpdate} className="space-y-4">
+              <h3 className="text-xl font-semibold">Update Email</h3>
               <div>
-                <label className="block text-gray-600">Username</label>
-                <input
-                  type="text"
-                  defaultValue={userDetails?.username}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-600">Email</label>
+                <label className="block text-gray-700">Email</label>
                 <input
                   type="email"
-                  defaultValue={userDetails?.email}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  value={updatedEmail}
+                  onChange={(e) => setUpdatedEmail(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  required
                 />
               </div>
               <button
                 type="submit"
-                className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
+                className="p-2 bg-blue-500 text-white rounded"
               >
-                Save Changes
+                Update Email
+              </button>
+            </form>
+
+            {/* Update Profile Picture */}
+            <form onSubmit={handleProfilePictureUpload} className="space-y-4">
+              <h3 className="text-xl font-semibold">Update Profile Picture</h3>
+              <div>
+                <label className="block text-gray-700">Upload Picture</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setProfilePicture(e.target.files ? e.target.files[0] : null)
+                  }
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+              <button
+                type="submit"
+                className="p-2 bg-blue-500 text-white rounded"
+              >
+                Upload Picture
               </button>
             </form>
 
             {/* Change Password */}
-            <h3 className="mt-8 text-lg font-semibold text-gray-700">Change Password</h3>
-            <form onSubmit={handleChangePassword} className="mt-4 space-y-4">
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <h3 className="text-xl font-semibold">Change Password</h3>
               <div>
-                <label className="block text-gray-600">Current Password</label>
+                <label className="block text-gray-700">Current Password</label>
                 <input
                   type="password"
                   name="currentPassword"
-                  value={passwords.currentPassword}
                   onChange={handlePasswordChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2 border rounded"
                   required
                 />
               </div>
               <div>
-                <label className="block text-gray-600">New Password</label>
+                <label className="block text-gray-700">New Password</label>
                 <input
                   type="password"
                   name="newPassword"
-                  value={passwords.newPassword}
                   onChange={handlePasswordChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2 border rounded"
                   required
                 />
               </div>
               <div>
-                <label className="block text-gray-600">Confirm New Password</label>
+                <label className="block text-gray-700">Confirm Password</label>
                 <input
                   type="password"
                   name="confirmPassword"
-                  value={passwords.confirmPassword}
                   onChange={handlePasswordChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-2 border rounded"
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
+                className="p-2 bg-blue-500 text-white rounded"
               >
                 Change Password
               </button>
             </form>
-          </div>
+          </section>
         )}
-      </div>
+      </main>
     </div>
   );
 };

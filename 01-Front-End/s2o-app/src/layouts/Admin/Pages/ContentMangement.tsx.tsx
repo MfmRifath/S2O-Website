@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { AddEditArticle } from "../components/AddArticle";
+import AddEditArticle from "../components/AddArticle";
 import ArticleTable from "../components/ArticleTable";
 import ChatList from "../components/ChatTable";
 import { AdministrationTable } from "../components/AdminitarionTable";
