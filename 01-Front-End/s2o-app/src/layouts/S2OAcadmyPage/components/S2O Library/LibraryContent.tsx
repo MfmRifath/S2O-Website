@@ -15,7 +15,7 @@ const LibraryContent: React.FC = () => {
         
         <div className="library-item exam">
           <h2><FontAwesomeIcon icon={faFileAlt} /> Exam Papers</h2>
-          <p><a href="#">Past Exam Papers</a>: Access previous years' exam papers to help you prepare and practice.</p>
+          <p><a href="/examPapers">Exam Papers</a>: Access previous years' exam papers to help you prepare and practice.</p>
         </div>
         
         <div className="library-item resource">
@@ -25,7 +25,7 @@ const LibraryContent: React.FC = () => {
         
         <div className="library-item">
           <h2><FontAwesomeIcon icon={faVideo} /> Video Resources</h2>
-          <p><a href="#">Educational Videos</a>: Watch instructional and educational videos to enhance your understanding.</p>
+          <p><a href="/video">Educational Videos</a>: Watch instructional and educational videos to enhance your understanding.</p>
         </div>
       </div>
     </div>

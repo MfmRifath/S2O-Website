@@ -1,7 +1,8 @@
 package com.S2O.webapp.services;
 
 import com.S2O.webapp.Entity.Book;
-import com.S2O.webapp.dao.BookRepository;
+import com.S2O.webapp.Entity.ExamPaper;
+import com.S2O.webapp.dao.ExamPaperRepository;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -17,30 +18,30 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class BookService {
+public class ExamPaperService {
 
     @Autowired
-    private BookRepository bookRepository;
+    private ExamPaperRepository examPaperRepository;
 
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public List<ExamPaper> getAllExamPaper() {
+        return examPaperRepository.findAll();
     }
 
-    public Book saveBook(Book book, MultipartFile file) throws IOException {
+    public ExamPaper saveExamPaper(ExamPaper examPaper, MultipartFile file) throws IOException {
         if (file != null && !file.isEmpty()) {
-            book.setPdfFile(file.getBytes());
+            examPaper.setPdfFile(file.getBytes());
         } else {
             throw new IllegalArgumentException("PDF file is required");
         }
-        return bookRepository.save(book);
+        return examPaperRepository.save(examPaper);
     }
 
-    public Optional<Book> getBookById(Long id) {
-        return bookRepository.findById(id);
+    public Optional<ExamPaper> getExamPaperById(Long id) {
+        return examPaperRepository.findById(id);
     }
 
-    public void deleteBookById(Long id) {
-        bookRepository.deleteById(id);
+    public void deleteExamPaperById(Long id) {
+        examPaperRepository.deleteById(id);
     }
 
     public byte[] getFirstPageAsImage(byte[] pdfData) throws IOException {

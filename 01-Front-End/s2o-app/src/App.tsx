@@ -30,6 +30,8 @@ import ProfilePage from "./layouts/Profile";
 import { useState } from "react";
 import AddEditAdministration from "./layouts/Admin/components/AddAdministration";
 import AddEditArticle from "./layouts/Admin/components/AddArticle";
+import ExamPapersPage from "./layouts/S2OAcadmyPage/components/S2O Library/ExamPapers";
+import VideoCenter from "./layouts/S2OAcadmyPage/components/S2O Library/VedioCenter";
 
 function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -157,6 +159,24 @@ function App() {
             <PrivateRoute
               element={< DonationManagement/>}
               requiredRole={"ROLE_ADMIN"}
+            />
+          }
+        />
+        <Route
+          path="/examPapers"
+          element={
+            <PrivateRoute
+              element={< ExamPapersPage/>}
+              requiredRole={"ROLE_USER"}
+            />
+          }
+        />
+        <Route
+          path="/video"
+          element={
+            <PrivateRoute
+              element={< VideoCenter/>}
+              requiredRole={"ROLE_USER"}
             />
           }
         />

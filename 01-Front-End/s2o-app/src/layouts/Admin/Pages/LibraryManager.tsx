@@ -2,6 +2,9 @@ import React, { useState } from "react";
 
 
 import BookManager from "../components/BookManager";
+import ExamPapersPage from "../../S2OAcadmyPage/components/S2O Library/ExamPapers";
+import ManageExamPapersPage from "./ManageExamPapers";
+import ManageVideoList from "../components/ManageVedioList";
 
 export const LibraryManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("admin-table");
@@ -20,6 +23,8 @@ export const LibraryManagement: React.FC = () => {
           <div className="flex flex-wrap justify-center space-x-4">
             {[
               { id: "Book-Manager", label: "Manage Book" },
+              { id: "ExamPaper-Manager", label: "Manage ExamPaper" },
+              { id: "Video-Manager", label: "Manage Video" },
               
             ].map((tab) => (
               <button
@@ -38,6 +43,8 @@ export const LibraryManagement: React.FC = () => {
         </nav>
         <div className="mt-6 p-6 bg-gray-50 shadow-inner rounded-lg">
           {activeTab === "Book-Manager" && <BookManager />}
+          {activeTab === "ExamPaper-Manager" && <ManageExamPapersPage />}
+          {activeTab === "Video-Manager" && <ManageVideoList/>}
           
         </div>
       </div>
