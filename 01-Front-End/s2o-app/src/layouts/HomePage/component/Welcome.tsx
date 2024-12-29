@@ -16,7 +16,7 @@ export const Welcome = () => {
   }, []);
 
   return (
-    <header className="relative h-screen flex items-center justify-center text-white overflow-hidden">
+    <header className="header12 relative h-screen flex items-center justify-center text-white overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0">
         {/* Large Gradient Circle */}
