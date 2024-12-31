@@ -9,6 +9,9 @@ import { Vision } from "./component/Vision";
 import { Welcome } from "./component/Welcome";
 import Gallery from "./Gallery";
 import './HomePage.css';
+import OpenAiAssistant from "../AIAssistent/OpenAiAssistent";
+import { useState } from "react";
+import OpenAiIntegration from "../AIAssistent/OpenAiAssistent";
 
 export const HomePage = () => {
   // Intersection observers for each section
@@ -20,6 +23,7 @@ export const HomePage = () => {
   const [academyRef, academyInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [donationRef, donationInView] = useInView({ triggerOnce: true, threshold: 0.1 });
   const [galleryRef, galleryInView] = useInView({ triggerOnce: true, threshold: 0.1 });
+  const [isAssistantOpen, setIsAssistantOpen] = useState<boolean>(false);
 
   return (
     <>
@@ -114,6 +118,58 @@ export const HomePage = () => {
           >
             <Gallery />
           </section>
+        </div>
+
+        {/* AI Assistant Button */}
+        <div className="fixed bottom-5 right-5 z-50">
+          <button
+            onClick={() => setIsAssistantOpen(true)}
+            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            Open AI Assistant
+          </button>
+        </div>
+
+        {/* AI Assistant Panel */}
+        {/* AI Assistant Button */}
+        <div className="fixed bottom-5 right-5 z-50">
+          <button
+            onClick={() => setIsAssistantOpen(true)}
+            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            Open AI Assistant
+          </button>
+        </div>
+
+        {/* AI Assistant Button */}
+        <div className="fixed bottom-5 right-5 z-50">
+          <button
+            onClick={() => setIsAssistantOpen(true)}
+            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            Open AI Assistant
+          </button>
+        </div>
+
+        {/* AI Assistant Panel */}
+        <div
+          className={`fixed bottom-5 right-5 z-50 bg-white shadow-lg transform transition-transform duration-300 ${
+            isAssistantOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+          style={{
+            width: "400px", // Set fixed width
+            height: "80vh", // Set fixed height
+            borderRadius: "10px", // Rounded corners
+            bottom: "10px", // Prevent the panel from being hidden under the bottom edge
+          }}
+        >
+          <button
+            onClick={() => setIsAssistantOpen(false)}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          >
+            &times;
+          </button>
+          <OpenAiIntegration />
         </div>
       </div>
     </>

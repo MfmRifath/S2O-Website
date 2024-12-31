@@ -13,6 +13,7 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://localhost:3000"); // Allow your frontend origin
+        corsConfiguration.addAllowedOrigin("http://localhost:5001"); // Allow your ngrok URL
         corsConfiguration.addAllowedHeader("*"); // Allow all headers
         corsConfiguration.addAllowedMethod("*"); // Allow all HTTP methods
         corsConfiguration.setAllowCredentials(true); // Allow cookies
