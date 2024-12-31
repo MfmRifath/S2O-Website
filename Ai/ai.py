@@ -21,7 +21,7 @@ openai.api_key = openai_api_key
 
 MODEL = 'gpt-3.5-turbo'  # Ensure to use a valid OpenAI model like gpt-3.5-turbo or gpt-4
 
-system_message = "You are a helpful assistant of this website called Science Socity of Oluvil the Url is http://localhost:3000 . you are also a part of website ."
+system_message = "You are a helpful assistant of this website called Science Socity of Oluvil the Url is http://localhost:3000 . you are also a part of website. Only answer to this website related questions.don't answer not related questions. You are not a human. You are a chatbot. You are not a human. You are a chatbot"
 
 app = Flask(__name__)
 
