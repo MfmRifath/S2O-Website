@@ -32,8 +32,11 @@ import AddEditAdministration from "./layouts/Admin/components/AddAdministration"
 import AddEditArticle from "./layouts/Admin/components/AddArticle";
 import ExamPapersPage from "./layouts/S2OAcadmyPage/components/S2O Library/ExamPapers";
 import VideoCenter from "./layouts/S2OAcadmyPage/components/S2O Library/VedioCenter";
+import OpenAiIntegration from "./layouts/AIAssistent/OpenAiAssistent";
+import ShowStudyNotes from "./layouts/S2OAcadmyPage/components/S2O Library/StudyNotes";
 
 function Layout({ children }: { children: React.ReactNode }) {
+  const [isAssistantOpen, setIsAssistantOpen] = useState<boolean>(false);
   return (
     <div className="min-h-screen flex flex-col">
       {/* Navbar */}
@@ -41,6 +44,57 @@ function Layout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="flex-1 pt-16 pb-8">{children}</main>
       {/* Footer */}
+
+        {/* AI Assistant Button */}
+        <div className="fixed bottom-5 right-5 z-50">
+          <button
+            onClick={() => setIsAssistantOpen(true)}
+            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            Open AI Assistant
+          </button>
+        </div>
+
+        {/* AI Assistant Panel */}
+        {/* AI Assistant Button */}
+        <div className="fixed bottom-5 right-5 z-50">
+          <button
+            onClick={() => setIsAssistantOpen(true)}
+            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            Open AI Assistant
+          </button>
+        </div>
+
+        {/* AI Assistant Button */}
+        <div className="fixed bottom-5 right-5 z-50">
+          <button
+            onClick={() => setIsAssistantOpen(true)}
+            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            Open AI Assistant
+          </button>
+        </div>
+       {/* AI Assistant Panel */}
+       <div
+          className={`fixed bottom-5 right-5 z-50 bg-white shadow-lg transform transition-transform duration-300 ${
+            isAssistantOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+          style={{
+            width: "400px", // Set fixed width
+            height: "80vh", // Set fixed height
+            borderRadius: "10px", // Rounded corners
+            bottom: "10px", // Prevent the panel from being hidden under the bottom edge
+          }}
+        >
+          <button
+            onClick={() => setIsAssistantOpen(false)}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          >
+            &times;
+          </button>
+          <OpenAiIntegration />
+        </div>
       <Footer />
     </div>
   );
@@ -114,6 +168,15 @@ function App() {
             <PrivateRoute
               element={<AdminDashboard />}
               requiredRole={"ROLE_ADMIN"}
+            />
+          }
+        />
+        <Route
+          path="/notes"
+          element={
+            <PrivateRoute
+              element={<ShowStudyNotes />}
+              requiredRole={"ROLE_USER"}
             />
           }
         />

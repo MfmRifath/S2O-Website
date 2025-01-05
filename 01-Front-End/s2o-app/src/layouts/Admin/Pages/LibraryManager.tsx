@@ -5,6 +5,7 @@ import BookManager from "../components/BookManager";
 import ExamPapersPage from "../../S2OAcadmyPage/components/S2O Library/ExamPapers";
 import ManageExamPapersPage from "./ManageExamPapers";
 import ManageVideoList from "../components/ManageVedioList";
+import StudyNotesManagement from "../components/StudyNotesManagements";
 
 export const LibraryManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("admin-table");
@@ -25,6 +26,7 @@ export const LibraryManagement: React.FC = () => {
               { id: "Book-Manager", label: "Manage Book" },
               { id: "ExamPaper-Manager", label: "Manage ExamPaper" },
               { id: "Video-Manager", label: "Manage Video" },
+              { id: "Notes-Manager", label: "Manage Notes" }
               
             ].map((tab) => (
               <button
@@ -45,6 +47,7 @@ export const LibraryManagement: React.FC = () => {
           {activeTab === "Book-Manager" && <BookManager />}
           {activeTab === "ExamPaper-Manager" && <ManageExamPapersPage />}
           {activeTab === "Video-Manager" && <ManageVideoList/>}
+          {activeTab === "Notes-Manager" && <StudyNotesManagement/>}
           
         </div>
       </div>

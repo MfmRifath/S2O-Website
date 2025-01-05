@@ -20,7 +20,7 @@ const LibraryContent: React.FC = () => {
         
         <div className="library-item resource">
           <h2><FontAwesomeIcon icon={faStickyNote} /> Resource Notes</h2>
-          <p><a href="#">Study Notes</a>: Find comprehensive resource notes and study guides on various topics.</p>
+          <p><a href="/notes">Study Notes</a>: Find comprehensive resource notes and study guides on various topics.</p>
         </div>
         
         <div className="library-item">
