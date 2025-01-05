@@ -69,7 +69,7 @@ const ManageExamPapersPage: React.FC = () => {
           onEdit={(examPaper) => setEditingExamPaper({
             id: examPaper.id,
             title: examPaper.title,
-            year: examPaper.year
+            year: String(examPaper.year)
           })}
           onDelete={handleDelete}
         />

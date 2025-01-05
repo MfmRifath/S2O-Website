@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import{ jwtDecode }from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const Navbar: React.FC = () => {
   const [showNavbar, setShowNavbar] = useState(true);
@@ -34,11 +34,9 @@ const Navbar: React.FC = () => {
           setUserRole("ROLE_ADMIN");
         } else if (roles.includes("ROLE_TEACHER")) {
           setUserRole("ROLE_TEACHER");
-        }
-        else if (roles.includes("ROLE_USER")) {
+        } else if (roles.includes("ROLE_USER")) {
           setUserRole("ROLE_USER");
-        }
-         else {
+        } else {
           setUserRole(null);
         }
       } catch (error) {
@@ -70,19 +68,19 @@ const Navbar: React.FC = () => {
       transition={{ type: "spring", stiffness: 80, damping: 15 }}
       className="fixed top-0 left-0 w-full z-50 bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 backdrop-blur-md shadow-lg rounded-b-3xl"
     >
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
         {/* Logo */}
         <div>
-          <Link to="/" className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-2">
             <motion.div
-              className="bg-blue p-3 rounded-full shadow-md hover:shadow-lg"
+              className="bg-blue p-2 rounded-full shadow-md hover:shadow-lg"
               whileHover={{ scale: 1.1 }}
               transition={{ type: "spring", stiffness: 120 }}
             >
               <motion.img
                 src={require("./../../Images/logo.png")}
                 alt="Logo"
-                className="h-15 w-20 rounded-full"
+                className="h-12 w-16 rounded-full"
                 whileHover={{ scale: 1.2 }}
                 transition={{ duration: 0.3 }}
               />
@@ -91,16 +89,16 @@ const Navbar: React.FC = () => {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden lg:flex space-x-6 items-center">
+        <div className="hidden lg:flex space-x-4 items-center">
           {[
             { to: "/home", label: "Home" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/s2oAcademy", label: "S2O Academy" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/eventCalender", label: "Event Calendar" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/register", label: "Registration" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") &&{ to: "/article", label: "Article" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/s2oAcademy", label: "Academy" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/eventCalender", label: "Events" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/register", label: "Registration" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/article", label: "Article" },
             userRole === "ROLE_ADMIN" && { to: "/admin", label: "Admin" },
             userRole === "ROLE_TEACHER" && { to: "/teacher", label: "Teacher" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/chat", label: "Chat" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/chat", label: "Chat" },
           ]
             .filter(Boolean)
             .map((link) =>
@@ -113,7 +111,7 @@ const Navbar: React.FC = () => {
                 >
                   <Link
                     to={link.to}
-                    className={`text-sm font-medium px-6 py-3 rounded-lg transition ${
+                    className={`text-sm font-medium px-4 py-2 rounded-lg transition ${
                       location.pathname === link.to
                         ? "bg-white text-blue-700 shadow-lg"
                         : "text-white hover:bg-blue-700 hover:shadow-md"
@@ -182,16 +180,16 @@ const Navbar: React.FC = () => {
         transition={{ duration: 0.4 }}
         className={`lg:hidden overflow-hidden bg-white rounded-b-2xl shadow-md`}
       >
-        <div className="flex flex-col px-6 py-4 space-y-3">
+        <div className="flex flex-col px-6 py-3 space-y-3">
           {[
             { to: "/home", label: "Home" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/s2oAcademy", label: "S2O Academy" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") &&  { to: "/eventCalender", label: "Event Calendar" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/register", label: "Registration" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/article", label: "Article" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/s2oAcademy", label: "Academy" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/eventCalender", label: "Events" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/register", label: "Registration" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/article", label: "Article" },
             userRole === "ROLE_ADMIN" && { to: "/admin", label: "Admin" },
             userRole === "ROLE_TEACHER" && { to: "/teacher", label: "Teacher" },
-            (userRole === "ROLE_USER" ||userRole === "ROLE_ADMIN"||userRole === "ROLE_TEACHER") && { to: "/chat", label: "Chat" },
+            (userRole === "ROLE_USER" || userRole === "ROLE_ADMIN" || userRole === "ROLE_TEACHER") && { to: "/chat", label: "Chat" },
           ]
             .filter(Boolean)
             .map((link) =>
@@ -203,7 +201,7 @@ const Navbar: React.FC = () => {
                 >
                   <Link
                     to={link.to}
-                    className={`text-base font-medium px-4 py-2 rounded-lg transition ${
+                    className={`text-base font-medium px-6 py-2 rounded-lg transition ${
                       location.pathname === link.to
                         ? "bg-blue-600 text-white"
                         : "text-gray-700 hover:bg-blue-500 hover:text-white"

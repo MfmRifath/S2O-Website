@@ -2,15 +2,17 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ExamPaperList from './ExamPaperList';
 
+// Define the ExamPaper interface consistently
 interface ExamPaper {
   id: number;
   title: string;
   description: string;
-  year: string;
+  year: string | number; // Allow both string and number types for the year
 }
 
 const ExamPapersPage: React.FC = () => {
   const [examPapers, setExamPapers] = useState<ExamPaper[]>([]);
+  const [filterYear, setFilterYear] = useState<string>("");
 
   useEffect(() => {
     fetchExamPapers();
@@ -41,10 +43,15 @@ const ExamPapersPage: React.FC = () => {
     }
   };
 
+  const filteredExamPapers = examPapers.filter(examPaper => {
+    return examPaper.year.toString().includes(filterYear);
+  });
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="container mx-auto">
-        <ExamPaperList examPapers={examPapers} onDownload={handleDownload} />
+       
+        <ExamPaperList examPapers={filteredExamPapers} onDownload={handleDownload} />
       </div>
     </div>
   );
