@@ -7,6 +7,7 @@ import { AdministrationTable } from "../components/AdminitarionTable";
 import { ManageGallery } from "../components/ManageGallary";
 import AddEditAdministration from "../components/AddAdministration";
 import { LibraryManagement } from "./LibraryManager";
+import ManageOurTeacher from "../components/ManageOurTeachers";
 
 export const ContentManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("admin-table");
@@ -31,6 +32,7 @@ export const ContentManagement: React.FC = () => {
               { id: "chat-list", label: "Chat Table" },
               { id: "manage-gallery", label: "Manage Gallery" },
               { id: "manage-Library", label: "Manage Library" },
+              { id: "manage-OurTeachers", label: "Manage Our Teacher" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -54,6 +56,7 @@ export const ContentManagement: React.FC = () => {
           {activeTab === "chat-list" && <ChatList />}
           {activeTab === "manage-gallery" && <ManageGallery />}
           {activeTab === "manage-Library" && <LibraryManagement />}
+          {activeTab === "manage-OurTeachers" && <ManageOurTeacher />}
         </div>
       </div>
     </div>

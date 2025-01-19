@@ -46,38 +46,7 @@ const LoginPage: React.FC = () => {
           Log In
         </h2>
 
-        {/* Social Media Icons */}
-        <div className="flex justify-center gap-4 mb-4">
-          <a
-            href="#"
-            className="text-white bg-blue-600 rounded-full p-2 hover:bg-blue-700 transition duration-300"
-          >
-            <FaFacebookF />
-          </a>
-          <a
-            href="#"
-            className="text-white bg-red-500 rounded-full p-2 hover:bg-red-600 transition duration-300"
-          >
-            <FaGoogle />
-          </a>
-          <a
-            href="#"
-            className="text-white bg-blue-400 rounded-full p-2 hover:bg-blue-500 transition duration-300"
-          >
-            <FaTwitter />
-          </a>
-          <a
-            href="#"
-            className="text-white bg-gray-800 rounded-full p-2 hover:bg-gray-900 transition duration-300"
-          >
-            <FaGithub />
-          </a>
-        </div>
-
-        <p className="text-center text-gray-600 mb-4">
-          Or sign in with your email
-        </p>
-
+        
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -113,21 +82,6 @@ const LoginPage: React.FC = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <input
-                type="checkbox"
-                id="remember"
-                className="mr-2 rounded border-gray-300"
-              />
-              <label htmlFor="remember" className="text-sm text-gray-600">
-                Remember me
-              </label>
-            </div>
-            <a href="#" className="text-sm text-blue-500 hover:underline">
-              Forgot your password?
-            </a>
-          </div>
 
           <button
             type="submit"

@@ -41,6 +41,16 @@ public class Image {
     @JsonBackReference("gallery-images")
     private Gallery gallery;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ourTeacher_id", nullable = true) // Allow null for images not associated with a Gallery
+    @JsonBackReference("ourTeacher-images")
+    private OurTeacher ourTeacher;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bestResult_id", nullable = true) // Allow null for images not associated with a BestResult
+    @JsonBackReference("bestResult-images") // Make sure the reference name matches in both entities
+    private BestResult bestResult; // Change from bestTeacher to bestResult
+
     @OneToOne
     @JoinColumn(name = "administration_id", nullable = true) // Allow null for images not associated with Administration
     @JsonBackReference

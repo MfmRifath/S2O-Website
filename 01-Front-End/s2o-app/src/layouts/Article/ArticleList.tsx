@@ -58,7 +58,7 @@ const ArticleList: React.FC<{ article: Article }> = ({ article }) => {
             {article.content.split("\n").map((line, index) => (
               <p
                 key={index}
-                className="text-gray-700 text-lg leading-relaxed mb-6 font-serif font-bamini"
+                className="text-gray-700 text-lg leading-relaxed mb-6 font-bamini"
               >
                 {line}
               </p>
