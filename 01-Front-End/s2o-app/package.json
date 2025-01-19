@@ -87,6 +87,7 @@
     "styled-components": "^6.1.13",
     "styled-reset": "^4.5.2",
     "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5",
     "yet-another-react-lightbox": "^3.21.1",
     "yup": "^1.4.0"
   },
@@ -123,6 +124,7 @@
     "@types/react-slick": "^0.23.13",
     "@types/react-table": "^7.7.20",
     "@types/sockjs-client": "^1.5.4",
+    "@types/xlsx": "^0.0.35",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.49",

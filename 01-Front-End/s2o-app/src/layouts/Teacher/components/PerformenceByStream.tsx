@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { PerformanceDTO } from '../types/MarkDTOs';
-import { getPerformanceByStream } from '../api/markApi';
+import axios from 'axios';
+const BASE_URL = 'http://localhost:8080/api/marks';
 
 const PerformanceByStream: React.FC = () => {
   const [performance, setPerformance] = useState<Record<string, PerformanceDTO[]>>({});
   const [loading, setLoading] = useState<boolean>(true);
-
+  
+  const getPerformanceByStream = async (): Promise<Record<string, PerformanceDTO[]>> => {
+    const response = await axios.get(`${BASE_URL}/performance/stream`);
+    return response.data;
+  };
   useEffect(() => {
     const fetchData = async () => {
       const data = await getPerformanceByStream();

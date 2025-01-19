@@ -9,22 +9,29 @@ import ExamManagement from '../components/ExamManagement';
 const TeacherDashBoard: React.FC = () => {
   const [activePage, setActivePage] = React.useState<string>('MarksList');
 
+  const menuItems = [
+    { id: 'MarksList', label: 'Marks List' },
+    { id: 'StudentManagement', label: 'Student Management' },
+    { id: 'PerformanceByStream', label: 'Performance by Stream' },
+    { id: 'PerformanceBySubject', label: 'Performance by Subject' },
+    { id: 'ExamManagement', label: 'Exam Management' },
+    { id: 'SubjectManagement', label: 'Subject Management' },
+  ];
+
   const renderPage = () => {
     switch (activePage) {
       case 'MarksList':
         return <MarksList />;
-      case 'PerformanceByStream':
-        return <PerformanceByStream />;
-      case 'studentManagement':
-        return <StudentManagement />;
-      case 'PerformanceBySubject':
-        return <PerformanceBySubject />;
       case 'StudentManagement':
         return <StudentManagement />;
-      case 'SubjectManagement':
-        return <SubjectManagement />;
+      case 'PerformanceByStream':
+        return <PerformanceByStream />;
+      case 'PerformanceBySubject':
+        return <PerformanceBySubject />;
       case 'ExamManagement':
         return <ExamManagement />;
+      case 'SubjectManagement':
+        return <SubjectManagement />;
       default:
         return <MarksList />;
     }
@@ -35,62 +42,18 @@ const TeacherDashBoard: React.FC = () => {
       <aside className="w-64 bg-blue-800 text-white flex flex-col p-6">
         <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
         <ul className="space-y-4">
-          <li
-            className={`cursor-pointer p-2 rounded-lg ${
-              activePage === 'MarksList' ? 'bg-blue-600' : 'hover:bg-blue-700'
-            }`}
-            onClick={() => setActivePage('MarksList')}
-          >
-            Marks List
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg ${
-              activePage === 'StudentManagement' ? 'bg-blue-600' : 'hover:bg-blue-700'
-            }`}
-            onClick={() => setActivePage('StudentManagement')}
-          >
-            Student Management
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg ${
-              activePage === 'PerformanceByStream' ? 'bg-blue-600' : 'hover:bg-blue-700'
-            }`}
-            onClick={() => setActivePage('PerformanceByStream')}
-          >
-            Performance by Stream
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg ${
-              activePage === 'PerformanceBySubject' ? 'bg-blue-600' : 'hover:bg-blue-700'
-            }`}
-            onClick={() => setActivePage('PerformanceBySubject')}
-          >
-            Performance by Subject
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg ${
-              activePage === 'ExamManagement' ? 'bg-blue-600' : 'hover:bg-blue-700'
-            }`}
-            onClick={() => setActivePage('ExamManagement')}
-          >
-            Exam Management
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg ${
-              activePage === 'PerformanceByStream' ? 'bg-blue-600' : 'hover:bg-blue-700'
-            }`}
-            onClick={() => setActivePage('PerformanceByStream')}
-          >
-            Performance by Stream
-          </li>
-          <li
-            className={`cursor-pointer p-2 rounded-lg ${
-              activePage === 'SubjectManagement' ? 'bg-blue-600' : 'hover:bg-blue-700'
-            }`}
-            onClick={() => setActivePage('SubjectManagement')}
-          >
-            Subject Management
-          </li>
+          {menuItems.map((item) => (
+            <li
+              key={item.id}
+              role="button"
+              className={`cursor-pointer p-2 rounded-lg ${
+                activePage === item.id ? 'bg-blue-600' : 'hover:bg-blue-700'
+              }`}
+              onClick={() => setActivePage(item.id)}
+            >
+              {item.label}
+            </li>
+          ))}
         </ul>
       </aside>
 

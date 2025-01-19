@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
+// Import API functions
 import { SubjectDTO } from '../types/SubjectDTO';
-import { createSubject, deleteSubject, getAllSubjects, updateSubject } from '../api/subjectApi';
-
-
+import axios from 'axios';
+const API_URL = 'http://localhost:8080/api/subjects'; // Update this URL to match your backend
 const SubjectManagement: React.FC = () => {
   const [subjects, setSubjects] = useState<SubjectDTO[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -12,33 +12,76 @@ const SubjectManagement: React.FC = () => {
     stream: '',
   });
   const [editMode, setEditMode] = useState<boolean>(false);
-
+  const getAllSubjects = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+      throw error;
+    }
+  };
+  const createSubject = async (subject: SubjectDTO) => {
+    try {
+      const response = await axios.post(API_URL, subject);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating subject:', error);
+      throw error;
+    }
+  };
+  const updateSubject = async (id: number, subject: SubjectDTO) => {
+    try {
+      const response = await axios.put(`${API_URL}/${id}`, subject);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating subject:', error);
+      throw error;
+    }
+  };
+  const deleteSubject = async (id: number) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+    } catch (error) {
+      console.error('Error deleting subject:', error);
+      throw error;
+    }
+  };
   useEffect(() => {
     const fetchSubjects = async () => {
-      const data = await getAllSubjects();
-      setSubjects(data);
-      setLoading(false);
+      try {
+        const data = await getAllSubjects();
+        setSubjects(data);
+      } catch (error) {
+        console.error('Failed to fetch subjects:', error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchSubjects();
   }, []);
 
-  const handleCreateSubject = async () => {
+  const handleCreateOrUpdateSubject = async () => {
     if (!newSubject.name || !newSubject.stream) {
       alert('Please fill all fields!');
       return;
     }
 
-    if (editMode) {
-      const updated = await updateSubject(newSubject.id, newSubject);
-      setSubjects(subjects.map((subject) => (subject.id === updated.id ? updated : subject)));
-      setEditMode(false);
-    } else {
-      const created = await createSubject(newSubject);
-      setSubjects([...subjects, created]);
-    }
+    try {
+      if (editMode) {
+        const updated = await updateSubject(newSubject.id, newSubject);
+        setSubjects(subjects.map((subject) => (subject.id === updated.id ? updated : subject)));
+        setEditMode(false);
+      } else {
+        const created = await createSubject(newSubject);
+        setSubjects([...subjects, created]);
+      }
 
-    setNewSubject({ id: 0, name: '', stream: '' });
+      setNewSubject({ id: 0, name: '', stream: '' });
+    } catch (error) {
+      alert('Failed to save subject!');
+    }
   };
 
   const handleEditSubject = (subject: SubjectDTO) => {
@@ -47,8 +90,12 @@ const SubjectManagement: React.FC = () => {
   };
 
   const handleDeleteSubject = async (id: number) => {
-    await deleteSubject(id);
-    setSubjects(subjects.filter((subject) => subject.id !== id));
+    try {
+      await deleteSubject(id);
+      setSubjects(subjects.filter((subject) => subject.id !== id));
+    } catch (error) {
+      alert('Failed to delete subject!');
+    }
   };
 
   if (loading) return <div>Loading...</div>;
@@ -76,7 +123,7 @@ const SubjectManagement: React.FC = () => {
             className="border rounded-lg p-2"
           />
           <button
-            onClick={handleCreateSubject}
+            onClick={handleCreateOrUpdateSubject}
             className="bg-blue-500 text-white rounded-lg px-4 py-2"
           >
             {editMode ? 'Update Subject' : 'Add Subject'}

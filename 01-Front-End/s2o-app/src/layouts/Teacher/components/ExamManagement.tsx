@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ExamDTO } from '../types/ExamDTO';
-import { createExam, deleteExam, getAllExams } from '../api/examApi';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:8080/api/exams'; // Update this to match your backend URL
 
 
 const ExamManagement: React.FC = () => {
@@ -14,9 +16,14 @@ const ExamManagement: React.FC = () => {
 
   useEffect(() => {
     const fetchExams = async () => {
-      const data = await getAllExams();
-      setExams(data);
-      setLoading(false);
+      try {
+        const data = await getAllExams();
+        setExams(data);
+      } catch (error) {
+        alert('Failed to fetch exams!');
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchExams();
@@ -28,18 +35,51 @@ const ExamManagement: React.FC = () => {
       return;
     }
 
-    const created = await createExam(newExam);
-    setExams([...exams, created]);
-    setNewExam({ id: 0, name: '', date: '' });
+    try {
+      const createdExam = await createExam(newExam);
+      setExams([...exams, createdExam]);
+      setNewExam({ id: 0, name: '', date: '' });
+    } catch (error) {
+      alert('Failed to create exam!');
+    }
   };
 
   const handleDeleteExam = async (id: number) => {
-    await deleteExam(id);
-    setExams(exams.filter((exam) => exam.id !== id));
+    try {
+      await deleteExam(id);
+      setExams(exams.filter((exam) => exam.id !== id));
+    } catch (error) {
+      alert('Failed to delete exam!');
+    }
   };
-
+  const getAllExams = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching exams:', error);
+      throw error;
+    }
+  };
   if (loading) return <div>Loading...</div>;
 
+  const createExam = async (exam: ExamDTO) => {
+    try {
+      const response = await axios.post(API_URL, exam);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating exam:', error);
+      throw error;
+    }
+  };
+  const deleteExam = async (id: number) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+    } catch (error) {
+      console.error('Error deleting exam:', error);
+      throw error;
+    }
+  };
   return (
     <div className="bg-white shadow-md rounded-lg p-6">
       <h1 className="text-2xl font-bold mb-4">Exam Management</h1>
