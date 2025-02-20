@@ -80,10 +80,9 @@ public class AuthController {
 
         // Assign default role (fetch from database if possible)
         Role defaultRole = roleRepository.findByAuthority("ROLE_USER");
-        newUser.setRoles(Collections.singleton(defaultRole));  // Assign the default role
-
-        // Save the user to the database
+        newUser.setRoles(Collections.singleton(defaultRole));
         userRepository.save(newUser);
+
 
         // Return success response
         return ResponseEntity.ok("User registered successfully.");

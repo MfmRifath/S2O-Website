@@ -19,7 +19,8 @@ public class Role implements GrantedAuthority {
     private Long id;
 
     private String authority;
-
+    @ManyToMany(mappedBy = "roles") // "roles" is the field name in the User entity
+    private Set<User> users;
     @Override
     public String getAuthority() {
         return authority;

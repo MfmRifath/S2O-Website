@@ -1,8 +1,12 @@
 package com.S2O.webapp.RequesModal;
 
+import lombok.Data;
+
+@Data
 public class SignUpRequest {
     private String username;
     private String email;
+    private String role;
     private String password;
     private String confirmPassword;  // Confirm password for validation
 

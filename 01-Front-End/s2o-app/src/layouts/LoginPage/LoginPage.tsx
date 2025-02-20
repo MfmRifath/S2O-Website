@@ -12,25 +12,27 @@ import { login } from "./AuthenticationService";
 
 const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-    const handleSubmit = async (event: { preventDefault: () => void }) => {
-      event.preventDefault();
-      setError(''); // Clear previous errors
-      try {
-        await login(username, password);
-        window.location.href = '/home';
-      } catch (err: any) {
-        if (err.response?.status === 401) {
-          setError('Invalid username or password');
-        } else if (err.response?.status === 500) {
-          setError('Internal server error. Please try again later.');
-        } else {
-          setError('An unexpected error occurred');
-        }
+  const handleSubmit = async (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    setError(''); // Clear previous errors
+
+    try {
+      await login(username, password);
+      window.location.href = '/home';
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        setError('Invalid username or password');
+      } else if (err.response?.status === 500) {
+        setError('Internal server error. Please try again later.');
+      } else {
+        setError('An unexpected error occurred');
       }
-    };
+    }
+  };
+
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600"
@@ -46,23 +48,29 @@ const LoginPage: React.FC = () => {
           Log In
         </h2>
 
-        
+        {/* Display Error Message */}
+        {error && (
+          <p className="text-red-500 text-center bg-red-100 border border-red-400 px-3 py-2 rounded-md mb-4">
+            {error}
+          </p>
+        )}
+
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
-              htmlFor="email"
+              htmlFor="username"
               className="block text-sm font-semibold text-gray-700"
             >
               User Name
             </label>
             <input
               type="text"
-              id="email"
+              id="username"
               placeholder="Enter your User Name"
               className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
               onChange={(e) => setUsername(e.target.value)}
-                    required
+              required
             />
           </div>
           <div className="mb-4">
@@ -78,10 +86,9 @@ const LoginPage: React.FC = () => {
               placeholder="Enter your password"
               className="w-full mt-1 px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
               onChange={(e) => setPassword(e.target.value)}
-                    required
+              required
             />
           </div>
-
 
           <button
             type="submit"
