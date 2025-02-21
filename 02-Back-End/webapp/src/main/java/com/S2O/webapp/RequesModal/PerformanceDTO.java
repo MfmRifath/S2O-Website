@@ -14,4 +14,5 @@ public class PerformanceDTO {
     private double marks;
     private double maxMarks;
     private double percentage;
+    private String year; // Top-level property for the student's year
 }

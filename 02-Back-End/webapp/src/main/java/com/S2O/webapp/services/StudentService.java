@@ -38,6 +38,7 @@ public class StudentService {
         student.setName(studentDTO.getName());
         student.setStream(studentDTO.getStream());
         student.setYear(studentDTO.getYear());
+        student.setNic(studentDTO.getNic());
         Student saved = studentRepository.save(student);
         return convertToDTO(saved);
     }

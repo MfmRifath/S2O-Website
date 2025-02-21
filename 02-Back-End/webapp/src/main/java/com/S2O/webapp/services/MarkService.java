@@ -21,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -141,9 +138,9 @@ public class MarkService {
 
                 // Create MarkDTO
                 MarkDTO markDTO = new MarkDTO();
-                markDTO.setStudentDTO(new StudentDTO(student.getId(), student.getName(), student.getStream(), student.getYear(), null));
+                markDTO.setStudentDTO(new StudentDTO(student.getId(), student.getName(), student.getStream(), student.getYear(), null,student.getNic()));
                 markDTO.setSubjectDTO(new SubjectDTO(subject.getId(), subject.getName(), null));
-                markDTO.setExamDTO(new ExamDTO(exam.getId(), exam.getName(), null));
+                markDTO.setExamDTO(new ExamDTO(exam.getId(), exam.getName(), null) );
                 markDTO.setMarks(markValue);
                 markDTO.setMaxMarks(100);
 
@@ -266,37 +263,7 @@ public class MarkService {
         return mark;
     }
     // Convert Mark entity to DTO
-    private MarkDTO convertToDTO(Mark mark) {
-        MarkDTO dto = new MarkDTO();
-        dto.setId(mark.getId());
-        dto.setMarks(mark.getMarks());
-        dto.setMaxMarks(mark.getMaxMarks());
 
-        if (mark.getStudent() != null) {
-            StudentDTO studentDTO = new StudentDTO();
-            studentDTO.setId(mark.getStudent().getId());
-            studentDTO.setName(mark.getStudent().getName());
-            studentDTO.setStream(mark.getStudent().getStream());
-            studentDTO.setYear(mark.getStudent().getYear());
-            dto.setStudentDTO(studentDTO);
-        }
-
-        if (mark.getSubject() != null) {
-            SubjectDTO subjectDTO = new SubjectDTO();
-            subjectDTO.setId(mark.getSubject().getId());
-            subjectDTO.setName(mark.getSubject().getName());
-            dto.setSubjectDTO(subjectDTO);
-        }
-
-        if (mark.getExam() != null) {
-            ExamDTO examDTO = new ExamDTO();
-            examDTO.setId(mark.getExam().getId());
-            examDTO.setName(mark.getExam().getName());
-            dto.setExamDTO(examDTO);
-        }
-
-        return dto;
-    }
 
     // Map Mark entity to PerformanceDTO
     private PerformanceDTO mapToPerformanceDTO(Mark mark) {
@@ -390,5 +357,322 @@ public class MarkService {
 
         // Return distribution as a list
         return List.of(range0_20, range21_40, range41_60, range61_80, range81_100);
+    }
+    // Inside MarkService
+    // In your MarkService class
+
+    public Map<String, Map<String, Map<String, List<LeaderBoardDTO>>>> getYearExamSubjectWiseLeaderBoard() {
+        // Retrieve all Mark entities and convert them to MarkDTO objects.
+        List<Mark> markEntities = markRepository.findAll();
+        List<MarkDTO> allMarks = markEntities.stream()
+                .map(this::convertToMarkDTO)
+                .collect(Collectors.toList());
+
+        // Group marks by Year (from StudentDTO)
+        Map<String, List<MarkDTO>> marksByYear = allMarks.stream()
+                .collect(Collectors.groupingBy(
+                        mark -> Optional.ofNullable(mark.getStudentDTO().getYear()).orElse("Unknown Year")
+                ));
+
+        // Final structure: Year -> Exam -> Subject -> List<LeaderBoardDTO>
+        Map<String, Map<String, Map<String, List<LeaderBoardDTO>>>> leaderBoard = new HashMap<>();
+
+        marksByYear.forEach((year, marksForYear) -> {
+            // Group marks by Exam (from ExamDTO)
+            Map<String, List<MarkDTO>> marksByExam = marksForYear.stream()
+                    .collect(Collectors.groupingBy(
+                            mark -> Optional.ofNullable(mark.getExamDTO().getName()).orElse("Unknown Exam")
+                    ));
+            Map<String, Map<String, List<LeaderBoardDTO>>> examMap = new HashMap<>();
+
+            marksByExam.forEach((exam, marksForExam) -> {
+                // Group marks by Subject (from SubjectDTO)
+                Map<String, List<MarkDTO>> marksBySubject = marksForExam.stream()
+                        .collect(Collectors.groupingBy(
+                                mark -> Optional.ofNullable(mark.getSubjectDTO().getName()).orElse("Unknown Subject")
+                        ));
+                Map<String, List<LeaderBoardDTO>> subjectMap = new HashMap<>();
+
+                marksBySubject.forEach((subject, marksForSubject) -> {
+                    // Aggregate total marks per student for this subject, exam, and year
+                    Map<Long, Double> studentTotalMarks = marksForSubject.stream()
+                            .collect(Collectors.groupingBy(
+                                    mark -> mark.getStudentDTO().getId(),
+                                    Collectors.summingDouble(MarkDTO::getMarks)
+                            ));
+
+                    // Build the leaderboard list for this group
+                    List<LeaderBoardDTO> leaderboardList = studentTotalMarks.entrySet().stream()
+                            .map(entry -> {
+                                LeaderBoardDTO dto = new LeaderBoardDTO();
+                                dto.setStudentId(entry.getKey());
+                                // Retrieve the student name from one mark in this group
+                                String studentName = marksForSubject.stream()
+                                        .filter(mark -> mark.getStudentDTO().getId().equals(entry.getKey()))
+                                        .findFirst()
+                                        .map(mark -> mark.getStudentDTO().getName())
+                                        .orElse("Unknown");
+                                dto.setStudentName(studentName);
+                                dto.setTotalMarks(entry.getValue());
+                                return dto;
+                            })
+                            .sorted(Comparator.comparingDouble(LeaderBoardDTO::getTotalMarks).reversed())
+                            .collect(Collectors.toList());
+
+                    // Assign ranking numbers for this subject group
+                    int rank = 1;
+                    for (LeaderBoardDTO dto : leaderboardList) {
+                        dto.setRank(rank++);
+                    }
+                    subjectMap.put(subject, leaderboardList);
+                });
+                examMap.put(exam, subjectMap);
+            });
+            leaderBoard.put(year, examMap);
+        });
+
+        return leaderBoard;
+    }
+    /**
+     * Converts a Mark entity to a MarkDTO.
+     */
+    private MarkDTO convertToMarkDTO(Mark mark) {
+        MarkDTO dto = new MarkDTO();
+        dto.setId(mark.getId());
+        dto.setMarks(mark.getMarks());
+        dto.setMaxMarks(mark.getMaxMarks());
+
+        // Ensure Student is not null and its fields are properly loaded
+        if (mark.getStudent() != null) {
+            StudentDTO studentDTO = new StudentDTO();
+            studentDTO.setId(mark.getStudent().getId());
+            studentDTO.setName(mark.getStudent().getName());
+            studentDTO.setStream(mark.getStudent().getStream());
+            studentDTO.setYear(mark.getStudent().getYear());
+            dto.setStudentDTO(studentDTO);
+        } else {
+            // Log or handle the case where student data is missing
+            // e.g., dto.setStudentDTO(new StudentDTO());
+        }
+
+        // Similarly convert Subject and Exam details...
+        SubjectDTO subjectDTO = new SubjectDTO();
+        subjectDTO.setId(mark.getSubject().getId());
+        subjectDTO.setName(mark.getSubject().getName());
+        dto.setSubjectDTO(subjectDTO);
+
+        ExamDTO examDTO = new ExamDTO();
+        examDTO.setId(mark.getExam().getId());
+        examDTO.setName(mark.getExam().getName());
+        examDTO.setDate(mark.getExam().getDate());
+        dto.setExamDTO(examDTO);
+
+        return dto;
+    }
+    public Map<String, Map<String, List<LeaderBoardDTO>>> getTotalMarksLeaderBoardByZScore() {
+        // Retrieve all Mark entities and convert them to MarkDTO objects.
+        List<Mark> markEntities = markRepository.findAll();
+        List<MarkDTO> allMarks = markEntities.stream()
+                .map(this::convertToMarkDTO)
+                .collect(Collectors.toList());
+
+        // Group marks by Year (from StudentDTO) and then by Exam (from ExamDTO).
+        Map<String, Map<String, List<MarkDTO>>> groupedData = allMarks.stream()
+                .collect(Collectors.groupingBy(
+                        mark -> Optional.ofNullable(mark.getStudentDTO().getYear()).orElse("Unknown Year"),
+                        Collectors.groupingBy(
+                                mark -> Optional.ofNullable(mark.getExamDTO().getName()).orElse("Unknown Exam")
+                        )
+                ));
+
+        // Final structure: Year -> Exam -> List<LeaderBoardDTO>
+        Map<String, Map<String, List<LeaderBoardDTO>>> leaderboard = new HashMap<>();
+
+        // Process each (year, exam) group.
+        groupedData.forEach((year, examMap) -> {
+            Map<String, List<LeaderBoardDTO>> examLeaderboards = new HashMap<>();
+
+            examMap.forEach((exam, marksList) -> {
+                // Aggregate total marks per student for the given (year, exam) group.
+                Map<Long, Double> studentTotalMarks = marksList.stream()
+                        .collect(Collectors.groupingBy(
+                                mark -> mark.getStudentDTO().getId(),
+                                Collectors.summingDouble(MarkDTO::getMarks)
+                        ));
+
+                // Map to store student names (assuming at least one mark exists per student).
+                Map<Long, String> studentNames = marksList.stream()
+                        .collect(Collectors.toMap(
+                                mark -> mark.getStudentDTO().getId(),
+                                mark -> mark.getStudentDTO().getName(),
+                                (n1, n2) -> n1
+                        ));
+
+                // Collect all total marks into a list for computing the mean and standard deviation.
+                List<Double> totals = new ArrayList<>(studentTotalMarks.values());
+                double mean = totals.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+
+                // Compute variance, then standard deviation.
+                double variance = totals.stream()
+                        .mapToDouble(total -> Math.pow(total - mean, 2))
+                        .average().orElse(0.0);
+                double stdDev = Math.sqrt(variance);
+
+                // Build the leaderboard list by computing the Z‑score for each student.
+                List<LeaderBoardDTO> lbList = studentTotalMarks.entrySet().stream()
+                        .map(entry -> {
+                            LeaderBoardDTO dto = new LeaderBoardDTO();
+                            dto.setStudentId(entry.getKey());
+                            dto.setStudentName(studentNames.get(entry.getKey()));
+                            dto.setTotalMarks(entry.getValue());
+                            // Compute Z‑score. If stdDev is zero, avoid division by zero.
+                            double zScore = stdDev == 0 ? 0 : (entry.getValue() - mean) / stdDev;
+                            dto.setZScore(zScore);
+                            return dto;
+                        })
+                        .sorted(Comparator.comparingDouble(LeaderBoardDTO::getZScore).reversed())
+                        .collect(Collectors.toList());
+
+                // Assign ranking numbers based on the sorted order.
+                int rank = 1;
+                for (LeaderBoardDTO dto : lbList) {
+                    dto.setRank(rank++);
+                }
+
+                examLeaderboards.put(exam, lbList);
+            });
+
+            leaderboard.put(year, examLeaderboards);
+        });
+
+        return leaderboard;
+    }
+    // A conversion method to convert Mark entities to PerformanceDTO
+    private PerformanceDTO convertToPerformanceDTO(Mark mark) {
+        PerformanceDTO dto = new PerformanceDTO();
+        dto.setStudentName(mark.getStudent().getName());
+        dto.setSubjectName(mark.getSubject().getName());
+        dto.setExamName(mark.getExam().getName());
+        dto.setPercentage(calculatePercentage(mark)); // Implement calculatePercentage as needed.
+        // Set additional fields, including stream and year if desired.
+        dto.setStream(mark.getStudent().getStream());
+        dto.setYear(mark.getStudent().getYear());
+        return dto;
+    }
+
+    // Example method to compute a percentage (replace with your actual logic)
+    private double calculatePercentage(Mark mark) {
+        // For example: (marks obtained / max marks) * 100
+        return (mark.getMarks() / mark.getMaxMarks()) * 100;
+    }
+
+    // Implement getPerformanceByStream method
+    public Map<String, List<PerformanceDTO>> getPerformanceByStream() {
+        // Retrieve all marks from the repository
+        List<Mark> marks = markRepository.findAll();
+        // Convert to DTOs
+        List<PerformanceDTO> dtos = marks.stream()
+                .map(this::convertToPerformanceDTO)
+                .collect(Collectors.toList());
+        // Group by stream (assuming PerformanceDTO has a getStream() method)
+        return dtos.stream()
+                .collect(Collectors.groupingBy(PerformanceDTO::getStream));
+    }
+    public List<MarkDTO> getExamMarksOfStudent(String nic, Long examId) {
+        // Find the student by NIC.
+        Student student = studentRepository.findByNic(nic)
+                .orElseThrow(() -> new EntityNotFoundException("Student not found with NIC: " + nic));
+
+        // Retrieve marks for this student for the given exam.
+        List<Mark> marks = markRepository.findByStudent_IdAndExam_Id(student.getId(), examId);
+        if (marks.isEmpty()) {
+            throw new EntityNotFoundException("No marks found for NIC: " + nic + " and exam ID: " + examId);
+        }
+
+        // Compute total marks for this student.
+        double studentTotal = marks.stream()
+                .mapToDouble(Mark::getMarks)
+                .sum();
+
+        // Retrieve all marks for this exam (across all students).
+        List<Mark> allMarksForExam = markRepository.findByExam_Id(examId);
+        if (allMarksForExam.isEmpty()) {
+            throw new EntityNotFoundException("No marks found for exam ID: " + examId);
+        }
+
+        // Group marks by student ID and compute the total marks per student.
+        Map<Long, Double> totalsByStudent = allMarksForExam.stream()
+                .collect(Collectors.groupingBy(
+                        mark -> mark.getStudent().getId(),
+                        Collectors.summingDouble(Mark::getMarks)
+                ));
+
+        // Determine the rank by sorting totals in descending order.
+        List<Double> sortedTotals = totalsByStudent.values().stream()
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
+        int rank = sortedTotals.indexOf(studentTotal) + 1;
+
+        // Compute mean and standard deviation for totals.
+        double mean = totalsByStudent.values().stream()
+                .mapToDouble(Double::doubleValue)
+                .average().orElse(0.0);
+        double variance = totalsByStudent.values().stream()
+                .mapToDouble(total -> Math.pow(total - mean, 2))
+                .average().orElse(0.0);
+        double stdDev = Math.sqrt(variance);
+        double zScore = stdDev == 0 ? 0 : (studentTotal - mean) / stdDev;
+
+        // Convert each Mark to its DTO and set rank and zScore.
+        List<MarkDTO> markDTOs = marks.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+
+        // Set the computed rank and zScore in each DTO.
+        markDTOs.forEach(dto -> {
+            dto.setRank(rank);
+            dto.setZScore(zScore);
+        });
+
+        return markDTOs;
+    }
+
+    private MarkDTO convertToDTO(Mark mark) {
+        MarkDTO dto = new MarkDTO();
+        dto.setId(mark.getId());
+        dto.setMarks(mark.getMarks());
+        dto.setMaxMarks(mark.getMaxMarks());
+
+        // Convert Student details using the provided StudentDTO constructor.
+        if (mark.getStudent() != null) {
+            dto.setStudentDTO(new StudentDTO(
+                    mark.getStudent().getId(),
+                    mark.getStudent().getName(),
+                    mark.getStudent().getStream(),
+                    mark.getStudent().getYear(),
+                    new ArrayList<>(),  // Pass an empty list for marks (or adjust as needed)
+                    mark.getStudent().getNic()
+            ));
+        }
+
+        // Convert Subject details.
+        if (mark.getSubject() != null) {
+            dto.setSubjectDTO(new SubjectDTO(
+                    mark.getSubject().getId(),
+                    mark.getSubject().getName(),
+                    mark.getSubject().getStream()
+            ));
+        }
+
+        // Convert Exam details.
+        if (mark.getExam() != null) {
+            dto.setExamDTO(new ExamDTO(
+                    mark.getExam().getId(),
+                    mark.getExam().getName(),
+                    mark.getExam().getDate()
+            ));
+        }
+
+        return dto;
     }
 }

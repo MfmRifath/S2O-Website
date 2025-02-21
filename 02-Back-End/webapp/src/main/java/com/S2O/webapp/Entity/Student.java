@@ -19,6 +19,9 @@ public class Student {
     private String name;
     private String stream;
     private String year;
+    // New NIC field
+    @Column(unique = true, nullable = false)
+    private String nic;
 
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Mark> marks;

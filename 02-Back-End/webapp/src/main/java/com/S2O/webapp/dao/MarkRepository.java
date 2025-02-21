@@ -23,4 +23,7 @@ public interface MarkRepository extends JpaRepository<Mark, Long> {
 
     // Get marks distribution for a specific subject, exam, and year
     List<Mark> findBySubject_NameAndExam_NameAndStudent_Year(String subjectName, String examName, String year);
+    // Retrieve all marks for a given student ID and exam ID.
+    List<Mark> findByStudent_IdAndExam_Id(Long studentId, Long examId);
+    List<Mark> findByExam_Id(Long examId);
 }

@@ -24,6 +24,7 @@ const MarksDistribution: React.FC = () => {
   const [data, setData] = useState<MarksDistribution[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [selectedSubject, setSelectedSubject] = useState<string>('');
   const [selectedExam, setSelectedExam] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
@@ -50,12 +51,22 @@ const MarksDistribution: React.FC = () => {
     fetchData();
   }, []);
 
+  // Deduplicate subjects
   const subjects = Array.from(new Set(data.map((item) => item.subject)));
-  const exams = data
-    .filter((item) => item.subject === selectedSubject)
-    .map((item) => item.exam);
+
+  // Deduplicate exams, but only for the selected subject
+  const exams = Array.from(
+    new Set(
+      data
+        .filter((item) => item.subject === selectedSubject)
+        .map((item) => item.exam)
+    )
+  );
+
+  // Deduplicate years
   const years = Array.from(new Set(data.map((item) => item.year)));
 
+  // Find distribution for the selected filters
   const distribution = data.find(
     (item) =>
       item.subject === selectedSubject &&
@@ -63,11 +74,14 @@ const MarksDistribution: React.FC = () => {
       item.year === selectedYear
   )?.distribution;
 
+  // Prepare chart data
   const chartData = {
     labels: ['0-20', '21-40', '41-60', '61-80', '81-100'],
     datasets: [
       {
-        label: `Marks Distribution for ${selectedSubject} - ${selectedExam} - Year ${selectedYear}`,
+        label: `Marks Distribution for ${selectedSubject || '...'} - ${
+          selectedExam || '...'
+        } - Year ${selectedYear || '...'}`,
         data: distribution || [],
         backgroundColor: 'rgba(75, 192, 192, 0.6)',
         borderColor: 'rgba(75, 192, 192, 1)',
@@ -76,6 +90,7 @@ const MarksDistribution: React.FC = () => {
     ],
   };
 
+  // Chart options
   const chartOptions = {
     responsive: true,
     plugins: {
@@ -91,6 +106,12 @@ const MarksDistribution: React.FC = () => {
       duration: 1000,
       easing: 'easeOutBounce' as const,
     },
+  };
+
+  const handleResetFilters = () => {
+    setSelectedSubject('');
+    setSelectedExam('');
+    setSelectedYear('');
   };
 
   if (loading) {
@@ -112,67 +133,107 @@ const MarksDistribution: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-4">
-      <h1 className="text-2xl font-bold text-center mb-6">
+    <div className="max-w-5xl mx-auto mt-10 px-4">
+      <h1 className="text-3xl font-bold text-center mb-8">
         Marks Distribution by Subject, Exam, and Year
       </h1>
 
-      <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-6">
-        {/* Subject Dropdown */}
-        <select
-          value={selectedSubject}
-          onChange={(e) => setSelectedSubject(e.target.value)}
-          className="p-2 border rounded-md w-full md:w-1/3"
-        >
-          <option value="">Select Subject</option>
-          {subjects.map((subject) => (
-            <option key={subject} value={subject}>
-              {subject}
-            </option>
-          ))}
-        </select>
+      {/* Filter Section */}
+      <div className="bg-white shadow-md rounded-lg p-6 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+          {/* Subject Dropdown */}
+          <div className="flex flex-col w-full md:w-1/4">
+            <label htmlFor="subjectSelect" className="mb-1 font-medium">
+              Subject
+            </label>
+            <select
+              id="subjectSelect"
+              value={selectedSubject}
+              onChange={(e) => {
+                setSelectedSubject(e.target.value);
+                setSelectedExam('');
+                setSelectedYear('');
+              }}
+              className="p-2 border rounded-md"
+            >
+              <option value="">-- Select Subject --</option>
+              {subjects.map((subject) => (
+                <option key={subject} value={subject}>
+                  {subject}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {/* Exam Dropdown */}
-        {selectedSubject && (
-          <select
-            value={selectedExam}
-            onChange={(e) => setSelectedExam(e.target.value)}
-            className="p-2 border rounded-md w-full md:w-1/3"
-          >
-            <option value="">Select Exam</option>
-            {exams.map((exam) => (
-              <option key={exam} value={exam}>
-                {exam}
-              </option>
-            ))}
-          </select>
-        )}
+          {/* Exam Dropdown */}
+          <div className="flex flex-col w-full md:w-1/4">
+            <label htmlFor="examSelect" className="mb-1 font-medium">
+              Exam
+            </label>
+            <select
+              id="examSelect"
+              value={selectedExam}
+              onChange={(e) => {
+                setSelectedExam(e.target.value);
+                setSelectedYear('');
+              }}
+              disabled={!selectedSubject}
+              className={`p-2 border rounded-md ${
+                !selectedSubject ? 'bg-gray-100 cursor-not-allowed' : ''
+              }`}
+            >
+              <option value="">-- Select Exam --</option>
+              {exams.map((exam) => (
+                <option key={exam} value={exam}>
+                  {exam}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {/* Year Dropdown */}
-        {selectedSubject && selectedExam && (
-          <select
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value)}
-            className="p-2 border rounded-md w-full md:w-1/3"
+          {/* Year Dropdown */}
+          <div className="flex flex-col w-full md:w-1/4">
+            <label htmlFor="yearSelect" className="mb-1 font-medium">
+              Year
+            </label>
+            <select
+              id="yearSelect"
+              value={selectedYear}
+              onChange={(e) => setSelectedYear(e.target.value)}
+              disabled={!selectedExam}
+              className={`p-2 border rounded-md ${
+                !selectedExam ? 'bg-gray-100 cursor-not-allowed' : ''
+              }`}
+            >
+              <option value="">-- Select Year --</option>
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Reset Button */}
+          <button
+            onClick={handleResetFilters}
+            className="bg-gray-500 text-white px-4 py-2 rounded-md mt-4 md:mt-8 hover:bg-gray-600 transition-colors"
           >
-            <option value="">Select Year</option>
-            {years.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
-        )}
+            Reset Filters
+          </button>
+        </div>
       </div>
 
-      {/* Bar Chart */}
-      {distribution ? (
-        <Bar data={chartData} options={chartOptions} />
-      ) : (
-        <p className="text-center text-gray-500">
-          Select all filters to view the distribution chart.
-        </p>
-      )}
+      {/* Chart Section */}
+      <div className="bg-white shadow-md rounded-lg p-6">
+        {distribution ? (
+          <Bar data={chartData} options={chartOptions} />
+        ) : (
+          <p className="text-center text-gray-500">
+            Select all filters to view the distribution chart.
+          </p>
+        )}
+      </div>
     </div>
   );
 };

@@ -17,4 +17,7 @@ public class MarkDTO {
     private ExamDTO examDTO;
     private double marks;
     private double maxMarks;
+    // New fields for rank and Z-score
+    private Integer rank;
+    private Double zScore;
 }

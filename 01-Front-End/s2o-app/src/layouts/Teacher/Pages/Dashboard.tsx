@@ -5,6 +5,8 @@ import PerformanceBySubject from '../components/PerfomenceBySubject';
 import StudentManagement from '../components/StudentManagement';
 import SubjectManagement from '../components/SubjectManagement';
 import ExamManagement from '../components/ExamManagement';
+import LeaderBoard from '../components/LeaderBoard';
+import TotalMarksLeaderBoard from '../components/TotalMarksLeaderBoard';
 
 const TeacherDashBoard: React.FC = () => {
   const [activePage, setActivePage] = React.useState<string>('MarksList');
@@ -16,6 +18,8 @@ const TeacherDashBoard: React.FC = () => {
     { id: 'PerformanceBySubject', label: 'Performance by Subject' },
     { id: 'ExamManagement', label: 'Exam Management' },
     { id: 'SubjectManagement', label: 'Subject Management' },
+    { id: 'LeaderBoard', label: 'LeaderBoard' },
+    { id: 'TotalMarksLeaderBoard', label: 'TotalMarksLeaderBoard' },
   ];
 
   const renderPage = () => {
@@ -32,6 +36,10 @@ const TeacherDashBoard: React.FC = () => {
         return <ExamManagement />;
       case 'SubjectManagement':
         return <SubjectManagement />;
+      case 'LeaderBoard':
+        return <LeaderBoard />;
+        case 'TotalMarksLeaderBoard':
+        return <TotalMarksLeaderBoard />;
       default:
         return <MarksList />;
     }

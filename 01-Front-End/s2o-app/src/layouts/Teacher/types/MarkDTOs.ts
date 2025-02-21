@@ -23,6 +23,7 @@ export interface MarkDTO {
     marks: number;
     maxMarks: number;
     percentage: number;
+    year: string; // Make sure this is set, e.g. from student.year
   }
   
   export interface SubjectPerformanceDTO {

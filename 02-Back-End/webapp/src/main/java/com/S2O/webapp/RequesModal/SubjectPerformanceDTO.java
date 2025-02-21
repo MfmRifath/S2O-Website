@@ -9,4 +9,5 @@ public class SubjectPerformanceDTO {
     private double totalMarksObtained;
     private double totalMaxMarks;
     private double averagePercentage;
+
 }

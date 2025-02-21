@@ -1,8 +1,10 @@
 package com.S2O.webapp.controller;
 
+import com.S2O.webapp.RequesModal.LeaderBoardDTO;
 import com.S2O.webapp.RequesModal.MarkDTO;
 import com.S2O.webapp.RequesModal.PerformanceDTO;
 import com.S2O.webapp.RequesModal.SubjectPerformanceDTO;
+import com.S2O.webapp.error.EntityNotFoundException;
 import com.S2O.webapp.services.MarkService;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -15,7 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -106,12 +107,6 @@ public class MarkController {
     /**
      * Get performance grouped by stream.
      */
-    @GetMapping("/performance/stream")
-    public ResponseEntity<Map<String, List<PerformanceDTO>>> getPerformanceByStream() {
-        Map<String, List<PerformanceDTO>> performanceByStream = markService.calculatePerformanceByStream();
-        return ResponseEntity.ok(performanceByStream);
-    }
-
     /**
      * Get overall performance by subject.
      */
@@ -165,5 +160,33 @@ public class MarkController {
     public ResponseEntity<List<Map<String, Object>>> getMarksDistribution() {
         List<Map<String, Object>> distributions = markService.getMarksDistributionBySubjectExamAndYear();
         return ResponseEntity.ok(distributions);
+    }
+    @GetMapping("/leaderboard/subject-year")
+    public ResponseEntity<Map<String, Map<String, Map<String, List<LeaderBoardDTO>>>>> getSubjectYearWiseLeaderBoard() {
+        Map<String, Map<String, Map<String, List<LeaderBoardDTO>>>> leaderBoard = markService.getYearExamSubjectWiseLeaderBoard();
+        return ResponseEntity.ok(leaderBoard);
+    }
+    @GetMapping("/leaderboard/total-marks-zscore")
+    public ResponseEntity<Map<String, Map<String, List<LeaderBoardDTO>>>> getTotalMarksLeaderBoardByZScore() {
+        Map<String, Map<String, List<LeaderBoardDTO>>> leaderboard = markService.getTotalMarksLeaderBoardByZScore();
+        return ResponseEntity.ok(leaderboard);
+    }
+
+    @GetMapping("/performance/stream")
+    public ResponseEntity<Map<String, List<PerformanceDTO>>> getPerformanceByStream() {
+        Map<String, List<PerformanceDTO>> performanceByStream = markService.getPerformanceByStream();
+        return ResponseEntity.ok(performanceByStream);
+    }
+
+    @GetMapping("/result")
+    public ResponseEntity<List<MarkDTO>> getExamMarks(
+            @RequestParam String nic,
+            @RequestParam Long examId) {
+        try {
+            List<MarkDTO> examMarks = markService.getExamMarksOfStudent(nic, examId);
+            return ResponseEntity.ok(examMarks);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
