@@ -47,13 +47,14 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(
-            @RequestBody User user,
-            @RequestParam Set<String> roles // Accept roles as query parameters
-    ) {
-        // Encrypt the password before saving the user
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User savedUser = userService.saveUser(user, roles);
+    public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO) {
+        User userEntity = new User();
+        userEntity.setUsername(userDTO.getUsername());
+        userEntity.setEmail(userDTO.getEmail());
+        userEntity.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        // roles to set
+        Set<String> roles = new HashSet<>(userDTO.getRoles());
+        User savedUser = userService.saveUser(userEntity, roles);
         return ResponseEntity.ok(savedUser);
     }
 

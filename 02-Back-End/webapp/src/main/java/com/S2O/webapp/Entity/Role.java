@@ -1,6 +1,7 @@
 package com.S2O.webapp.Entity;
 
 import com.S2O.webapp.utility.RoleDeserializer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,8 +20,11 @@ public class Role implements GrantedAuthority {
     private Long id;
 
     private String authority;
-    @ManyToMany(mappedBy = "roles") // "roles" is the field name in the User entity
+
+    @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
     private Set<User> users;
+
     @Override
     public String getAuthority() {
         return authority;
