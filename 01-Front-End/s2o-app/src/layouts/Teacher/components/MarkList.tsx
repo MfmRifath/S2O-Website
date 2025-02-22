@@ -20,7 +20,7 @@ const MarksManagement: React.FC = () => {
     id: 0,
     marks: 0,
     maxMarks: 100,
-    studentDTO: { id: 0, name: '', stream: '', year: '', marks: [] },
+    studentDTO: { id: 0, name: '', nic:'', stream: '', year: '', marks: [] },
     subjectDTO: { id: 0, name: '', stream: '' },
     examDTO: { id: 0, name: '', date: '' },
   });
@@ -192,7 +192,7 @@ const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEl
       id: 0,
       marks: 0,
       maxMarks: 100,
-      studentDTO: { id: 0, name: '', stream: '', year: '', marks: [] },
+      studentDTO: { id: 0, name: '',nic:'', stream: '', year: '', marks: [] },
       subjectDTO: { id: 0, name: '', stream: '' },
       examDTO: { id: 0, name: '', date: '' },
     });
@@ -385,6 +385,7 @@ const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEl
           <tr>
             <th className="p-2">ID</th>
             <th className="p-2">Student</th>
+            <th className="p-2">NIC</th>
             <th className="p-2">Stream</th>
             <th className="p-2">Year</th>
             <th className="p-2">Subject</th>
@@ -402,6 +403,7 @@ const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectEl
             >
               <td className="p-2">{student.id}</td>
               <td className="p-2">{student.name}</td>
+              <td className="p-2">{student.nic}</td>
               <td className="p-2">{student.stream}</td>
               <td className="p-2">{student.year}</td>
               {student.marks.map((mark) => (

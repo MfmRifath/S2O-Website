@@ -67,10 +67,15 @@ public class UserController {
 
     // Get user by ID
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        return userService.getUserById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<?> getUserById(@PathVariable String id) {
+        try {
+            Long userId = Long.parseLong(id);
+            return userService.getUserById(userId)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body(new ApiError("Invalid user ID format", HttpStatus.BAD_REQUEST.value()));
+        }
     }
 
     // Delete user by ID
@@ -82,25 +87,21 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-        try {
-            // Map UserDTO to User entity
-            com.S2O.webapp.Entity.User updatedUser = new com.S2O.webapp.Entity.User();
-            updatedUser.setUsername(userDTO.getUsername());
-            updatedUser.setEmail(userDTO.getEmail());
-
-            // Encrypt the password before updating the user
-            if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
-                updatedUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-            } else {
-                updatedUser.setPassword(userDTO.getPassword()); // Keep the current password if not provided
-            }
-
-            // Update the user
-            com.S2O.webapp.Entity.User user = userService.updateUser(id, updatedUser, new HashSet<>(userDTO.getRoles()));
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        User existingUser = userService.findById(id);
+        if (existingUser == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiError("User not found", HttpStatus.NOT_FOUND.value()));
         }
+
+        existingUser.setUsername(userDTO.getUsername());
+        existingUser.setEmail(userDTO.getEmail());
+
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+
+        User updatedUser = userService.updateUser(id, existingUser, new HashSet<>(userDTO.getRoles()));
+        return ResponseEntity.ok(updatedUser);
     }
     @PutMapping("/{id}/change-password")
     public ResponseEntity<?> changePassword(

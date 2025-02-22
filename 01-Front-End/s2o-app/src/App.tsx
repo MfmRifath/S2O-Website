@@ -273,10 +273,11 @@ function App() {
         <Route
           path="/profile"
           element={
-            <PrivateRoute
-              element={< ProfilePage/>}
-              requiredRole={"ROLE_USER"}
-            />
+            <Layout>
+              <ProfilePage/>
+            </Layout>
+          
+          
           }
         />
         <Route

@@ -52,6 +52,7 @@ public class StudentService {
         StudentDTO dto = new StudentDTO();
         dto.setId(student.getId());
         dto.setName(student.getName());
+        dto.setNic(student.getNic());
         dto.setStream(student.getStream());
         dto.setYear(student.getYear());
 
@@ -67,6 +68,7 @@ public class StudentService {
                     StudentDTO studentDTO = new StudentDTO();
                     studentDTO.setId(mark.getStudent().getId());
                     studentDTO.setName(mark.getStudent().getName());
+                    studentDTO.setNic(mark.getStudent().getNic());
                     studentDTO.setStream(mark.getStudent().getStream());
                     studentDTO.setYear(mark.getStudent().getYear());
                     markDTO.setStudentDTO(studentDTO);

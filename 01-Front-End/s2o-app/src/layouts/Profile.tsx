@@ -1,246 +1,200 @@
-import React, { useEffect, useState } from "react";
-import {jwtDecode} from "jwt-decode";
-import axios from "axios";
-import { AiOutlineLogout } from "react-icons/ai";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useParams, useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
-const ProfilePage: React.FC = () => {
-  interface UserDetails {
-    userId: string;
-    username: string;
-    email: string;
-    bio?: string;
-    profilePicture?: string;
-  }
-
-  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState("overview");
-  const [passwords, setPasswords] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [updatedEmail, setUpdatedEmail] = useState("");
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+const ProfilePage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [roles, setRoles] = useState<string[]>([]);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    interface DecodedToken {
-      userId: string;
-    }
-
-    const token = localStorage.getItem("token");
-    if (token) {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
       try {
-        const decodedUser = jwtDecode<DecodedToken>(token);
-        axios
-          .get(`http://localhost:8080/api/user/${decodedUser.userId}`)
-          .then((res) => {
-            setUserDetails(res.data);
-            setUpdatedEmail(res.data.email);
-            setLoading(false);
-          })
-          .catch(() => setError("Failed to load user details."));
-      } catch {
-        setError("Invalid token.");
+        const decodedToken: any = jwtDecode(storedToken);
+        // If token is expired, remove and redirect
+        if (decodedToken.exp * 1000 < Date.now()) {
+          localStorage.removeItem('token');
+          navigate('/login');
+        } else {
+          // Store roles and user info from token
+          setRoles(decodedToken.roles || []);
+          setUsername(decodedToken.sub);
+          setUser({
+            userId: decodedToken.userId,
+            username: decodedToken.sub,
+            roles: decodedToken.roles,
+          });
+        }
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        localStorage.removeItem('token');
+        navigate('/login');
       }
     } else {
-      setError("No token found.");
+      navigate('/login');
     }
-  }, []);
+  }, [navigate]);
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPasswords({ ...passwords, [name]: value });
-  };
-
-  const handleEmailUpdate = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    axios
-      .put(`http://localhost:8080/api/user/${userDetails?.userId}`, {
-        email: updatedEmail,
-      })
-      .then(() => {
-        toast.success("Email updated successfully!");
-        setUserDetails((prev) => (prev ? { ...prev, email: updatedEmail } : prev));
-      })
-      .catch(() => toast.error("Failed to update email."));
-  };
-
-  const handleProfilePictureUpload = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!profilePicture) {
-      toast.error("Please select a profile picture.");
-      return;
+  useEffect(() => {
+    if (token && user?.userId) {
+      axios
+        .get(`/api/user/${user.userId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          setUser(response.data);
+          setEmail(response.data.email);
+        })
+        .catch((error) => console.error('Error fetching user data:', error));
     }
+  }, [user?.userId, token]);
 
-    const formData = new FormData();
-    formData.append("profilePicture", profilePicture);
-    formData.append("userId", userDetails?.userId || "");
-
-    axios
-      .post(`http://localhost:8080/api/user/upload-profile-picture`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-      .then((res) => {
-        toast.success("Profile picture updated successfully!");
-        setUserDetails((prev) => (prev ? { ...prev, profilePicture: res.data.url } : prev));
-      })
-      .catch(() => toast.error("Failed to upload profile picture."));
-  };
-
-  const handleChangePassword = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (passwords.newPassword !== passwords.confirmPassword) {
-      toast.error("New passwords do not match.");
-      return;
+  const handleUpdateProfile = () => {
+    if (token) {
+      axios
+        .put(
+          `/api/user/${user?.userId}`,
+          { username, email, password, roles },
+          { headers: { Authorization: `Bearer ${token}` } },
+        )
+        .then((response) => {
+          setUser(response.data);
+          alert('Profile updated successfully');
+        })
+        .catch((error) => console.error('Error updating profile:', error));
     }
-
-    axios
-      .post("http://localhost:8080/api/user/change-password", {
-        userId: userDetails?.userId,
-        currentPassword: passwords.currentPassword,
-        newPassword: passwords.newPassword,
-      })
-      .then(() => toast.success("Password changed successfully!"))
-      .catch(() => toast.error("Failed to change password."));
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  const handleChangePassword = () => {
+    if (token) {
+      axios
+        .put(
+          `/api/user/${user?.userId}/change-password`,
+          null,
+          {
+            params: { currentPassword, newPassword },
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        )
+        .then(() => alert('Password updated successfully'))
+        .catch((error) => {
+          if (error.response?.data?.message) {
+            alert(error.response.data.message);
+          } else {
+            alert('Error updating password');
+          }
+        });
+    }
+  };
+
+  if (!user) return <p className="text-center mt-8">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="container mx-auto p-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-800">My Profile</h1>
-          <button className="flex items-center text-red-500">
-            <AiOutlineLogout className="mr-2" /> Logout
-          </button>
-        </div>
-      </header>
-
-      <main className="container mx-auto mt-8 p-6 bg-white shadow rounded">
-        <div className="flex border-b mb-4">
-          {["overview", "settings"].map((tab) => (
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
+      <div className="max-w-md w-full space-y-6">
+        {/* Profile Card */}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Profile
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block mb-1 font-medium text-gray-700">
+                Username
+              </label>
+              <input
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={username}
+                disabled
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium text-gray-700">
+                Roles
+              </label>
+              <input
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={roles.join(', ')}
+                disabled
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium text-gray-700">
+                New Password (optional)
+              </label>
+              <input
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
             <button
-              key={tab}
-              className={`px-4 py-2 ${
-                activeTab === tab
-                  ? "text-blue-600 border-b-2 border-blue-600"
-                  : "text-gray-500"
-              }`}
-              onClick={() => setActiveTab(tab)}
+              className="w-full py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 transition-colors"
+              onClick={handleUpdateProfile}
             >
-              {tab === "overview" ? "Overview" : "Settings"}
+              Update Profile
             </button>
-          ))}
+          </div>
         </div>
-
-        {activeTab === "overview" && (
-          <section className="mt-4 text-center">
-            <img
-              src={userDetails?.profilePicture || `https://ui-avatars.com/api/?name=${userDetails?.username}&background=random`}
-              alt="Avatar"
-              className="w-24 h-24 rounded-full mx-auto border-2 border-blue-500"
-            />
-            <h2 className="mt-4 text-2xl font-semibold text-gray-800">
-              {userDetails?.username}
-            </h2>
-            <p className="text-gray-500">{userDetails?.email}</p>
-          </section>
-        )}
-
-        {activeTab === "settings" && (
-          <section className="mt-4 space-y-8">
-            {/* Update Email */}
-            <form onSubmit={handleEmailUpdate} className="space-y-4">
-              <h3 className="text-xl font-semibold">Update Email</h3>
-              <div>
-                <label className="block text-gray-700">Email</label>
-                <input
-                  type="email"
-                  value={updatedEmail}
-                  onChange={(e) => setUpdatedEmail(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="p-2 bg-blue-500 text-white rounded"
-              >
-                Update Email
-              </button>
-            </form>
-
-            {/* Update Profile Picture */}
-            <form onSubmit={handleProfilePictureUpload} className="space-y-4">
-              <h3 className="text-xl font-semibold">Update Profile Picture</h3>
-              <div>
-                <label className="block text-gray-700">Upload Picture</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) =>
-                    setProfilePicture(e.target.files ? e.target.files[0] : null)
-                  }
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <button
-                type="submit"
-                className="p-2 bg-blue-500 text-white rounded"
-              >
-                Upload Picture
-              </button>
-            </form>
-
-            {/* Change Password */}
-            <form onSubmit={handleChangePassword} className="space-y-4">
-              <h3 className="text-xl font-semibold">Change Password</h3>
-              <div>
-                <label className="block text-gray-700">Current Password</label>
-                <input
-                  type="password"
-                  name="currentPassword"
-                  onChange={handlePasswordChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700">New Password</label>
-                <input
-                  type="password"
-                  name="newPassword"
-                  onChange={handlePasswordChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700">Confirm Password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  onChange={handlePasswordChange}
-                  className="w-full p-2 border rounded"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="p-2 bg-blue-500 text-white rounded"
-              >
-                Change Password
-              </button>
-            </form>
-          </section>
-        )}
-      </main>
+        {/* Password Change Card */}
+        <div className="bg-white shadow-md rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">
+            Change Password
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block mb-1 font-medium text-gray-700">
+                Current Password
+              </label>
+              <input
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium text-gray-700">
+                New Password
+              </label>
+              <input
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <button
+              className="w-full py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 transition-colors"
+              onClick={handleChangePassword}
+            >
+              Change Password
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

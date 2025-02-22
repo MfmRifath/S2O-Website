@@ -118,15 +118,16 @@ public class MarkService {
 
                 // Dynamically handle cell types
                 String studentName = getCellStringValue(row.getCell(0));
-                String streamName = getCellStringValue(row.getCell(1));
-                String year = getCellStringValue(row.getCell(2));
-                String subjectName = getCellStringValue(row.getCell(3));
-                int markValue = (int) getCellNumericValue(row.getCell(4));
-                String examName = getCellStringValue(row.getCell(5));
+                String nic = getCellStringValue(row.getCell(1));
+                String streamName = getCellStringValue(row.getCell(2));
+                String year = getCellStringValue(row.getCell(3));
+                String subjectName = getCellStringValue(row.getCell(4));
+                int markValue = (int) getCellNumericValue(row.getCell(5));
+                String examName = getCellStringValue(row.getCell(6));
 
                 // Find or create Student
                 Student student = studentRepository.findByNameAndStream(studentName, streamName)
-                        .orElseGet(() -> createStudent(studentName, streamName, year));
+                        .orElseGet(() -> createStudent(studentName, streamName, year, nic));
 
                 // Find or create Exam
                 Exam exam = examRepository.findByName(examName)
@@ -170,9 +171,10 @@ public class MarkService {
         };
     }
 
-    private Student createStudent(String name, String stream, String year) {
+    private Student createStudent(String name, String stream, String year, String nic)  {
         Student student = new Student();
         student.setName(name);
+        student.setNic(nic);
         student.setStream(stream);
         student.setYear(year);
         return studentRepository.save(student);
@@ -447,6 +449,7 @@ public class MarkService {
             StudentDTO studentDTO = new StudentDTO();
             studentDTO.setId(mark.getStudent().getId());
             studentDTO.setName(mark.getStudent().getName());
+            studentDTO.setNic(mark.getStudent().getNic());
             studentDTO.setStream(mark.getStudent().getStream());
             studentDTO.setYear(mark.getStudent().getYear());
             dto.setStudentDTO(studentDTO);
